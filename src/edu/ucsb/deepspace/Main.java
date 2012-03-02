@@ -25,6 +25,6 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		window.alive();
+		window.alive();//change
 	}
 }
