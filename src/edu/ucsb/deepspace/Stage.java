@@ -389,15 +389,17 @@ public class Stage {
 //		//System.out.println("velocity:  " + this.velocity);
 //	}
 	
-	public double getMinAz() {return minAz;}
-	public double getMaxAz() {return maxAz;}	
+	//TODO unneeded?
+	//public double getMinAz() {return minAz;}
+	//public double getMaxAz() {return maxAz;}	
 	public void setMinMaxAz(double minAz, double maxAz) {
 		this.minAz = minAz;
 		this.maxAz = maxAz;
 	}
 	
-	public double getMinEl() {return minEl;}
-	public double getMaxEl() {return maxEl;}	
+	//TODO unneeded?
+	//public double getMinEl() {return minEl;}
+	//public double getMaxEl() {return maxEl;}	
 	public void setMinMaxEl(double minEl, double maxEl) {
 		this.minEl = minEl;
 		this.maxEl = maxEl;
@@ -440,10 +442,12 @@ public class Stage {
 		protocol.test();
 	}
 	
-	public double getAzOffset() {return az.getOffset();}
-	public double getElOffset() {return el.getOffset();}
-	public double getAzEncInd() {return az.getEncInd();}
-	public double getElEncInd() {return el.getEncInd();}
+	//TODO unneeded?
+	//probably don't need these since the settings files are written from stage
+//	public double getAzOffset() {return az.getOffset();}
+//	public double getElOffset() {return el.getOffset();}
+//	public double getAzEncInd() {return az.getEncInd();}
+//	public double getElEncInd() {return el.getEncInd();}
 	
 	public double currentAzDeg() {
 		double azDeg = az.currentDegPos();
@@ -451,6 +455,7 @@ public class Stage {
 		//if (azDeg == null) azDeg = 0;
 		return azDeg;
 	}
+	
 	public double currentElDeg() {
 		double elDeg = el.currentDegPos();
 		//elDeg = 78.61;
@@ -467,9 +472,6 @@ public class Stage {
 		}
 	}
 	
-	
-	
-	
 	public void goToPos(Coordinate c) {
 		
 	}
@@ -481,6 +483,30 @@ public class Stage {
 	public void setBalloonLocation(LatLongAlt pos) {
 		balloonLocation = pos;
 		window.updateBaseBalloonLoc();
+		
+		Coordinate base = new Coordinate(baseLocation);
+    	Coordinate balloon = new Coordinate(balloonLocation);
+
+		double deltaX = balloon.getX() - base.getX();
+		double deltaY = balloon.getY() - base.getY();
+		double deltaZ = balloon.getZ() - base.getZ();
+
+		Coordinate R = new Coordinate(deltaX, deltaY, deltaZ, true);
+
+		Coordinate rHat = base.rHat();
+		Coordinate thetaHat = base.thetaHat();
+		Coordinate phiHat = base.phiHat();
+		thetaHat = thetaHat.negate();
+
+		double xRel = R.dot(phiHat);
+		double yRel = R.dot(thetaHat);
+		double zRel = R.dot(rHat);
+		double xyRel = Math.sqrt(xRel*xRel + yRel*yRel);
+
+		elToBalloon = Math.toDegrees(Math.atan2(zRel, xyRel));
+		azToBalloon = Math.toDegrees(Math.atan2(xRel, yRel));
+		if (azToBalloon < 0) azToBalloon = azToBalloon + 360;
+		
 	}
 	
 	public void setBaseLocation(LatLongAlt pos) {
@@ -531,10 +557,8 @@ public class Stage {
 		try {
 			saveSettings();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		switch (type) {

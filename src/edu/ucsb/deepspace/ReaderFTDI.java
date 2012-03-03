@@ -21,7 +21,7 @@ public class ReaderFTDI extends Thread implements ReaderInterface {
 		this.stage = stage;
 	}
 	private boolean indexElStart = false, indexAzStart = false;
-	//sfdsfdff
+	
 	@SuppressWarnings("unused")
 	@Override
 	public void run() {
