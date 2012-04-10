@@ -15,9 +15,10 @@ public class ActGalil implements ActInterface {
 	private DataGalil.GalilStatus status;
 	private double offset = 0;
 
-	public ActGalil(axisType axis) {
+	public ActGalil(axisType axis, CommGalil protocol) {
 		//this.axis = axis;
-		this.protocol = CommGalil.getInstance();
+		//this.protocol = CommGalil.getInstance();
+		this.protocol = protocol;
 		if (axis == axisType.AZ) axisName = "A";
 		else axisName = "B";
 	}
@@ -80,8 +81,8 @@ public class ActGalil implements ActInterface {
 		String out = "PA" + axisName;
 		out += "=" + (long) numEncPulses;
 		System.out.println(out);
-		protocol.send(out);
-		protocol.send("BG");
+		protocol.sendRead(out);
+		protocol.sendRead("BG");
 	}
 	
 	//method that returns current position in degrees
@@ -90,7 +91,7 @@ public class ActGalil implements ActInterface {
 	}
 	
 	//Not sure if this is even relevant to the Galil, but this should convert a desired encoder
-	private double encValToDeg(double encVal) {
+	public double encValToDeg(double encVal) {
 		return offset + encVal / encPulsePerDeg;
 	}
 	
@@ -149,6 +150,9 @@ public class ActGalil implements ActInterface {
 	}
 	
 	private double getPos() {
+		if(protocol.queueSize() != 0) {
+			protocol.read();
+		}
 		String pos = protocol.sendRead("TP" + axisName);
 		return Double.parseDouble(pos);
 	}
@@ -158,35 +162,51 @@ public class ActGalil implements ActInterface {
 	}
 	
 	public void index() {
+//		System.out.println(stage == null);
+//		stage.toggleReader();
+//		try {
+//			Thread.sleep(2000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		// Save acceleration and jog speed values
-		protocol.send("T1 = _JG" + axisName);
-		protocol.send("T2 = _AC" + axisName);
+		protocol.sendRead("T1 = _JG" + axisName);
+		protocol.sendRead("T2 = _AC" + axisName);
 
 		// then overwrite them
-		protocol.send("MG \"Homing\", T1");
-		protocol.send("JG" + axisName + "=150000");
-		protocol.send("AC" + axisName + "=50000");
+		protocol.sendRead("MG \"Homing\", T1");
+		protocol.sendRead("JG" + axisName + "=150000");
+		protocol.sendRead("AC" + axisName + "=50000");
 
 		// "FE" - find the opto-edge
-		protocol.send("FE" + axisName);
-		protocol.send("BG" + axisName);
-		protocol.send("AM" + axisName);
-		protocol.send("MG \"Found Opto-Index\"; TP" + axisName);
+		protocol.sendRead("FE" + axisName);
+		protocol.sendRead("BG" + axisName);
+		protocol.sendRead("AM" + axisName);
+		protocol.sendRead("MG \"Found Opto-Index\"; TP" + axisName);
 
 		// Turn the jog speed WAAAY down when searching for the index
-		protocol.send("JG" + axisName + "=500");
+		protocol.sendRead("JG" + axisName + "=500");
 
 		// Do the index search ("FI")
-		protocol.send("FI" + axisName);
-		protocol.send("BG" + axisName);
-		protocol.send("AM" + axisName);
-		protocol.send("MG \"Motion Done\";TP" + axisName);
+		protocol.sendRead("FI" + axisName);
+		protocol.sendRead("BG" + axisName);
+		protocol.sendRead("AM" + axisName);
+		protocol.sendRead("MG \"Motion Done\";TP" + axisName);
 		
 		// Finally, restore accel and jog speeds from before routine was run
-		protocol.send("JG" + axisName + "=T1");
-		protocol.send("AC" + axisName + "=T2");
-		
-		
+		protocol.sendRead("JG" + axisName + "=T1");
+		protocol.sendRead("AC" + axisName + "=T2");
+		//protocol.test();
+//		System.out.println("shouldn't send this");
+//		try {
+//			Thread.sleep(1000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		System.out.println("shouldn't send this");
+//		stage.toggleReader();
 	}
 	
 	public void setEncInd(double encInd) {

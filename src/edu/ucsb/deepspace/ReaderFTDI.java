@@ -149,5 +149,10 @@ public class ReaderFTDI extends Thread implements ReaderInterface {
 	public void stop2() {
 		flag = false;
 	}
+	@Override
+	public void togglePauseFlag() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
