@@ -64,6 +64,7 @@ public class Stage {
 				el = new ActGalil(axisType.EL);
 				reader = new ReaderGalil(this);
 				loadGalil();
+				az.registerStage(this);
 				break;
 			case FTDI:
 				az = new ActFTDI();
@@ -74,8 +75,8 @@ public class Stage {
 		}
 		updateLst();
 		if (commStatus) {
-			//System.out.println("reader started");
-			//reader.start();
+			System.out.println("reader started");
+			reader.start();
 		}
 	}
 	
@@ -549,6 +550,10 @@ public class Stage {
 		position = data;
 		window.updateTxtPosInfo(position.info());
 		
+	}
+	
+	void toggleReader() {
+		reader.togglePauseFlag();
 	}
 	
 	public void shutdown() {

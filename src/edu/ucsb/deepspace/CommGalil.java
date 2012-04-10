@@ -9,6 +9,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.Date;
 
 public class CommGalil implements CommInterface {
 	//Singleton
@@ -20,6 +21,8 @@ public class CommGalil implements CommInterface {
 	Socket socket = null;
 	boolean connection = false;
 	
+	Watcher watcher;
+	
 	public CommGalil() {
 		try {
 			
@@ -29,6 +32,7 @@ public class CommGalil implements CommInterface {
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			connection = true;
+			watcher = new Watcher(out, in);
 			Stage.getInstance().confirmCommConnection();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -41,12 +45,14 @@ public class CommGalil implements CommInterface {
 	}
 	
 	//Send message through output stream.
-    public void send(String message) {
-    	out.println(message);
+    public void send(String message, Date date) {
+    	//Date date = new Date();
+    	watcher.send(message, date);
+    	//out.println(message);
     }
     
     public String read() {
-    	String result = "";
+    	String result = "nothing";
     	//As long as we haven't reached the EOL character (:), continue looping.
     	while (!result.contains(":")) {
     		try {
@@ -64,7 +70,7 @@ public class CommGalil implements CommInterface {
     		System.out.println("Error code: " + sendRead("TC1"));
     	}
     	//System.out.println("length before trim:  " + result.length());
-    	result = result.replace("\r\n:", "");
+    	result = result.replace("\r\n", "");
     	//System.out.println("length after trim:  " + result.length());
     	//System.out.println("result:  " + result);
     	//Get rid of the carriage return and newline.
@@ -73,8 +79,11 @@ public class CommGalil implements CommInterface {
     
     //Simply calls send and then receive for convenience.
     public String sendRead(String message) {
-    	send(message);
-    	return read();
+    	Date date = new Date();
+    	watcher.send(message, date);
+    	String response = watcher.receive(message, date);
+    	return response;
+    	//return read();
     }
     
     //How many bytes are waiting to be read.
