@@ -45,6 +45,7 @@ public class Stage {
 	private final Properties settings = new Properties();
 	private LatLongAlt baseLocation, balloonLocation;
 	private double azToBalloon = 0, elToBalloon = 0;
+	private CommGalil protocol;
 	
 	public Stage() {
 		try {
@@ -60,8 +61,11 @@ public class Stage {
 		this.window = window;
 		switch (type) {
 			case Galil:
-				az = new ActGalil(axisType.AZ);
-				el = new ActGalil(axisType.EL);
+				//TODO
+				//CommGalil.getInstance();
+				protocol = new CommGalil(1337);
+				az = new ActGalil(axisType.AZ, protocol);
+				el = new ActGalil(axisType.EL, protocol);
 				reader = new ReaderGalil(this);
 				loadGalil();
 				az.registerStage(this);
@@ -181,7 +185,10 @@ public class Stage {
 				Calendar local = Calendar.getInstance();
 				DateFormat a = new SimpleDateFormat("HH:mm:ss");
 				
-				double azPos = 4;
+				double azPos = 0;
+				if (position != null ) {
+					azPos = az.encValToDeg(position.azPos());
+				}
 				double elPos = 3;
 				
 				double ra = baseLocation.azelToRa(azPos, elPos);
@@ -416,8 +423,8 @@ public class Stage {
 		String tellVel = "TV";
 		String azAxis = "A";
 		DataGalil data;
-		
-		CommGalil protocol = CommGalil.getInstance();
+		//TODO
+		//CommGalil protocol = CommGalil.getInstance();
 		
 		String azPos = protocol.sendRead(tellPos + azAxis);
 		String azVel = protocol.sendRead(tellVel + azAxis);
@@ -429,17 +436,17 @@ public class Stage {
 	}
 	
 	public void sendCommand(String command) {
-		CommGalil protocol = CommGalil.getInstance();
+		//CommGalil protocol = CommGalil.getInstance();
 		System.out.println(protocol.sendRead(command));
 	}
 	
 	public void queueSize() {
-		CommGalil protocol = CommGalil.getInstance();
+		//CommGalil protocol = CommGalil.getInstance();
 		System.out.println(protocol.queueSize());
 	}
 	
 	public void readQueue() {
-		CommGalil protocol = CommGalil.getInstance();
+		//CommGalil protocol = CommGalil.getInstance();
 		protocol.test();
 	}
 	
@@ -569,7 +576,8 @@ public class Stage {
 		switch (type) {
 			case Galil:
 				closeGalil();
-				CommGalil.getInstance().close();
+				//CommGalil.getInstance().close();
+				protocol.close();
 				break;
 			case FTDI:
 				break;

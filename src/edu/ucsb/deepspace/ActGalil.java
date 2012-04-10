@@ -15,9 +15,10 @@ public class ActGalil implements ActInterface {
 	private DataGalil.GalilStatus status;
 	private double offset = 0;
 
-	public ActGalil(axisType axis) {
+	public ActGalil(axisType axis, CommGalil protocol) {
 		//this.axis = axis;
-		this.protocol = CommGalil.getInstance();
+		//this.protocol = CommGalil.getInstance();
+		this.protocol = protocol;
 		if (axis == axisType.AZ) axisName = "A";
 		else axisName = "B";
 	}
@@ -90,7 +91,7 @@ public class ActGalil implements ActInterface {
 	}
 	
 	//Not sure if this is even relevant to the Galil, but this should convert a desired encoder
-	private double encValToDeg(double encVal) {
+	public double encValToDeg(double encVal) {
 		return offset + encVal / encPulsePerDeg;
 	}
 	
@@ -149,6 +150,9 @@ public class ActGalil implements ActInterface {
 	}
 	
 	private double getPos() {
+		if(protocol.queueSize() != 0) {
+			protocol.read();
+		}
 		String pos = protocol.sendRead("TP" + axisName);
 		return Double.parseDouble(pos);
 	}

@@ -14,12 +14,12 @@ import java.util.concurrent.BlockingQueue;
 
 public class Watcher {
 	
-	private BlockingQueue<String> newCommands = new ArrayBlockingQueue<String>(50);
-	private BlockingQueue<String> writtenCommands = new ArrayBlockingQueue<String>(50);
-	private BlockingQueue<Date> newDates = new ArrayBlockingQueue<Date>(50);
-	private BlockingQueue<Date> writtenDates = new ArrayBlockingQueue<Date>(50);
-	private BlockingQueue<String> responses = new ArrayBlockingQueue<String>(50);
-	private BlockingQueue<Command> aaa = new ArrayBlockingQueue<Command>(50);
+	private BlockingQueue<String> newCommands = new ArrayBlockingQueue<String>(10);
+	private BlockingQueue<String> writtenCommands = new ArrayBlockingQueue<String>(10);
+	private BlockingQueue<Date> newDates = new ArrayBlockingQueue<Date>(10);
+	private BlockingQueue<Date> writtenDates = new ArrayBlockingQueue<Date>(10);
+	private BlockingQueue<String> responses = new ArrayBlockingQueue<String>(10);
+	private BlockingQueue<Command> aaa = new ArrayBlockingQueue<Command>(10);
 	
 	PrintWriter out;
 	BufferedReader in;
@@ -30,43 +30,46 @@ public class Watcher {
 	public Watcher(PrintWriter out, BufferedReader in) {
 		this.out = out;
 		this.in = in;
+	}
+	
+	public void makeTimers() {
+//		writer.scheduleAtFixedRate(new TimerTask() {
+//			@Override
+//			public void run() {
+//				String command;
+//				Date date;
+//				try {
+//					command = newCommands.take();
+//					date = newDates.take();
+//					write(command);
+//					writtenCommands.put(command);
+//					writtenDates.put(date);
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		}, 0, 100);
 		reader.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
 				read();
 			}
-		}, 0, 100);
-		writer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				String command;
-				Date date;
-				try {
-					command = newCommands.take();
-					date = newDates.take();
-					write(command);
-					writtenCommands.put(command);
-					writtenDates.put(date);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}, 0, 100);
-		maker.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				try {
-					String command = writtenCommands.take();
-					Date date = writtenDates.take();
-					String response = responses.take();
-					Command c = new Command(command, date);
-					c.updateResponse(response);
-					aaa.add(c);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}, 0, 100);
+		}, 0, 1000);
+//		maker.scheduleAtFixedRate(new TimerTask() {
+//			@Override
+//			public void run() {
+//				try {
+//					String command = writtenCommands.take();
+//					Date date = writtenDates.take();
+//					String response = responses.take();
+//					Command c = new Command(command, date);
+//					c.updateResponse(response);
+//					aaa.add(c);
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		}, 0, 100);
 	}
 	
 	public void send(String command, Date date) {
@@ -116,6 +119,7 @@ public class Watcher {
     	
     	//System.out.println("length before trim:  " + result.length());
     	result = result.replace("\r\n", "");
+    	System.out.println("RESULTRESULT:  " + result);
     	//System.out.println("length after trim:  " + result.length());
     	//System.out.println("result:  " + result);
     	//Get rid of the carriage return and newline.
@@ -126,6 +130,10 @@ public class Watcher {
 		out.println(command);
 	}
 	
-	
+	public void close() {
+		reader.cancel();
+		writer.cancel();
+		maker.cancel();
+	}
 
 }

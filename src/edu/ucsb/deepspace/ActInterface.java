@@ -42,5 +42,7 @@ public interface ActInterface {
 	public void setIndexing(boolean indexing);
 	
 	public boolean isMoving();
+	
+	public double encValToDeg(double encVal);
 
 }

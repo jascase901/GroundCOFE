@@ -11,7 +11,8 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 	
 	public ReaderGalil(Stage stage) {
 		this.setDaemon(true);
-		protocol = CommGalil.getInstance();
+		//protocol = CommGalil.getInstance();
+		
 		this.stage = stage;
 		
 		//TODO methods that fetch these from stage
@@ -33,11 +34,15 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 	}
 	
 	public void run() {
+		protocol = new CommGalil(13358);
 		while (flag) {
 			if (!pauseFlag) {
 				String azPos = protocol.sendRead(tellPos + azAxis);
 				String azVel = protocol.sendRead(tellVel + azAxis);
-	
+				//System.out.println("azPos: " + azPos);
+				//System.out.println("azVel: " + azVel);
+				//String azPos = "4";
+				//String azVel = "5";
 				data = new DataGalil();
 				data.makeAz(azPos, azVel);
 				stage.updatePosition(data);
@@ -47,6 +52,7 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 			}
 			pause(1000);
 		}
+		protocol.close();
 	}
 	
 	public void stop2() {

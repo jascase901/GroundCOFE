@@ -9,6 +9,12 @@ public class DataGalil implements DataInterface {
 	}
 	
 	void makeAz(String pos, String vel) {
+		if (pos.equals("")) {
+			pos = "0";
+		}
+		if (vel.equals("")) {
+			vel = "0";
+		}
 		double dPos = Double.parseDouble(pos);
 		double dVel = Double.parseDouble(vel); 
 		az = new GalilStatus(dPos, dVel);

@@ -111,4 +111,10 @@ public class ActFTDI implements ActInterface {
 		return false;
 	}
 
+	@Override
+	public double encValToDeg(double encVal) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }
