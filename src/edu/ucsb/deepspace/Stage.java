@@ -280,18 +280,18 @@ public class Stage {
 				else {
 					System.out.println("az not in range");
 				}
-				System.out.println("should wait - stage");
-				while (!isAtRest()) {
-					pause(100);
-				}
-				System.out.println("done waiting - stage");
-				if (elDeg >= minEl && elDeg <= maxEl) {
-					el.moveAbsolute(elDeg);
-					System.out.println("allowed el");
-				}
-				else {
-					System.out.println("el not in range");
-				}
+//				System.out.println("should wait - stage");
+//				while (!isAtRest()) {
+//					pause(100);
+//				}
+//				System.out.println("done waiting - stage");
+//				if (elDeg >= minEl && elDeg <= maxEl) {
+//					el.moveAbsolute(elDeg);
+//					System.out.println("allowed el");
+//				}
+//				else {
+//					System.out.println("el not in range");
+//				}
 				window.enableMoveButtons();
 			}
 		});
@@ -481,7 +481,7 @@ public class Stage {
 	}
 	
 	public void goToPos(Coordinate c) {
-		
+		moveAbsolute(c.getAz(), c.getEl());
 	}
 	
 	public void setRaDecTracking(double ra, double dec) {

@@ -21,11 +21,8 @@ public class CommGalil implements CommInterface {
 	Socket socket = null;
 	boolean connection = false;
 	
-	Watcher watcher;
-	
 	public CommGalil(int port) {
 		try {
-			System.out.println("hello from CommGalil constructor!");
 			socket = new Socket();
 			socket.connect(new InetSocketAddress("192.168.1.200", port), 3000);
 			socket.setSoTimeout(3000);
