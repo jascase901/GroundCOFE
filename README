@@ -1,0 +1,31 @@
+Requirements for Running GroundCOFE on Eclipse:
+	Download eclipse indigo(currently the latest version) from http://www.eclipse.org/downloads/
+	Download java jdk x86 version 1.7 from http://www.oracle.com/technetwork/java/javase/downloads/jdk-7u3-download-1501626.html
+	-Note must be the x86 version, because this program uses 32 bit libraries, must be 1.7 because this program uses 1.7 switch features
+
+Getting the Code for contribution
+	download from git
+		1) open up eclipse
+		2)click help->install new software
+		3)on the drop down box click all available sites
+		4)then click on the colobartion catagory and download egit
+			-note the source code, and Myrlen stuff our not needed
+		5)restart eclipse
+		6)click file->import
+		
+		7a)-Email jasface901@gmail.com to get your git account added to contributers list
+		7b)click projects from git
+		8)paste https url in prompt https://${account}@github.com/dontQQ/GroundCOFE.git
+Setting eclipse to use java 1.7
+	1)click project->properties
+	2)click add library
+	3)click jre system library
+	4)click installed jres
+	5)click add
+	6)browse for jre 7 
+Running From within java
+	1)click on the edu.ucsb.deepsace package
+	2)select Main.java
+	3)Hit the f-11 key on your keyboard
+			
+	
