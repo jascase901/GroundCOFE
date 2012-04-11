@@ -239,10 +239,11 @@ status = new Button(area, SWT.PUSH | SWT.CENTER);
     	indexAz = new Button(area, SWT.PUSH | SWT.CENTER);
     	indexAz.setText("Index Az");
     	indexAz.setBounds(10, 21, 60, 30);
+    	buttonMap.put("indexAz", indexAz);
     	indexAz.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
     			indexAz.setEnabled(false);
-    			indexEl.setEnabled(false);
+    			
     			stage.index(axisType.AZ);
     		}
     	});
@@ -250,9 +251,10 @@ status = new Button(area, SWT.PUSH | SWT.CENTER);
     	indexEl = new Button(area, SWT.PUSH | SWT.CENTER);
     	indexEl.setText("Index El");
     	indexEl.setBounds(10, 57, 60, 30);
+    	buttonMap.put("indexEl", indexEl);
     	indexEl.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
-    			indexAz.setEnabled(false);
+    			
     			indexEl.setEnabled(false);
     			stage.index(axisType.EL);
     		}
@@ -923,4 +925,6 @@ status = new Button(area, SWT.PUSH | SWT.CENTER);
 			}
 		});
 	}
+	
+	
 }
