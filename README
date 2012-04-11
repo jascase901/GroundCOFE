@@ -30,3 +30,11 @@ Running From within java
 	test
 			
 	
+calibration
+test min/max angles
+different move types in joystick section
+degrees modulus 360
+steps & encoder steps for galil should be the same
+maximum degree move relative
+redo popup window text entry
+ra/dec tracking "change ra/dec" doesn't populate text areas
