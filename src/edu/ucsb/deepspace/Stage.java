@@ -332,9 +332,13 @@ public class Stage {
 	public void index(axisType type) {
 		switch (type) {
 			case AZ:
-				az.index(); break;
+				az.index();
+				buttonEnabler("indexAz");
+				break;
 			case EL:
-				el.index(); break;
+				el.index();
+				buttonEnabler("indexEl");
+				break;
 		}
 	}
 	
