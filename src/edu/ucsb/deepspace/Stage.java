@@ -482,6 +482,7 @@ public class Stage {
 	
 	public void goToPos(Coordinate c) {
 		moveAbsolute(c.getAz(), c.getEl());
+		//test
 	}
 	
 	public void setRaDecTracking(double ra, double dec) {
