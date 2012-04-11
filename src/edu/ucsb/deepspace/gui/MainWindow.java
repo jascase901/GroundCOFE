@@ -923,4 +923,14 @@ status = new Button(area, SWT.PUSH | SWT.CENTER);
 			}
 		});
 	}
+	
+	public void updateIndex() {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				indexAz.setEnabled(true);
+    			indexEl.setEnabled(true);
+			}
+		});
+	}
 }
