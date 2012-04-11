@@ -197,6 +197,9 @@ public class ActGalil implements ActInterface {
 		// Finally, restore accel and jog speeds from before routine was run
 		protocol.sendRead("JG" + axisName + "=T1");
 		protocol.sendRead("AC" + axisName + "=T2");
+		
+		
+		
 		//protocol.test();
 //		System.out.println("shouldn't send this");
 //		try {
