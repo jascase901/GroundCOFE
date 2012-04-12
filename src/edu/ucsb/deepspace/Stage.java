@@ -131,10 +131,16 @@ public class Stage {
 		encTol = Integer.parseInt(actSettings.getProperty("encTol"));
 		az.setOffset(azOffset);
 		el.setOffset(elOffset);
+		window.setMinMaxAzEl(minAz, maxAz, minEl, maxEl);
 	}
 	
 	private void closeGalil() {
 		actSettings.setProperty("azOffset", String.valueOf(az.getOffset()));
+		actSettings.setProperty("minAz", String.valueOf(minAz));
+		actSettings.setProperty("maxAz", String.valueOf(maxAz));
+		actSettings.setProperty("minEl", String.valueOf(minEl));
+		actSettings.setProperty("maxEl", String.valueOf(maxEl));
+		actSettings.setProperty("encTol", String.valueOf(encTol));
 		try {
 			actSettings.store(new FileOutputStream("Galil.ini"), "");
 		} catch (FileNotFoundException e) {

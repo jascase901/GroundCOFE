@@ -9,7 +9,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.Date;
 
 public class CommGalil implements CommInterface {
 	//Singleton
@@ -29,8 +28,6 @@ public class CommGalil implements CommInterface {
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			connection = true;
-			//watcher = new Watcher(out, in);
-			//watcher.makeTimers();
 			Stage.getInstance().confirmCommConnection();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -44,8 +41,6 @@ public class CommGalil implements CommInterface {
 	
 	//Send message through output stream.
     public void send(String message) {
-    	//Date date = new Date();
-    	//watcher.send(message, date);
     	out.println(message);
     }
     
@@ -77,16 +72,6 @@ public class CommGalil implements CommInterface {
     
     //Simply calls send and then receive for convenience.
     public String sendRead(String message) {
-//    	Date date = new Date();
-//    	watcher.send(message, date);
-//    	try {
-//			Thread.sleep(1000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//    	String response = watcher.receive(message, date);
-//    	return response;
     	send(message);
     	return read();
     }
@@ -96,7 +81,6 @@ public class CommGalil implements CommInterface {
     	int size = 0;
     	try {
 			size = socket.getInputStream().available();
-			//size = in.
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -105,13 +89,8 @@ public class CommGalil implements CommInterface {
     
     public void close() {
     	try {
-    		//watcher.close();
-    		Thread.sleep(3000);
 			socket.close();
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
@@ -131,7 +110,6 @@ public class CommGalil implements CommInterface {
 			}
 			System.out.println(a);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }

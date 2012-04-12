@@ -933,5 +933,17 @@ status = new Button(area, SWT.PUSH | SWT.CENTER);
 		
 	}
 	
+	public void setMinMaxAzEl(final double minAz, final double maxAz, final double minEl, final double maxEl) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				txtMinAz.setText(String.valueOf(minAz));
+				txtMaxAz.setText(String.valueOf(maxAz));
+				txtMinEl.setText(String.valueOf(minEl));
+				txtMaxEl.setText(String.valueOf(maxEl));
+			}
+		});
+	}
+	
 	
 }
