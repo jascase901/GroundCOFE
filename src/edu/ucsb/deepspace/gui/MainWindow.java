@@ -101,6 +101,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Text txtAzElRaDec;
 	private Text txtBaseLocation;
 	private Text txtBalloonLocation;
+	private Text txtGoalAz;
+	private Text txtGoalEl;
 
 	public MainWindow(Composite parent, int style, Stage stage) {
 		super(parent, style);
@@ -548,8 +550,11 @@ status = new Button(area, SWT.PUSH | SWT.CENTER);
     		}
     	});
     	
-    	Text txtGoalAz = new Text(area, SWT.BORDER | SWT.READ_ONLY);
+    	txtGoalAz = new Text(area, SWT.BORDER | SWT.READ_ONLY);
     	txtGoalAz.setBounds(620, 242, 94, 17);
+    	
+    	txtGoalEl = new Text(area, SWT.BORDER | SWT.READ_ONLY);
+    	txtGoalEl.setBounds(620, 269, 94, 17);
     	
     	Group grpScanning = new Group(area, SWT.NONE);
     	grpScanning.setText("Scanning");
@@ -690,8 +695,7 @@ status = new Button(area, SWT.PUSH | SWT.CENTER);
     		}
     	});
     	
-    	Text txtGoalEl = new Text(area, SWT.BORDER | SWT.READ_ONLY);
-    	txtGoalEl.setBounds(620, 269, 94, 17);
+
     	
     	Button btnQueueSize = new Button(area, SWT.NONE);
     	
@@ -941,6 +945,24 @@ status = new Button(area, SWT.PUSH | SWT.CENTER);
 				txtMaxAz.setText(String.valueOf(maxAz));
 				txtMinEl.setText(String.valueOf(minEl));
 				txtMaxEl.setText(String.valueOf(maxEl));
+			}
+		});
+	}
+	
+	public void setGoalAz(final double goalAz) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				txtGoalAz.setText(String.valueOf(goalAz));
+			}
+		});
+	}
+	
+	public void setGoalEl(final double goalEl) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				txtGoalEl.setText(String.valueOf(goalEl));
 			}
 		});
 	}

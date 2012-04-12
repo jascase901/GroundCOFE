@@ -2,7 +2,7 @@ package edu.ucsb.deepspace;
 
 public class ActGalil implements ActInterface {
 	
-	//private axisType axis;
+	private axisType axis;
 	@SuppressWarnings("unused")
 	private Stage stage;
 	private CommGalil protocol;
@@ -16,7 +16,7 @@ public class ActGalil implements ActInterface {
 	private double offset = 0;
 
 	public ActGalil(axisType axis, CommGalil protocol) {
-		//this.axis = axis;
+		this.axis = axis;
 		//this.protocol = CommGalil.getInstance();
 		this.protocol = protocol;
 		if (axis == axisType.AZ) axisName = "A";
@@ -44,8 +44,8 @@ public class ActGalil implements ActInterface {
 	}
 	
 	public void moveAbsolute(double goalPosInDeg) {
-		//if (axis == axisType.AZ) stage.setGoalAz(goalPosInDeg);
-		//else stage.setGoalEl(goalPosInDeg);
+	    if (axis == axisType.AZ) stage.setGoalAz(goalPosInDeg);
+		else stage.setGoalEl(goalPosInDeg);
 		
 		long encPulses = encPulseToMove(goalPosInDeg);
 		moveEncVal(encPulses);

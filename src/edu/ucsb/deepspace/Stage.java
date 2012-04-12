@@ -274,7 +274,6 @@ public class Stage {
 		
 	}
 	
-	//TODO make this code do something?
 	public void moveAbsolute(final double azDeg, final double elDeg) {
 		exec.submit(new Runnable() {
 			@Override
@@ -364,6 +363,7 @@ public class Stage {
 		el.calibrate(elDeg);
 	}
 	
+	//TODO probably not needed with Galil
 	public void previousCalibrate(final double previousAz, final double previousEl) {
 		exec.submit(new Runnable() {
 			@Override
@@ -481,14 +481,11 @@ public class Stage {
 	
 	public double currentAzDeg() {
 		double azDeg = az.currentDegPos();
-		//azDeg = 270.07;
-		//if (azDeg == null) azDeg = 0;
 		return azDeg;
 	}
 	
 	public double currentElDeg() {
 		double elDeg = el.currentDegPos();
-		//elDeg = 78.61;
 		return elDeg;
 	}
 	
@@ -504,7 +501,6 @@ public class Stage {
 	
 	public void goToPos(Coordinate c) {
 		moveAbsolute(c.getAz(), c.getEl());
-		//test
 	}
 	
 	public void setRaDecTracking(double ra, double dec) {
@@ -537,7 +533,6 @@ public class Stage {
 		elToBalloon = Math.toDegrees(Math.atan2(zRel, xyRel));
 		azToBalloon = Math.toDegrees(Math.atan2(xRel, yRel));
 		if (azToBalloon < 0) azToBalloon = azToBalloon + 360;
-		
 	}
 	
 	public void setBaseLocation(LatLongAlt pos) {
@@ -584,6 +579,14 @@ public class Stage {
 	
 	void toggleReader() {
 		reader.togglePauseFlag();
+	}
+	
+	void setGoalAz(double goalAz) {
+		window.setGoalAz(goalAz);
+	}
+	
+	void setGoalEl(double goalEl) {
+		window.setGoalEl(goalEl);
 	}
 	
 	public void shutdown() {
