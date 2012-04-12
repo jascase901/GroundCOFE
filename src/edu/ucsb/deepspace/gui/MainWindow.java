@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.swing.JOptionPane;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -515,6 +517,7 @@ status = new Button(area, SWT.PUSH | SWT.CENTER);
     				double minAz = Double.parseDouble(txtMinAz.getText());
     				double maxAz = Double.parseDouble(txtMaxAz.getText());
     				stage.setMinMaxAz(minAz, maxAz);
+    				
     			} catch (NumberFormatException e1) {
     				txtStatusArea.append("Must input a number.\n");
     			}
@@ -924,6 +927,10 @@ status = new Button(area, SWT.PUSH | SWT.CENTER);
 				txtBalloonLocation.setText(stage.balloonLocDisplay());
 			}
 		});
+	}
+	public void displayErrorBox(String message){
+		JOptionPane.showMessageDialog(null, message,"Error ", JOptionPane.ERROR_MESSAGE);
+		
 	}
 	
 	

@@ -131,8 +131,10 @@ public class ActGalil implements ActInterface {
 	public boolean allowedMove(String moveType, double min, double max, double amount) {
 		double goalPos = goalPos(moveType, amount);
 		if (goalPos >= min && goalPos <= max) {
+			System.out.println("Allowed Move");
 			return true;
 		}
+		System.out.println("Not Allowed move:golpos="+goalPos+" min="+min+" max="+max);
 		return false;
 	}
 	

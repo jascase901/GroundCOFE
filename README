@@ -38,3 +38,10 @@ steps & encoder steps for galil should be the same
 maximum degree move relative
 redo popup window text entry
 ra/dec tracking "change ra/dec" doesn't populate text areas
+
+
+The Limits have no units when you set them
+The moveAbsolute in stage does not seem to actually do anything
+Renabled limits in stage-added printstatements to AllowedMove in ActGalil
+Added a dialog box that pops up when user tries to move outside limits inside main window, had to import JOptionpane
+S

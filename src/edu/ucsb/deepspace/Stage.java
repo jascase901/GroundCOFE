@@ -248,7 +248,7 @@ public class Stage {
 					case EL:
 						axis = el; min = minEl; max = maxEl; break;
 				}
-				
+				System.out.println(min +" "+ max);
 				if (minScan < min || maxScan > max) {
 					System.out.println("invalid minscan or maxscan");
 					return;
@@ -268,11 +268,12 @@ public class Stage {
 		
 	}
 	
-	
+	//TODO make this code do something?
 	public void moveAbsolute(final double azDeg, final double elDeg) {
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {	
+			
 				if (az.allowedMove("absolute", minAz, maxAz, azDeg)) {
 					System.out.println("allowed az");
 					az.moveAbsolute(azDeg);
@@ -280,6 +281,8 @@ public class Stage {
 				else {
 					System.out.println("az not in range");
 				}
+				
+				
 //				System.out.println("should wait - stage");
 //				while (!isAtRest()) {
 //					pause(100);
@@ -297,6 +300,7 @@ public class Stage {
 		});
 	}
 	
+	
 	public void relative(final axisType type, final String moveType, final double amount) {
 		exec.submit(new Runnable() {
 			@Override
@@ -309,22 +313,29 @@ public class Stage {
 					case EL:
 						axis = el; min = minEl; max = maxEl; break;
 				}
-				axis.allowedMove(moveType, min, max, amount);
-				if (moveType.equals("steps")) {
-					axis.moveEncVal((long) amount);
-				}
-				else if (moveType.equals("degrees")) {
-					if (amount <= maxMoveRel) {
-						axis.moveRelative(amount);
+				if(axis.allowedMove(moveType, min, max, amount)){
+					if (moveType.equals("steps")) {
+						axis.moveEncVal((long) amount);
 					}
-					else {
-						//message to user saying that moving that much isn't allowed
+					else if (moveType.equals("degrees")) {
+						if (amount <= maxMoveRel) {
+							axis.moveRelative(amount);
+						}
+						else {
+							//message to user saying that moving that much isn't allowed
+							
+						}
+					}
+					else if (moveType.equals("encoder")) {
+						axis.moveEncoder(amount);
 					}
 				}
-				else if (moveType.equals("encoder")) {
-					axis.moveEncoder(amount);
+				else{
+					
+					window.displayErrorBox("Not allowed to move here");
 				}
 				window.enableMoveButtons();
+				
 			}
 		});
 	}
@@ -407,6 +418,7 @@ public class Stage {
 	public void setMinMaxAz(double minAz, double maxAz) {
 		this.minAz = minAz;
 		this.maxAz = maxAz;
+		
 	}
 	
 	//TODO unneeded?
