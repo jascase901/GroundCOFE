@@ -4,9 +4,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Properties;
 import java.util.Timer;
@@ -61,14 +58,13 @@ public class Stage {
 		this.window = window;
 		switch (type) {
 			case Galil:
-				//TODO
-				//CommGalil.getInstance();
 				protocol = new CommGalil(1337);
 				az = new ActGalil(axisType.AZ, protocol);
 				el = new ActGalil(axisType.EL, protocol);
 				reader = new ReaderGalil(this);
 				loadGalil();
 				az.registerStage(this);
+				el.registerStage(this);
 				break;
 			case FTDI:
 				az = new ActFTDI();
@@ -158,10 +154,13 @@ public class Stage {
 		commStatus = true;
 	}
 	
+	//TODO When this method is called from MainWindow constructor, az and el have not
+	//been instantiated.  They are instantiated in Stage.initialize, which is called after MainWindow
+	// constructor.  Obviously this is a problem.  (Reed, 4/12/2012)
 	public String stageInfo() {
 		String out = "";
 		//String out = az.info() + "\n" + el.info();
-		System.out.println(out);
+		//System.out.println(out);
 		return out;
 	}
 	
@@ -189,7 +188,6 @@ public class Stage {
 			@Override
 			public void run() {		
 				Calendar local = Calendar.getInstance();
-				DateFormat a = new SimpleDateFormat("HH:mm:ss");
 				
 				double azPos = 0;
 				if (position != null ) {
@@ -202,23 +200,19 @@ public class Stage {
 				double lst = baseLocation.lst();
 				String gmt = baseLocation.gmt();
 				
-				double hourLst = (int) lst;
-				double minLst = (lst - hourLst)*60;
-				double secLst = (minLst - (int)minLst)*60;
-				String sLst = Formatters.lstFormatter(hourLst, minLst, secLst);
+				//double hourLst = (int) lst;
+				//double minLst = (lst - hourLst)*60;
+				//double secLst = (minLst - (int)minLst)*60;
+				//String sLst = Formatters.lstFormatter(hourLst, minLst, secLst);
+				String sLst = Formatters.formatLst(lst);
 				
-				
-				DecimalFormat formatter = new DecimalFormat("###.##");
-				
-				String out = "Az:  " + formatter.format(azPos);;
-				out += "\nEl:  " + formatter.format(elPos);
-				formatter = new DecimalFormat("##.####");
-				out += "\nRA:  " + formatter.format(ra);
-				formatter = new DecimalFormat("##.###");
-				out += "\nDec:  " + formatter.format(dec);
+				String out = "Az:  " + Formatters.DEGREE_POS.format(azPos);;
+				out += "\nEl:  " + Formatters.DEGREE_POS.format(elPos);
+				out += "\nRA:  " + Formatters.FOUR_POINTS.format(ra);
+				out += "\nDec:  " + Formatters.THREE_POINTS.format(dec);
 				out += "\nLST:  " + sLst;
 				out += "\nUTC:  " + gmt;
-				out += "\nLocal:  " + a.format(local.getTime());
+				out += "\nLocal:  " + Formatters.HOUR_MIN_SEC.format(local.getTime());
 				
 				window.updateTxtAzElRaDec(out);
 			}
