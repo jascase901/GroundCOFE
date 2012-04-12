@@ -231,7 +231,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
 //--------------------------------------------------------------------------------------------------------------------
     	
-status = new Button(area, SWT.PUSH | SWT.CENTER);
+    	status = new Button(area, SWT.PUSH | SWT.CENTER);
     	status.setText("status");
     	status.setBounds(10, 93, 60, 30);
     	status.addMouseListener(new MouseAdapter() {
@@ -805,11 +805,23 @@ status = new Button(area, SWT.PUSH | SWT.CENTER);
 	}
 	
 	public void enableMoveButtons() {
-		
+		System.out.println("hello");
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				azPlus.setEnabled(true);
+				azMinus.setEnabled(true);
+				elPlus.setEnabled(true);
+				elMinus.setEnabled(true);
+			}
+		});
 	}
 	
 	public void disableMoveButtons() {
-		
+		azPlus.setEnabled(false);
+		azMinus.setEnabled(false);
+		elPlus.setEnabled(false);
+		elMinus.setEnabled(false);
 	}
 	
 	public void enableButtons() {

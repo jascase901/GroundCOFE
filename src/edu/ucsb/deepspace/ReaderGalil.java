@@ -50,7 +50,7 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 	
 				//String elPos = protocol.sendRead(tellPos + elAxis);
 			}
-			pause(1000);
+			pause(500);
 		}
 		protocol.close();
 	}

@@ -38,6 +38,7 @@ steps & encoder steps for galil should be the same
 maximum degree move relative
 redo popup window text entry
 ra/dec tracking "change ra/dec" doesn't populate text areas
+accurate velocity method for galil
 
 
 The Limits have no units when you set them

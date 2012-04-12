@@ -272,7 +272,6 @@ public class Stage {
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {	
-			
 				if (az.allowedMove("absolute", minAz, maxAz, azDeg)) {
 					System.out.println("allowed az");
 					az.moveAbsolute(azDeg);
@@ -330,11 +329,9 @@ public class Stage {
 					}
 				}
 				else{
-					
 					window.displayErrorBox("Not allowed to move here");
 				}
 				window.enableMoveButtons();
-				
 			}
 		});
 	}
