@@ -89,6 +89,8 @@ public class ActGalil implements ActInterface {
 	public double currentDegPos() {
 		return encValToDeg(getPos());
 	}
+
+	
 	
 	//Not sure if this is even relevant to the Galil, but this should convert a desired encoder
 	public double encValToDeg(double encVal) {
@@ -156,6 +158,7 @@ public class ActGalil implements ActInterface {
 			protocol.read();
 		}
 		String pos = protocol.sendRead("TP" + axisName);
+		
 		return Double.parseDouble(pos);
 	}
 	

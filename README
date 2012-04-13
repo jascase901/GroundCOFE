@@ -29,19 +29,19 @@ Running From within java
 	3)Hit the f-11 key on your keyboard
 	test
 			
-	
-calibration
-test min/max angles
-different move types in joystick section
-degrees modulus 360
-steps & encoder steps for galil should be the same
-maximum degree move relative
-redo popup window text entry
-ra/dec tracking "change ra/dec" doesn't populate text areas
+Todo:	
+	calibration
+	test min/max angles
+	different move types in joystick section
+	degrees modulus 360
+	steps & encoder steps for galil should be the same
+	maximum degree move relative
+	ra/dec tracking "change ra/dec" doesn't populate text areas
 
+Jason 4/11
+	Renabled limits in stage-added printstatements to AllowedMove in ActGalil
+	Added a dialog box that pops up when user tries to move outside limits inside main window, had to import JOptionpane
 
-The Limits have no units when you set them
-The moveAbsolute in stage does not seem to actually do anything
-Renabled limits in stage-added printstatements to AllowedMove in ActGalil
-Added a dialog box that pops up when user tries to move outside limits inside main window, had to import JOptionpane
-S
+Jason 4/13
+	Changed ui interface of gotopos
+	removed superfulous code in AzElWindow 

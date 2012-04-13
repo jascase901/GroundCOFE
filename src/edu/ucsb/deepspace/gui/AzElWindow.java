@@ -1,19 +1,13 @@
 package edu.ucsb.deepspace.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -30,8 +24,7 @@ public class AzElWindow {
 	private Text azDeg, azMin, azSec;
 	private Text elDeg, elMin, elSec;
 	private Label el, min, az, sec, deg, lblDirections;
-	private Control current;
-	private List<Control> order = new ArrayList<Control>();
+
 	
 	private boolean minsec;
 	private final String type;
@@ -67,93 +60,81 @@ public class AzElWindow {
 		
 		azDeg = new Text(shell, SWT.BORDER);
 		azDeg.setBounds(53, 147, 37, 18);
-		azDeg.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, azDeg, false);
-			}
-		});
-		azDeg.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = azDeg;
-			}
-		});
+		azDeg.setMessage("");
+		azDeg.addModifyListener(new ModifyListener(){
+
+		      public void modifyText(ModifyEvent evt1) {
+		      
+		        checkHandler(evt1, azDeg,minsec );
+		        
+		      }});
+		
+
 		
 		azMin = new Text(shell, SWT.BORDER);
 		azMin.setBounds(96, 147, 37, 18);
-		azMin.setEnabled(false);
-		azMin.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, azMin, true);
-			}
-		});
-		azMin.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = azMin;
-			}
-		});
+		//azMin.setEnabled(false);
+		azMin.setMessage("");
+		azMin.addModifyListener(new ModifyListener(){
+
+		      public void modifyText(ModifyEvent evt1) {
+		      
+		        checkHandler(evt1, azDeg,minsec );
+		        
+		      }});
 		
+
 		azSec = new Text(shell, SWT.BORDER);
 		azSec.setBounds(139, 147, 37, 18);
-		azSec.setEnabled(false);
-		azSec.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, azSec, true);
-			}
-		});
-		azSec.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = azSec;
-			}
-		});
+		
+		azSec.setMessage("");
+		azSec.addModifyListener(new ModifyListener(){
+
+		      public void modifyText(ModifyEvent evt1) {
+		      
+		        checkHandler(evt1, azDeg,minsec );
+		        
+		      }});
+
 		
 		elDeg = new Text(shell, SWT.BORDER);
 		elDeg.setBounds(53, 168, 37, 18);
-		elDeg.setEnabled(false);
-		elDeg.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, elDeg, false);
-			}
-		});
-		elDeg.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = elDeg;
-			}
-		});
+		//elDeg.setEnabled(false);
+		elDeg.setMessage("");
+		elDeg.addModifyListener(new ModifyListener(){
+
+		      public void modifyText(ModifyEvent evt1) {
+		      
+		        checkHandler(evt1, azDeg,minsec );
+		        
+		      }});
 		
+
 		elMin = new Text(shell, SWT.BORDER);
 		elMin.setBounds(96, 168, 37, 18);
-		elMin.setEnabled(false);
-		elMin.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, elMin, true);
-			}
-		});
-		elMin.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = elMin;
-			}
-		});
+		elMin.setMessage("");
+		elMin.addModifyListener(new ModifyListener(){
+
+		      public void modifyText(ModifyEvent evt1) {
+		      
+		        checkHandler(evt1, azDeg,minsec );
+		        
+		      }});
+		
+
 		
 		elSec = new Text(shell, SWT.BORDER);
 		elSec.setBounds(139, 168, 37, 18);
-		elSec.setEnabled(false);
-		elSec.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, elSec, true);
-			}
-		});
-		elSec.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = elSec;
-			}
-		});
 		
+		elSec.addModifyListener(new ModifyListener(){
+
+		      public void modifyText(ModifyEvent evt1) {
+		      
+		        checkHandler(evt1, azDeg,minsec );
+		        
+		      }});
+		
+
 		action = new Button(shell, SWT.PUSH | SWT.CENTER);
 		if (type.equals("calibrate")) {
 			action.setText("Calibrate");
@@ -211,62 +192,42 @@ public class AzElWindow {
 		el.setText("el:");
 		el.setBounds(10, 168, 37, 13);
 		
-		order.add(azDeg);
-		order.add(azMin);
-		if (minsec) {
-			order.add(azSec);
-		}
-		order.add(elDeg);
-		order.add(elMin);
-		if (minsec) {
-			order.add(elSec);
+
+		if (!minsec) {
+			
+			sec.setVisible(false);
+			azSec.setVisible(false);	
+			elSec.setVisible(false);
 		}
 		
-		order.add(action);
-		current = azDeg;
+;
 		
 		lblDirections = new Label(shell, SWT.WRAP);
 		lblDirections.setBounds(27, 27, 149, 80);
 		//lblDirections.setText("azimuth is from 0 to 360.  positive is counter-clockwise.  el is currently 0 straight up.  positive is downwards.");
 	}
 	
-	@SuppressWarnings("unused")
-	public void handler(KeyEvent evt, Text text, boolean minOrSecFlag) {
-		double rangeMin = 0;
-		double rangeMax = 0;
-		if (minOrSecFlag) {
-			rangeMin = 0;
-			rangeMax = 60;
+	
+	//Enables calibrate if all the fields are filled.
+	public void checkHandler(ModifyEvent evt, Text text, boolean minOrSecFlag){
+		
+		boolean min_sec_check = false;
+		if(minOrSecFlag){
+			if(azSec.getText().equals("")||elSec.getText().equals("")){
+				min_sec_check = true;
+			}
 		}
-		else {
-			rangeMin = -180;
-			rangeMax = 180;
-		}
-		int pos = order.indexOf(current);
-		final Control next = order.get(pos+1);
-		if (evt.keyCode == 16777296 || evt.keyCode == 13) {
-			try {
-				Double val = Double.parseDouble(text.getText());
-				//if ((val >= rangeMin) && (val <= rangeMax)) {
-					Display.getCurrent().asyncExec(new Runnable() {
-						public void run() {
-							next.setEnabled(true);
-							next.setFocus();
-						}
-					});
-					current = next;
-					return;
-				//}
-			} catch (NumberFormatException e) {
-				if (text.getText()== null) {
-					
-				}
-				else if (text.getText().equals("")) {
-					
-				}
-				System.out.println("enter an integer between -180 and 180");
-			} 
-		}
-	}
+		if((elDeg.getText().equals("") || azDeg.getText().equals("")||azDeg.getText().equals("")
+				||azMin.getText().equals("")||elMin.getText().equals("")||min_sec_check)){
+			action.setEnabled(false);
+			System.out.println("gah");
 
+		}
+		else{
+			action.setEnabled(true);
+		}
+
+
+	}
+		
 }
