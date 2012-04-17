@@ -2,8 +2,7 @@ package edu.ucsb.deepspace;
 
 public class ActGalil implements ActInterface {
 	
-	//private axisType axis;
-	@SuppressWarnings("unused")
+	private axisType axis;
 	private Stage stage;
 	private CommGalil protocol;
 	private int encPulsePerRev = 1000*1024;
@@ -16,7 +15,7 @@ public class ActGalil implements ActInterface {
 	private double offset = 0;
 
 	public ActGalil(axisType axis, CommGalil protocol) {
-		//this.axis = axis;
+		this.axis = axis;
 		//this.protocol = CommGalil.getInstance();
 		this.protocol = protocol;
 		if (axis == axisType.AZ) axisName = "A";
@@ -43,9 +42,12 @@ public class ActGalil implements ActInterface {
 		return "info: blank";
 	}
 	
+	//TODO
+	//Galil is really precise.  Probably don't need any external tolerance checking.
+	// Reed, 4/12/2012
 	public void moveAbsolute(double goalPosInDeg) {
-		//if (axis == axisType.AZ) stage.setGoalAz(goalPosInDeg);
-		//else stage.setGoalEl(goalPosInDeg);
+	    if (axis == axisType.AZ) stage.setGoalAz(goalPosInDeg);
+		else stage.setGoalEl(goalPosInDeg);
 		
 		long encPulses = encPulseToMove(goalPosInDeg);
 		moveEncVal(encPulses);

@@ -29,6 +29,7 @@ Running From within java
 	3)Hit the f-11 key on your keyboard
 	test
 			
+<<<<<<< HEAD
 Todo:	
 	calibration
 	test min/max angles
@@ -37,6 +38,18 @@ Todo:
 	steps & encoder steps for galil should be the same
 	maximum degree move relative
 	ra/dec tracking "change ra/dec" doesn't populate text areas
+=======
+	
+calibration
+test min/max angles
+different move types in joystick section
+degrees modulus 360
+steps & encoder steps for galil should be the same
+maximum degree move relative
+redo popup window text entry
+ra/dec tracking "change ra/dec" doesn't populate text areas
+accurate velocity method for galil
+>>>>>>> ebf651bc2c49847d50b0f763439c85a5d6a472ee
 
 Jason 4/11
 	Renabled limits in stage-added printstatements to AllowedMove in ActGalil

@@ -101,6 +101,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Text txtAzElRaDec;
 	private Text txtBaseLocation;
 	private Text txtBalloonLocation;
+	private Text txtGoalAz;
+	private Text txtGoalEl;
 
 	public MainWindow(Composite parent, int style, Stage stage) {
 		super(parent, style);
@@ -229,7 +231,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
 //--------------------------------------------------------------------------------------------------------------------
     	
-status = new Button(area, SWT.PUSH | SWT.CENTER);
+    	status = new Button(area, SWT.PUSH | SWT.CENTER);
     	status.setText("status");
     	status.setBounds(10, 93, 60, 30);
     	status.addMouseListener(new MouseAdapter() {
@@ -548,8 +550,11 @@ status = new Button(area, SWT.PUSH | SWT.CENTER);
     		}
     	});
     	
-    	Text txtGoalAz = new Text(area, SWT.BORDER | SWT.READ_ONLY);
+    	txtGoalAz = new Text(area, SWT.BORDER | SWT.READ_ONLY);
     	txtGoalAz.setBounds(620, 242, 94, 17);
+    	
+    	txtGoalEl = new Text(area, SWT.BORDER | SWT.READ_ONLY);
+    	txtGoalEl.setBounds(620, 269, 94, 17);
     	
     	Group grpScanning = new Group(area, SWT.NONE);
     	grpScanning.setText("Scanning");
@@ -690,8 +695,7 @@ status = new Button(area, SWT.PUSH | SWT.CENTER);
     		}
     	});
     	
-    	Text txtGoalEl = new Text(area, SWT.BORDER | SWT.READ_ONLY);
-    	txtGoalEl.setBounds(620, 269, 94, 17);
+
     	
     	Button btnQueueSize = new Button(area, SWT.NONE);
     	
@@ -801,11 +805,23 @@ status = new Button(area, SWT.PUSH | SWT.CENTER);
 	}
 	
 	public void enableMoveButtons() {
-		
+		System.out.println("hello");
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				azPlus.setEnabled(true);
+				azMinus.setEnabled(true);
+				elPlus.setEnabled(true);
+				elMinus.setEnabled(true);
+			}
+		});
 	}
 	
 	public void disableMoveButtons() {
-		
+		azPlus.setEnabled(false);
+		azMinus.setEnabled(false);
+		elPlus.setEnabled(false);
+		elMinus.setEnabled(false);
 	}
 	
 	public void enableButtons() {
@@ -931,6 +947,36 @@ status = new Button(area, SWT.PUSH | SWT.CENTER);
 	public void displayErrorBox(String message){
 		JOptionPane.showMessageDialog(null, message,"Error ", JOptionPane.ERROR_MESSAGE);
 		
+	}
+	
+	public void setMinMaxAzEl(final double minAz, final double maxAz, final double minEl, final double maxEl) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				txtMinAz.setText(String.valueOf(minAz));
+				txtMaxAz.setText(String.valueOf(maxAz));
+				txtMinEl.setText(String.valueOf(minEl));
+				txtMaxEl.setText(String.valueOf(maxEl));
+			}
+		});
+	}
+	
+	public void setGoalAz(final double goalAz) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				txtGoalAz.setText(String.valueOf(goalAz));
+			}
+		});
+	}
+	
+	public void setGoalEl(final double goalEl) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				txtGoalEl.setText(String.valueOf(goalEl));
+			}
+		});
 	}
 	
 	
