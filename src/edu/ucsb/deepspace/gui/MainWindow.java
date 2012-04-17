@@ -103,10 +103,12 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Text txtBalloonLocation;
 	private Text txtGoalAz;
 	private Text txtGoalEl;
+	private Stage.stageType stageType;
 
-	public MainWindow(Composite parent, int style, Stage stage) {
+	public MainWindow(Composite parent, int style, Stage stage, Stage.stageType stageType) {
 		super(parent, style);
 		this.stage = stage;
+		this.stageType = stageType;
 		actInfo = stage.stageInfo();
 		shell = parent.getShell();
 		setPreferences();
@@ -220,15 +222,17 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
-    	btnEncoderSteps = new Button(grpJoystick, SWT.RADIO);
-    	btnEncoderSteps.setBounds(106, 50, 83, 16);
-    	btnEncoderSteps.setText("encoder steps");
-    	btnEncoderSteps.addMouseListener(new MouseAdapter() {
-    		@Override
-    		public void mouseDown(MouseEvent e) {
-    			moveType = "encoder";
-    		}
-    	});
+    	if (stageType.equals(Stage.stageType.FTDI)) {
+	    	btnEncoderSteps = new Button(grpJoystick, SWT.RADIO);
+	    	btnEncoderSteps.setBounds(106, 50, 83, 16);
+	    	btnEncoderSteps.setText("encoder steps");
+	    	btnEncoderSteps.addMouseListener(new MouseAdapter() {
+	    		@Override
+	    		public void mouseDown(MouseEvent e) {
+	    			moveType = "encoder";
+	    		}
+	    	});
+    	}
 //--------------------------------------------------------------------------------------------------------------------
     	
     	status = new Button(area, SWT.PUSH | SWT.CENTER);

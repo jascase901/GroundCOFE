@@ -40,6 +40,9 @@ redo popup window text entry
 ra/dec tracking "change ra/dec" doesn't populate text areas
 accurate velocity method for galil
 
+customize user interface for galil or ftdi?
+slightly implemented 4/17 Reed.  made "encoder steps" radio button hidden if stageType is galil
+
 
 The Limits have no units when you set them
 The moveAbsolute in stage does not seem to actually do anything

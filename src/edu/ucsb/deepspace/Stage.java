@@ -23,6 +23,9 @@ public class Stage {
 		Galil, FTDI;
 	}
 	private stageType type = stageType.Galil;
+	public stageType getType() {
+		return this.type;
+	}
 	
 	private double minAz, maxAz, minEl, maxEl;
 	private double maxMoveRel = 90;
