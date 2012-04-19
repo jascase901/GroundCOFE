@@ -1,2 +1,7 @@
 bin/
-bin
+lib/
+.settings
+FTDI.ini
+Galil.ini
+Settings.ini
+WindowSettings.ini
