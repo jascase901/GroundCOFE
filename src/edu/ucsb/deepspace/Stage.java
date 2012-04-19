@@ -28,7 +28,7 @@ public class Stage {
 	}
 	
 	private double minAz, maxAz, minEl, maxEl;
-	private double maxMoveRel = 90;
+	private double maxMoveRel = 360;
 	private int encTol = 10;
 	
 	private int velocity;
@@ -380,12 +380,13 @@ public class Stage {
 		el.setEncInd(elEncInd);
 	}
 	
-	public boolean isAtRest() {
+	
+	public boolean isMoving() {
 		switch (type) {
 			case FTDI:
 				return Math.abs(velocity) <= 1;
 			case Galil:
-				return az.isMoving() && el.isMoving();
+				return position.moving();
 			default:
 				return true;
 		}

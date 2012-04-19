@@ -983,5 +983,14 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		});
 	}
 	
+	public void temp(final boolean asdf) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				btnCalibrate.setEnabled(asdf);
+			}
+		});
+	}
+	
 	
 }

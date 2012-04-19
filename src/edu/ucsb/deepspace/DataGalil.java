@@ -37,9 +37,10 @@ public class DataGalil implements DataInterface {
 
 	@Override
 	public boolean moving() {
-		boolean azMoving = (az.vel != 0);
+		boolean azMoving = (Math.abs(az.vel) >= 10);
 		boolean elMoving = (el.vel != 0);
-		return azMoving && elMoving;
+		return azMoving;
+		//return azMoving && elMoving;
 	}
 
 	@Override
@@ -50,6 +51,14 @@ public class DataGalil implements DataInterface {
 	@Override
 	public double elPos() {
 		return el.pos;
+	}
+	
+	public double azVel() {
+		return az.vel;
+	}
+	
+	public double elVel() {
+		return el.vel;
 	}
 	
 	class GalilStatus {
