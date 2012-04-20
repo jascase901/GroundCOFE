@@ -1,5 +1,7 @@
 package edu.ucsb.deepspace;
 
+import edu.ucsb.deepspace.DataGalil.GalilStatus;
+
 public class ActFTDI implements ActInterface {
 
 	@Override
@@ -26,7 +28,6 @@ public class ActFTDI implements ActInterface {
 		
 	}
 
-	@Override
 	public void moveRelative(double numDeg) {
 		// TODO Auto-generated method stub
 		
@@ -38,17 +39,16 @@ public class ActFTDI implements ActInterface {
 		
 	}
 
-	@Override
 	public void moveEncVal(double numSteps) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
-	public double currentDegPos() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+//	@Override
+//	public double currentDegPos() {
+//		// TODO Auto-generated method stub
+//		return 0;
+//	}
 
 	@Override
 	public boolean allowedMove(String moveType, double min, double max,
@@ -105,16 +105,28 @@ public class ActFTDI implements ActInterface {
 		
 	}
 
-	@Override
-	public boolean isMoving() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+//	@Override
+//	public boolean isMoving() {
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
 
 	@Override
 	public double encValToDeg(double encVal) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+//	@Override
+//	public void update(GalilStatus status) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+
+	@Override
+	public void moveRelative(double numDeg, String moveType) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

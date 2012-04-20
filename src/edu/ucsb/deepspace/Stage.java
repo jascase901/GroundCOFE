@@ -178,11 +178,18 @@ public class Stage {
 				System.out.println("az:  " + az);
 				System.out.println("el:  " + el);
 				System.out.println();
+				//for FTDI only: velocity of 0 means no motion has occured
+				//vel=1 currently at rest, but was moving forward
+				//vel=-1 currently at rest, but was moving backwards
 				if (Math.abs(velocity) == 1 || velocity == 0) {
 					moveAbsolute(az, el);
 				}
 			}
 		}, 0, period);
+	}
+	
+	public void stopRaDecTracking() {
+		raDecTracker.cancel();
 	}
 	
 	private void updateLst() {
@@ -220,15 +227,6 @@ public class Stage {
 				window.updateTxtAzElRaDec(out);
 			}
 		}, 0, 1000);
-	}
-	
-	
-	public void stopRaDecTracking() {
-		raDecTracker.cancel();
-	}
-	
-	public void stopScanning() {
-		scanning = false;
 	}
 	
 	//Unknown functionality at the moment.  (2/13/2012)
@@ -271,6 +269,10 @@ public class Stage {
 		
 	}
 	
+	public void stopScanning() {
+		scanning = false;
+	}
+	
 	public void moveAbsolute(final double azDeg, final double elDeg) {
 		exec.submit(new Runnable() {
 			@Override
@@ -301,7 +303,6 @@ public class Stage {
 		});
 	}
 	
-	
 	public void relative(final axisType type, final String moveType, final double amount) {
 		exec.submit(new Runnable() {
 			@Override
@@ -316,11 +317,12 @@ public class Stage {
 				}
 				if(axis.allowedMove(moveType, min, max, amount)){
 					if (moveType.equals("steps")) {
-						axis.moveEncVal((long) amount);
+						axis.moveRelative(amount, "steps");
+						//System.out.println(amount);
 					}
 					else if (moveType.equals("degrees")) {
 						if (amount <= maxMoveRel) {
-							axis.moveRelative(amount);
+							axis.moveRelative(amount, "degrees");
 						}
 						else {
 							//message to user saying that moving that much isn't allowed
@@ -328,7 +330,8 @@ public class Stage {
 						}
 					}
 					else if (moveType.equals("encoder")) {
-						axis.moveEncoder(amount);
+						//axis.moveRelative(amount, "encoder");
+						System.out.println("hi");
 					}
 				}
 				else{
@@ -339,19 +342,26 @@ public class Stage {
 		});
 	}
 	
-	public void index(axisType type) {
-		switch (type) {
-			case AZ:
-				az.index();
-				buttonEnabler("indexAz");
-				break;
-			case EL:
-				el.index();
-				buttonEnabler("indexEl");
-				break;
-		}
+	public void index(final axisType type) {
+		exec.submit(new Runnable() {
+			@Override
+			public void run() {
+				switch (type) {
+				case AZ:
+					az.index();
+					buttonEnabler("indexAz");
+					break;
+				case EL:
+					el.index();
+					buttonEnabler("indexEl");
+					break;
+				}
+			}
+			
+		});
 	}
 	
+	//probably not needed for galil
 	public void calibrate(double azDeg, double elDeg) {
 		az.calibrate(azDeg);
 		el.calibrate(elDeg);
@@ -380,7 +390,8 @@ public class Stage {
 		el.setEncInd(elEncInd);
 	}
 	
-	
+	//should return true if something is moving, false if not
+	//FTDI functionality unknown (reed, 4/19/2012)
 	public boolean isMoving() {
 		switch (type) {
 			case FTDI:
@@ -389,6 +400,15 @@ public class Stage {
 				return position.moving();
 			default:
 				return true;
+		}
+	}
+	
+	/**
+	 * While isMoving() is true, sleeps for 100ms.
+	 */
+	public void waitWhileMoving() {
+		while (isMoving()) {
+			pause(100);
 		}
 	}
 	
@@ -475,13 +495,31 @@ public class Stage {
 //	public double getElEncInd() {return el.getEncInd();}
 	
 	public double currentAzDeg() {
-		double azDeg = az.currentDegPos();
+//		double azDeg = az.currentDegPos();
+//		return azDeg;
+		if (position == null) return 0;
+		double azDeg = position.azPos();
 		return azDeg;
 	}
 	
+	public double degPos(axisType axisType) {
+		if (position == null) return 0;
+		switch (axisType) {
+			case AZ:
+				return position.azPos();
+			case EL:
+				return position.elPos();
+			default:
+				return 0;
+		}
+	}
+	
 	public double currentElDeg() {
-		double elDeg = el.currentDegPos();
-		return elDeg;
+//		double elDeg = el.currentDegPos();
+//		return elDeg;
+		if (position == null) return 0;
+		double azDeg = position.elPos();
+		return azDeg;
 	}
 	
 	public void indexingDone(axisType type) {
@@ -569,7 +607,6 @@ public class Stage {
 	void updatePosition(DataInterface data) {
 		position = data;
 		window.updateTxtPosInfo(position.info());
-		
 	}
 	
 	void toggleReader() {

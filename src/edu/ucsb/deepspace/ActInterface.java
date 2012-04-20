@@ -17,13 +17,13 @@ public interface ActInterface {
 	
 	public void moveAbsolute(double goalPosInDeg);
 	
-	public void moveRelative(double numDeg);
+	public void moveRelative(double numDeg, String moveType);
 	
 	public void moveEncoder(double numEncPulse);
 	
-	public void moveEncVal(double numSteps);
+	//public void moveEncVal(double numSteps);
 	
-	public double currentDegPos();
+	//public double currentDegPos();
 	
 	public boolean allowedMove(String moveType, double min, double max, double amount);
 	
@@ -41,8 +41,10 @@ public interface ActInterface {
 	
 	public void setIndexing(boolean indexing);
 	
-	public boolean isMoving();
+	//public boolean isMoving();
 	
 	public double encValToDeg(double encVal);
+	
+	//public void update(DataGalil.GalilStatus status);
 
 }

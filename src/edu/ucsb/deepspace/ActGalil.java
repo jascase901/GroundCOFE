@@ -8,10 +8,7 @@ public class ActGalil implements ActInterface {
 	private int encPulsePerRev = 1000*1024;
 	private double encPulsePerDeg = ((double) encPulsePerRev) / 360d;
 	private boolean indexing;
-	private int encTol = 2;
 	private String axisName = "";
-	private double position = 0, velocity;
-	private DataGalil.GalilStatus status;
 	private double offset = 0;
 
 	public ActGalil(axisType axis, CommGalil protocol) {
@@ -33,10 +30,10 @@ public class ActGalil implements ActInterface {
 		
 	}
 	
-	void update(DataGalil.GalilStatus status) {
-		this.position = status.pos;
-		this.velocity = status.vel;
-	}
+//	public void update(DataGalil.GalilStatus status) {
+//		this.position = status.pos;
+//		this.velocity = status.vel;
+//	}
 	
 	public String info() {
 		return "info: blank";
@@ -49,8 +46,9 @@ public class ActGalil implements ActInterface {
 	    if (axis == axisType.AZ) stage.setGoalAz(goalPosInDeg);
 		else stage.setGoalEl(goalPosInDeg);
 		
-		long encPulses = encPulseToMove(goalPosInDeg);
-		moveEncVal(encPulses);
+		//long encPulses = encPulseToMove(goalPosInDeg);
+	    double goalEnc = degToEncVal(goalPosInDeg);
+		moveEncVal(goalEnc);
 //		pause(2000);
 //		waitWhileMoving();
 //		pause(1000);
@@ -66,11 +64,14 @@ public class ActGalil implements ActInterface {
 //		}
 	}
 	
-	public void moveRelative(double numDeg) {
-		double goalDeg = goalPos("degrees", numDeg);
-		System.out.println("goalDeg=" + goalDeg);
+	public void moveRelative(double numDeg, String moveType) {
+		double goalDeg = goalPos(moveType, numDeg);
+		//System.out.println("goalDeg=" + goalDeg);
+		//System.out.println(numDeg);
 		moveAbsolute(goalDeg);
 	}
+	
+	//public void set
 	
 	public void moveEncoder(double numEncPulse) {
 		double goalDeg = goalPos("encoder", numEncPulse);
@@ -81,18 +82,15 @@ public class ActGalil implements ActInterface {
 	//This is the method that makes use of the GalilComm instance, "protocol".
 	public void moveEncVal(double numEncPulses) {
 		String out = "PA" + axisName;
-		out += "=" + (long) numEncPulses;
-		System.out.println(out);
+		out += "=" + numEncPulses;
+		//System.out.println(out);
 		protocol.sendRead(out);
 		protocol.sendRead("BG");
 	}
 	
-	//method that returns current position in degrees
-	public double currentDegPos() {
-		return encValToDeg(getPos());
+	private double currentPosDeg() {
+		return encValToDeg(stage.degPos(axis));
 	}
-
-	
 	
 	//Not sure if this is even relevant to the Galil, but this should convert a desired encoder
 	public double encValToDeg(double encVal) {
@@ -114,8 +112,13 @@ public class ActGalil implements ActInterface {
 	//This method will be used to calculate the final position as a result of a move command.
 	//Used so that the user knows where it will end up pointing, AND to verify that the move is valid.
 	private double goalPos(String moveType, double amount) {
-		double goalPos = currentDegPos();
-		System.out.println("current pos=" + goalPos);
+		double goalPos = currentPosDeg();
+		//System.out.println("currentDegPos: " + goalPos);
+		//System.out.println("moveType: " + moveType);
+		//System.out.println("current encoder count: " + degToEncVal(goalPos));
+		
+		
+		//System.out.println("current pos=" + goalPos);
 		switch (moveType) {
 			case "steps": //Galil: steps = enc pulses
 				goalPos += amount / encPulsePerDeg; break;
@@ -128,6 +131,9 @@ public class ActGalil implements ActInterface {
 			default :
 				System.out.println("Error in Galil.goalPos"); break;
 		}
+		//System.out.println("goalPos: " + goalPos);
+		//System.out.println("goalEnc: " + degToEncVal(goalPos));
+		//System.out.println();
 		return goalPos;
 	}
 	
@@ -135,48 +141,18 @@ public class ActGalil implements ActInterface {
 	public boolean allowedMove(String moveType, double min, double max, double amount) {
 		double goalPos = goalPos(moveType, amount);
 		if (goalPos >= min && goalPos <= max) {
-			System.out.println("Allowed Move");
+			//System.out.println("Allowed Move");
 			return true;
 		}
-		System.out.println("Not Allowed move:golpos="+goalPos+" min="+min+" max="+max);
+		//System.out.println("Not Allowed move:golpos="+goalPos+" min="+min+" max="+max);
 		return false;
 	}
 	
-	//Waits while moving.
-	private void waitWhileMoving() {
-		while (!isMoving()) {
-			pause(100);
-		}
-	}
-	
-	public boolean isMoving() {
-		String vel = protocol.sendRead("TV" + axisName);
-		double dVel = Double.parseDouble(vel);
-		return (dVel == 0);
-	}
-	
-	private double getPos() {
-		if(protocol.queueSize() != 0) {
-			protocol.read();
-		}
-		String pos = protocol.sendRead("TP" + axisName);
-		
-		return Double.parseDouble(pos);
-	}
-	
 	public void calibrate(double degVal) {
-		offset = degVal - getPos() / encPulsePerDeg;
+		offset = degVal - currentPosDeg() / encPulsePerDeg;
 	}
 	
 	public void index() {
-//		System.out.println(stage == null);
-//		stage.toggleReader();
-//		try {
-//			Thread.sleep(2000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 		// Save acceleration and jog speed values
 		protocol.sendRead("T1 = _JG" + axisName);
 		protocol.sendRead("T2 = _AC" + axisName);
@@ -204,19 +180,6 @@ public class ActGalil implements ActInterface {
 		// Finally, restore accel and jog speeds from before routine was run
 		protocol.sendRead("JG" + axisName + "=T1");
 		protocol.sendRead("AC" + axisName + "=T2");
-		
-		
-		
-		//protocol.test();
-//		System.out.println("shouldn't send this");
-//		try {
-//			Thread.sleep(1000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		System.out.println("shouldn't send this");
-//		stage.toggleReader();
 	}
 	
 	public void setEncInd(double encInd) {

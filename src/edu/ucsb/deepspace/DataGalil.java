@@ -38,7 +38,7 @@ public class DataGalil implements DataInterface {
 	@Override
 	public boolean moving() {
 		boolean azMoving = (Math.abs(az.vel) >= 10);
-		boolean elMoving = (el.vel != 0);
+		//boolean elMoving = (el.vel != 0);
 		return azMoving;
 		//return azMoving && elMoving;
 	}

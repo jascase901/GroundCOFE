@@ -809,7 +809,6 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	}
 	
 	public void enableMoveButtons() {
-		System.out.println("hello");
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
