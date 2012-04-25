@@ -257,18 +257,24 @@ public class Stage {
 				
 				for (int i = 1; i <= reps; i++) {
 					if (scanning == false) break;
-					if (i%2 == 0) {
 						axis.moveAbsolute(minScan);
-					}
-					else if (i%2 == 1) {
+						pauseWhileMoving();
 						axis.moveAbsolute(maxScan);
+						pauseWhileMoving();
 					}
-				}
+				window.toggleAzScan();
 			}
 		});
-		
+	
 	}
 	
+	public void pauseWhileMoving(){
+		while (isMoving()){
+			pause(500);
+		}
+		pause(1000);
+
+	}
 	public void stopScanning() {
 		scanning = false;
 	}

@@ -622,9 +622,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		@Override
     		public void mouseDown(MouseEvent e) {
     			if (btnScanAz.getText().equals("Stop Scan")) {
-    				enableScanButtons();
-    				btnScanAz.setText("Scan Az");
-    				stage.stopScanning();
+    				toggleAzScan();
+    				
     			}
     			else {
     				btnScanAz.setText("Stop Scan");
@@ -982,6 +981,13 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		});
 	}
 	
+	public void toggleAzScan(){
+		enableScanButtons();
+		btnScanAz.setText("Scan Az");
+		stage.stopScanning();
+		System.out.println("az on");
+	}
+
 	public void temp(final boolean asdf) {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
