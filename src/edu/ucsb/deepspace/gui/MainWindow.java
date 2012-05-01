@@ -32,8 +32,12 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import edu.ucsb.deepspace.ActInterface.axisType;
 import edu.ucsb.deepspace.Stage;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 public class MainWindow extends org.eclipse.swt.widgets.Composite {
+	private boolean debug = true;
+	private String debugAxis = "A";
 	
 	private Shell shell;
 	private final Properties windowSettings = new Properties();
@@ -105,6 +109,11 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Text txtGoalEl;
 	private Stage.stageType stageType;
 
+	private Button btnDebugAz;
+
+	private Button btnDebugEl;
+	private Text txtDebugVel;
+
 	public MainWindow(Composite parent, int style, Stage stage, Stage.stageType stageType) {
 		super(parent, style);
 		this.stage = stage;
@@ -140,7 +149,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
         Group area = new Group(this, SWT.NONE);
         area.setText("");
         area.setLayout(null);
-        area.setBounds(19, 7, 724, 690);
+        area.setBounds(10, 10, 724, 690);
         
 //--------------------------------------------------------------------------------------------------------------------
     	Group grpJoystick = new Group(area, SWT.NONE);
@@ -204,7 +213,6 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	btnRadioSteps = new Button(grpJoystick, SWT.RADIO);
     	btnRadioSteps.setBounds(106, 10, 47, 16);
     	btnRadioSteps.setText("steps");
-    	btnRadioSteps.setSelection(true);
     	btnRadioSteps.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
@@ -213,6 +221,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnRadioDegrees = new Button(grpJoystick, SWT.RADIO);
+    	btnRadioDegrees.setSelection(true);
     	btnRadioDegrees.setBounds(106, 29, 55, 16);
     	btnRadioDegrees.setText("degrees");
     	btnRadioDegrees.addMouseListener(new MouseAdapter() {
@@ -698,11 +707,12 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
-
+    	Group grpDebug = new Group(area, SWT.NONE);
+    	grpDebug.setText("Debug");
+    	grpDebug.setBounds(384, 524, 330, 156);
     	
-    	Button btnQueueSize = new Button(area, SWT.NONE);
-    	
-    	btnQueueSize.setBounds(408, 543, 68, 23);
+    	Button btnQueueSize = new Button(grpDebug, SWT.NONE);
+    	btnQueueSize.setBounds(10, 24, 68, 23);
     	btnQueueSize.setText("queue size");
     	btnQueueSize.addMouseListener(new MouseAdapter() {
     		@Override
@@ -711,8 +721,49 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
-    	Button btnReadQueue = new Button(area, SWT.NONE);
-    	btnReadQueue.setBounds(408, 571, 68, 23);
+    	btnStop = new Button(grpDebug, SWT.NONE);
+    	btnStop.setBounds(84, 24, 68, 23);
+    	btnStop.setText("Stop");
+    	btnStop.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			stage.sendCommand("ST" + debugAxis);
+    		}
+    	});
+    	
+    	btnBegin = new Button(grpDebug, SWT.NONE);
+    	btnBegin.setBounds(158, 24, 68, 23);
+    	btnBegin.setText("Begin");
+    	btnBegin.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			stage.sendCommand("BG" + debugAxis);
+    		}
+    	});
+    	
+    	btnMotorOff = new Button(grpDebug, SWT.NONE);
+    	btnMotorOff.setBounds(158, 53, 68, 23);
+    	btnMotorOff.setText("Motor Off");
+    	btnMotorOff.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			stage.sendCommand("MO" + debugAxis);
+    		}
+    	});
+    	
+    	
+    	btnMotorOn = new Button(grpDebug, SWT.NONE);
+    	btnMotorOn.setBounds(84, 53, 68, 23);
+    	btnMotorOn.setText("Motor On");
+    	btnMotorOn.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			stage.sendCommand("SH" + debugAxis);
+    		}
+    	});
+    	
+    	Button btnReadQueue = new Button(grpDebug, SWT.NONE);
+    	btnReadQueue.setBounds(10, 53, 68, 23);
     	btnReadQueue.setText("read queue");
     	btnReadQueue.addMouseListener(new MouseAdapter() {
     		@Override
@@ -721,45 +772,54 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
-    	btnStop = new Button(area, SWT.NONE);
-    	btnStop.setBounds(477, 543, 68, 23);
-    	btnStop.setText("Stop");
-    	btnStop.addMouseListener(new MouseAdapter() {
+    	btnDebugAz = new Button(grpDebug, SWT.RADIO);
+    	btnDebugAz.setSelection(true);
+    	btnDebugAz.setBounds(10, 82, 85, 16);
+    	btnDebugAz.setText("Azimuth");
+    	btnDebugAz.addSelectionListener(new SelectionAdapter() {
     		@Override
-    		public void mouseDown(MouseEvent e) {
-    			stage.sendCommand("ST");
+    		public void widgetSelected(SelectionEvent e) {
+    			debugAxis = "A";
     		}
     	});
     	
-    	btnMotorOn = new Button(area, SWT.NONE);
-    	btnMotorOn.setBounds(477, 571, 68, 23);
-    	btnMotorOn.setText("Motor On");
-    	btnMotorOn.addMouseListener(new MouseAdapter() {
+    	btnDebugEl = new Button(grpDebug, SWT.RADIO);
+    	btnDebugEl.setBounds(10, 103, 85, 16);
+    	btnDebugEl.setText("Elevation");
+    	btnDebugEl.addSelectionListener(new SelectionAdapter() {
     		@Override
-    		public void mouseDown(MouseEvent e) {
-    			stage.sendCommand("SH");
+    		public void widgetSelected(SelectionEvent e) {
+    			debugAxis = "B";
     		}
     	});
     	
-    	btnMotorOff = new Button(area, SWT.NONE);
-    	btnMotorOff.setBounds(546, 571, 68, 23);
-    	btnMotorOff.setText("Motor Off");
-    	btnMotorOff.addMouseListener(new MouseAdapter() {
+    	txtDebugVel = new Text(grpDebug, SWT.BORDER);
+    	txtDebugVel.setText("vel");
+    	txtDebugVel.setBounds(145, 100, 76, 19);
+    	
+    	Button btnSetVelocity = new Button(grpDebug, SWT.NONE);
+    	btnSetVelocity.setBounds(227, 96, 68, 23);
+    	btnSetVelocity.setText("Set Velocity");
+    	btnSetVelocity.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
-    			stage.sendCommand("MO");
+    			
+    			double vel = 0;
+    			try {
+    				vel = Double.parseDouble(txtDebugVel.getText());
+    			} catch (NumberFormatException f) {
+    				f.printStackTrace();
+    			}
+    			String out = "JG" + debugAxis + "=" + vel;
+    			stage.sendCommand(out);
     		}
     	});
     	
-    	btnBegin = new Button(area, SWT.NONE);
-    	btnBegin.setBounds(546, 543, 68, 23);
-    	btnBegin.setText("Begin");
-    	btnBegin.addMouseListener(new MouseAdapter() {
-    		@Override
-    		public void mouseDown(MouseEvent e) {
-    			stage.sendCommand("BG");
-    		}
-    	});
+    	
+    	//TODO hide the debug stuff
+    	if (debug) {
+    	}
+    	
 	}
 	
 	private void shellWidgetDisposed() {
@@ -996,6 +1056,4 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 			}
 		});
 	}
-	
-	
 }

@@ -30,7 +30,9 @@ public class DataGalil implements DataInterface {
 	public String info() {
 		String out = "";
 		out += "Az Position: " + az.pos + "\n";
-		out += "Az Velocity: " + az.vel;
+		out += "Az Velocity: " + az.vel + "\n";
+		out += "El Position: " + el.pos + "\n";
+		out += "El Velocity: " + el.vel;
 		
 		return out;
 	}
