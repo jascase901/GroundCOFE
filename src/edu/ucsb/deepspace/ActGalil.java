@@ -187,7 +187,7 @@ public class ActGalil implements ActInterface {
 		// Turn the jog speed WAAAY down when searching for the index
 		jg = 500d;
 		jg = jg * encPulsePerRev / azEncPerRev;
-		protocol.sendRead("JG" + axisName + "=500");
+		protocol.sendRead("JG" + axisName + "=" + jg);
 
 		// Do the index search ("FI")
 		protocol.sendRead("FI" + axisName);
