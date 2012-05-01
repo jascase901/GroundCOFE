@@ -85,7 +85,7 @@ public class ActGalil implements ActInterface {
 		out += "=" + numEncPulses;
 		//System.out.println(out);
 		protocol.sendRead(out);
-		protocol.sendRead("BG");
+		protocol.sendRead("BG"+ axisName);
 	}
 	
 	private double currentPosDeg() {
