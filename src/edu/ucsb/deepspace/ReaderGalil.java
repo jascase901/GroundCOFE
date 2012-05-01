@@ -39,18 +39,21 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 			if (!pauseFlag) {
 				String azPos = protocol.sendRead(tellPos + azAxis);
 				String azVel = protocol.sendRead(tellVel + azAxis);
-				//System.out.println("azPos: " + azPos);
-				//System.out.println("azVel: " + azVel);
+				String elPos = protocol.sendRead(tellPos + elAxis);
+				String elVel = protocol.sendRead(tellVel + elAxis);
+				System.out.println("elPos: " + elPos);
+				System.out.println("elVel: " + elVel);
 				//String azPos = "4";
 				//String azVel = "5";
 				data = new DataGalil();
 				data.makeAz(azPos, azVel);
+				data.makeEl(elPos, elVel);
 				stage.updatePosition(data);
 	
 	
 				//String elPos = protocol.sendRead(tellPos + elAxis);
 			}
-			pause(500);
+			pause(1000);
 		}
 		protocol.close();
 	}
