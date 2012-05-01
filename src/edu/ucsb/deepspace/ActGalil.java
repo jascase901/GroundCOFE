@@ -5,18 +5,25 @@ public class ActGalil implements ActInterface {
 	private axisType axis;
 	private Stage stage;
 	private CommGalil protocol;
-	private int encPulsePerRev = 1000*1024;
+	private int encPulsePerRev;
 	private double encPulsePerDeg = ((double) encPulsePerRev) / 360d;
 	private boolean indexing;
 	private String axisName = "";
 	private double offset = 0;
+	private double azEncPerRev = 1000*1024;
 
 	public ActGalil(axisType axis, CommGalil protocol) {
 		this.axis = axis;
 		//this.protocol = CommGalil.getInstance();
 		this.protocol = protocol;
-		if (axis == axisType.AZ) axisName = "A";
-		else axisName = "B";
+		if (axis == axisType.AZ) {
+			axisName = "A";
+			encPulsePerRev = 1000*1024;
+		}
+		else {
+			axisName = "B";
+			encPulsePerRev = 4000;
+		}
 	}
 	
 	//I haven't found a need for this yet.  (Reed, 2/15/2012)
@@ -85,7 +92,7 @@ public class ActGalil implements ActInterface {
 		out += "=" + numEncPulses;
 		//System.out.println(out);
 		protocol.sendRead(out);
-		protocol.sendRead("BG");
+		protocol.sendRead("BG"+axisName);
 	}
 	
 	private double currentPosDeg() {
@@ -104,6 +111,11 @@ public class ActGalil implements ActInterface {
 	
 	private long encPulseToMove(double goalPosInDeg) {
 		return (long) ((goalPosInDeg - offset)*encPulsePerDeg);
+	}
+	
+	public void setVelocity(double vel) {
+		String out = "JG" + axisName + "=" + vel;
+		protocol.sendRead(out);
 	}
 	
 	public boolean indexing() {return indexing;}
@@ -159,8 +171,12 @@ public class ActGalil implements ActInterface {
 
 		// then overwrite them
 		protocol.sendRead("MG \"Homing\", T1");
-		protocol.sendRead("JG" + axisName + "=150000");
-		protocol.sendRead("AC" + axisName + "=50000");
+		double jg = 150000d;
+		jg = jg * encPulsePerRev / azEncPerRev;
+		protocol.sendRead("JG" + axisName + "=" + jg);
+		double ac = 50000d;
+		ac = ac * encPulsePerRev / azEncPerRev;
+		protocol.sendRead("AC" + axisName + "=" + ac);
 
 		// "FE" - find the opto-edge
 		protocol.sendRead("FE" + axisName);
@@ -169,7 +185,9 @@ public class ActGalil implements ActInterface {
 		protocol.sendRead("MG \"Found Opto-Index\"; TP" + axisName);
 
 		// Turn the jog speed WAAAY down when searching for the index
-		protocol.sendRead("JG" + axisName + "=500");
+		jg = 500d;
+		jg = jg * encPulsePerRev / azEncPerRev;
+		protocol.sendRead("JG" + axisName + "=" + jg);
 
 		// Do the index search ("FI")
 		protocol.sendRead("FI" + axisName);
