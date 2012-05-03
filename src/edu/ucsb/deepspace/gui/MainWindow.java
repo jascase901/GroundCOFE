@@ -632,14 +632,11 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		@Override
     		public void mouseDown(MouseEvent e) {
     			if (btnScanAz.getText().equals("Stop Scan")) {
-<<<<<<< HEAD
-    				toggleAzScan();
-=======
+
     			
     				setScanEnabled(axisType.AZ);
     			
     				
->>>>>>> branch_jason
     				
     			}
     			else {
@@ -1048,13 +1045,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		});
 	}
 	
-<<<<<<< HEAD
-	public void toggleAzScan(){
-		enableScanButtons();
-		btnScanAz.setText("Scan Az");
-		stage.stopScanning();
-		System.out.println("az on");
-=======
+
 	public void setScanEnabled(final axisType type){
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
@@ -1073,7 +1064,6 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		});
 		
 		
->>>>>>> branch_jason
 	}
 
 	public void temp(final boolean asdf) {

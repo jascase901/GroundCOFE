@@ -5,10 +5,12 @@ public class ActGalil implements ActInterface {
 	private axisType axis;
 	private Stage stage;
 	private CommGalil protocol;
-	private double encPulsePerDeg = ((double) encPulsePerRev) / 360d;
+	private double encPulsePerRev;
+	private double encPulsePerDeg;
 	private boolean indexing;
 	private String axisName = "";
 	private double offset = 0;
+	private double azEncPerRev=1000*1024;
 
 	public ActGalil(axisType axis, CommGalil protocol) {
 		this.axis = axis;
@@ -21,7 +23,9 @@ public class ActGalil implements ActInterface {
 		else {
 			axisName = "B";
 			encPulsePerRev = 4000;
+			
 		}
+		encPulsePerDeg = ((double) encPulsePerRev) / 360d;
 	}
 	
 	//I haven't found a need for this yet.  (Reed, 2/15/2012)
