@@ -230,7 +230,7 @@ public class Stage {
 	}
 	
 	//Unknown functionality at the moment.  (2/13/2012)
-	public void startScanning(final double minScan, final double maxScan, double time, final int reps, final axisType type) {
+	public void startScanning(final double minScan, final double maxScan, double time, final int reps, final axisType type, final boolean continuous ) {
 		System.out.println("min angle:  " + minScan);
 		System.out.println("max angle:  " + maxScan);
 		System.out.println("time:  " + time);
@@ -254,10 +254,21 @@ public class Stage {
 					System.out.println("invalid minscan or maxscan");
 					return;
 				}
+				while(continuous){
+					if (scanning == false) break;
+					scan(minScan, maxScan, axis);
+					
+				}
 				
 				for (int i = 1; i <= reps; i++) {
 					if (scanning == false) break;
-						axis.moveAbsolute(minScan);
+						scan(minScan, maxScan, axis);
+					}
+			
+				window.setScanEnabled(type);
+				
+				stopScanning();
+				
 						pauseWhileMoving();
 						axis.moveAbsolute(maxScan);
 						pauseWhileMoving();
@@ -268,12 +279,26 @@ public class Stage {
 	
 	}
 	
+	public void scan(double minScan, double maxScan, ActInterface axis){
+	public void pauseWhileMoving(){
+		axis.moveAbsolute(minScan);
+		pauseWhileMoving();
+		axis.moveAbsolute(maxScan);
+		pauseWhileMoving();
+	}
+	
 	public void pauseWhileMoving(){
 		while (isMoving()){
 			pause(500);
 		}
 		pause(1000);
 
+		while (isMoving()){
+			pause(500);
+		}
+		pause(1000);
+
+	}
 	}
 	public void stopScanning() {
 		scanning = false;

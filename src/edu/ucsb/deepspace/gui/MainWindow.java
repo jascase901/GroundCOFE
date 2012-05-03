@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+
 import edu.ucsb.deepspace.ActInterface.axisType;
 import edu.ucsb.deepspace.Stage;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -631,7 +632,14 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		@Override
     		public void mouseDown(MouseEvent e) {
     			if (btnScanAz.getText().equals("Stop Scan")) {
+<<<<<<< HEAD
     				toggleAzScan();
+=======
+    			
+    				setScanEnabled(axisType.AZ);
+    			
+    				
+>>>>>>> branch_jason
     				
     			}
     			else {
@@ -643,7 +651,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	    				double max = Double.parseDouble(txtMaxAzScan.getText());
 	    				double time = Double.parseDouble(txtTimeAzScan.getText());
 	    				int reps = Integer.parseInt(txtRepScan.getText());
-	    				stage.startScanning(min, max, time, reps, axisType.AZ);
+	    				stage.startScanning(min, max, time, reps, axisType.AZ, continuousScanOn);
     				} catch (NumberFormatException e1) {
     					e1.printStackTrace();
     				}
@@ -658,9 +666,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		@Override
     		public void mouseDown(MouseEvent e) {
     			if (btnScanEl.getText().equals("Stop Scan")) {
-    				enableScanButtons();
-    				btnScanEl.setText("Scan El");
-    				stage.stopScanning();
+    				setScanEnabled(axisType.EL);
+    				
     			}
     			else {
     				btnScanEl.setText("Stop Scan");
@@ -671,7 +678,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	    				double max = Double.parseDouble(txtMaxElScan.getText());
 	    				double time = Double.parseDouble(txtTimeElScan.getText());
 	    				int reps = Integer.parseInt(txtRepScan.getText());
-	        			stage.startScanning(min, max, time, reps, axisType.EL);
+	        			stage.startScanning(min, max, time, reps, axisType.EL,continuousScanOn);
         			} catch (NumberFormatException e1) {
         				
         			}
@@ -1041,11 +1048,32 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		});
 	}
 	
+<<<<<<< HEAD
 	public void toggleAzScan(){
 		enableScanButtons();
 		btnScanAz.setText("Scan Az");
 		stage.stopScanning();
 		System.out.println("az on");
+=======
+	public void setScanEnabled(final axisType type){
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				enableScanButtons();
+				switch (type) {
+				case AZ:
+					btnScanAz.setText("Scan Az" );
+				case EL:
+					btnScanEl.setText("Scan El");
+				}
+				stage.stopScanning();
+				
+				System.out.println("set text");
+			}
+		});
+		
+		
+>>>>>>> branch_jason
 	}
 
 	public void temp(final boolean asdf) {

@@ -5,12 +5,10 @@ public class ActGalil implements ActInterface {
 	private axisType axis;
 	private Stage stage;
 	private CommGalil protocol;
-	private int encPulsePerRev;
 	private double encPulsePerDeg = ((double) encPulsePerRev) / 360d;
 	private boolean indexing;
 	private String axisName = "";
 	private double offset = 0;
-	private double azEncPerRev = 1000*1024;
 
 	public ActGalil(axisType axis, CommGalil protocol) {
 		this.axis = axis;
