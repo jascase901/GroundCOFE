@@ -980,6 +980,9 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	}
 	
 	public void enableScanButtons() {
+		btnScanAz.setEnabled(true);
+		btnScanEl.setEnabled(true);
+		btnScanBoth.setEnabled(true);
 		
 	}
 	
