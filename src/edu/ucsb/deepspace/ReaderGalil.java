@@ -41,8 +41,8 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 				String azVel = protocol.sendRead(tellVel + azAxis);
 				String elPos = protocol.sendRead(tellPos + elAxis);
 				String elVel = protocol.sendRead(tellVel + elAxis);
-				System.out.println("elPos: " + elPos);
-				System.out.println("elVel: " + elVel);
+				/*System.out.println("elPos: " + elPos);
+				System.out.println("elVel: " + elVel);*/
 				//String azPos = "4";
 				//String azVel = "5";
 				data = new DataGalil();

@@ -230,7 +230,7 @@ public class Stage {
 	}
 
 	//Unknown functionality at the moment.  (2/13/2012)
-	public void startScanning(final double minScan, final double maxScan, double time, final int reps, final axisType type, final boolean continuous ) {
+	public void startScanning(final double minScan, final double maxScan, final double time, final int reps, final axisType type, final boolean continuous ) {
 		System.out.println("min angle:  " + minScan);
 		System.out.println("max angle:  " + maxScan);
 		System.out.println("time:  " + time);
@@ -256,7 +256,7 @@ public class Stage {
 				}
 				while(continuous){
 					if (scanning == false) break;
-					scan(minScan, maxScan, axis);
+					scan(minScan, maxScan,  axis);
 
 				}
 
@@ -285,6 +285,8 @@ public class Stage {
 		while (isMoving()){
 			pause(500);
 		}
+		System.out.println("");
+		
 		pause(1000);
 
 	}

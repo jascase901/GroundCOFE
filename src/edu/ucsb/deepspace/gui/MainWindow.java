@@ -44,7 +44,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private final Properties windowSettings = new Properties();
 	private Stage stage;
 	
-	private String moveType = "steps";
+	private String moveType = "degrees";
 	private long moveAmountVal = 0;
 	private boolean minsec = false;
 	private boolean continuousScanOn = false;
