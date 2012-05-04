@@ -256,13 +256,13 @@ public class Stage {
 				}
 				while(continuous){
 					if (scanning == false) break;
-					scan(minScan, maxScan,  axis);
+					scan(minScan, maxScan, time, axis);
 
 				}
 
 				for (int i = 1; i <= reps; i++) {
 					if (scanning == false) break;
-					scan(minScan, maxScan, axis);
+					scan(minScan, maxScan, time, axis);
 				}
 
 				window.setScanEnabled(type);
@@ -274,20 +274,18 @@ public class Stage {
 
 	}
 
-	public void scan(double minScan, double maxScan, ActInterface axis){
+	public void scan(double minScan, double maxScan,final double time,ActInterface axis){
 		axis.moveAbsolute(minScan);
-		pauseWhileMoving();
+		pauseWhileMoving((long)time*1000);
 		axis.moveAbsolute(maxScan);
-		pauseWhileMoving();
+		pauseWhileMoving((long)time*1000);
 	}
 
-	public void pauseWhileMoving(){
+	public void pauseWhileMoving(long time){
 		while (isMoving()){
-			pause(500);
+			//pause(500);
 		}
-		System.out.println("");
-		
-		pause(1000);
+		pause(time);
 
 	}
 	public void stopScanning() {
