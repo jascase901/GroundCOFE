@@ -32,6 +32,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 
 import edu.ucsb.deepspace.ActInterface.axisType;
+import edu.ucsb.deepspace.Formatters;
 import edu.ucsb.deepspace.Stage;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -1079,6 +1080,17 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 			@Override
 			public void run() {
 				btnCalibrate.setEnabled(asdf);
+			}
+		});
+	}
+	
+	public void setRaDec(final double ra, final double dec) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				txtRa.setText(Formatters.TWO_POINTS.format(ra));
+				txtDec.setText(Formatters.TWO_POINTS.format(dec));
+				btnRaDecOn.setEnabled(true);
 			}
 		});
 	}

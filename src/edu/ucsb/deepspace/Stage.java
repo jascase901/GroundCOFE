@@ -31,8 +31,6 @@ public class Stage {
 	private double maxMoveRel = 360;
 	private int encTol = 10;
 
-	private int velocity;
-
 	private Timer raDecTracker, lstUpdater;
 	private final ExecutorService exec = Executors.newFixedThreadPool(1);
 	private boolean scanning = false;
@@ -182,9 +180,10 @@ public class Stage {
 				//for FTDI only: velocity of 0 means no motion has occurred
 				//vel=1 currently at rest, but was moving forward
 				//vel=-1 currently at rest, but was moving backwards
-				if (Math.abs(velocity) == 1 || velocity == 0) {
-					moveAbsolute(az, el);
-				}
+//				if (Math.abs(velocity) == 1 || velocity == 0) {
+//					moveAbsolute(az, el);
+//				}
+				moveAbsolute(az, el);
 			}
 		}, 0, period);
 	}
@@ -209,7 +208,6 @@ public class Stage {
 				if (position != null ) {
 					elPos = el.encValToDeg(position.elPos());
 				}
-				
 				double ra = baseLocation.azelToRa(azPos, elPos);
 				double dec = baseLocation.azelToDec(azPos, elPos);
 				double lst = baseLocation.lst();
@@ -391,50 +389,15 @@ public class Stage {
 					break;
 				}
 			}
-
 		});
-	}
-
-	//probably not needed for galil
-	//NOTE!!! this isn't used by the calibrate popup
-	//that method is calibrate(Coordinate c)
-	public void calibrate(double azDeg, double elDeg) {
-		System.out.println("wtf");
-		System.out.println("azDeg: " + azDeg);
-		System.out.println("elDeg: " + elDeg);
-		az.calibrate(azDeg);
-		el.calibrate(elDeg);
-	}
-
-	//TODO probably not needed with Galil
-	public void previousCalibrate(final double previousAz, final double previousEl) {
-		exec.submit(new Runnable() {
-			@Override
-			public void run() {
-				pause(2000);
-				//				ActStatus azStatus = az.getStatus();
-				//				ActStatus elStatus = el.getStatus();
-				//				if (azStatus.allZero() && elStatus.allZero()) {
-				//					az.setOffset(previousAz);
-				//					el.setOffset(previousEl);
-				//				}
-			}
-		});
-	}
-
-	public void initializeValues(double azOffset, double elOffset, double azEncInd, double elEncInd) {
-		az.setOffset(azOffset);
-		az.setEncInd(azEncInd);
-		el.setOffset(elOffset);
-		el.setEncInd(elEncInd);
 	}
 
 	//should return true if something is moving, false if not
-	//FTDI functionality unknown (reed, 4/19/2012)
 	public boolean isMoving() {
 		switch (type) {
 		case FTDI:
-			return Math.abs(velocity) <= 1;
+			return true; //don't care about FTDI right now (5/5/2012, reed)
+			//return Math.abs(velocity) <= 1;
 		case Galil:
 			return position.moving();
 		default:
@@ -451,8 +414,6 @@ public class Stage {
 		}
 	}
 
-	public boolean ftdiRest() {return Math.abs(velocity) <= 1;}
-
 	private void pause(long waitTimeInMS) {
 		try {
 			Thread.sleep(waitTimeInMS);
@@ -460,30 +421,12 @@ public class Stage {
 			e.printStackTrace();
 		}
 	}
-
-	public int getVelocity() {
-		return velocity;
-	}
-
-	//	public void setStatuses(ActStatus azStatus, ActStatus elStatus, int velocity) {
-	//		az.setStatus(azStatus);
-	//		el.setStatus(elStatus);
-	//		this.velocity = velocity;
-	//		//System.out.println("velocity:  " + this.velocity);
-	//	}
-
-	//TODO unneeded?
-	//public double getMinAz() {return minAz;}
-	//public double getMaxAz() {return maxAz;}	
+	
 	public void setMinMaxAz(double minAz, double maxAz) {
 		this.minAz = minAz;
 		this.maxAz = maxAz;
-
 	}
 
-	//TODO unneeded?
-	//public double getMinEl() {return minEl;}
-	//public double getMaxEl() {return maxEl;}	
 	public void setMinMaxEl(double minEl, double maxEl) {
 		this.minEl = minEl;
 		this.maxEl = maxEl;
@@ -499,8 +442,6 @@ public class Stage {
 		String tellVel = "TV";
 		String azAxis = "A";
 		DataGalil data;
-		//TODO
-		//CommGalil protocol = CommGalil.getInstance();
 
 		String azPos = protocol.sendRead(tellPos + azAxis);
 		String azVel = protocol.sendRead(tellVel + azAxis);
@@ -512,26 +453,16 @@ public class Stage {
 	}
 
 	public void sendCommand(String command) {
-		//CommGalil protocol = CommGalil.getInstance();
 		System.out.println(protocol.sendRead(command));
 	}
 
 	public void queueSize() {
-		//CommGalil protocol = CommGalil.getInstance();
 		System.out.println(protocol.queueSize());
 	}
 
 	public void readQueue() {
-		//CommGalil protocol = CommGalil.getInstance();
 		protocol.test();
 	}
-
-	//TODO unneeded?
-	//probably don't need these since the settings files are written from stage
-	//	public double getAzOffset() {return az.getOffset();}
-	//	public double getElOffset() {return el.getOffset();}
-	//	public double getAzEncInd() {return az.getEncInd();}
-	//	public double getElEncInd() {return el.getEncInd();}
 
 	public double currentAzDeg() {
 		//		double azDeg = az.currentDegPos();
@@ -541,8 +472,6 @@ public class Stage {
 		return azDeg;
 	}
 
-	
-	//this doesn't give the position in degrees...
 	public double encPos(axisType axisType) {
 		if (position == null) return 0;
 		switch (axisType) {
@@ -578,7 +507,7 @@ public class Stage {
 	}
 
 	public void setRaDecTracking(double ra, double dec) {
-
+		window.setRaDec(ra, dec);
 	}
 
 	public void setBalloonLocation(LatLongAlt pos) {
@@ -676,7 +605,6 @@ public class Stage {
 		switch (type) {
 		case Galil:
 			closeGalil();
-			//CommGalil.getInstance().close();
 			protocol.close();
 			break;
 		case FTDI:

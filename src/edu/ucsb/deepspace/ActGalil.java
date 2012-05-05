@@ -14,7 +14,6 @@ public class ActGalil implements ActInterface {
 
 	public ActGalil(axisType axis, CommGalil protocol) {
 		this.axis = axis;
-		//this.protocol = CommGalil.getInstance();
 		this.protocol = protocol;
 		if (axis == axisType.AZ) {
 			axisName = "A";
@@ -39,48 +38,21 @@ public class ActGalil implements ActInterface {
 		
 	}
 	
-//	public void update(DataGalil.GalilStatus status) {
-//		this.position = status.pos;
-//		this.velocity = status.vel;
-//	}
-	
 	public String info() {
 		return "info: blank";
 	}
 	
-	//TODO
-	//Galil is really precise.  Probably don't need any external tolerance checking.
-	// Reed, 4/12/2012
 	public void moveAbsolute(double goalPosInDeg) {
 	    if (axis == axisType.AZ) stage.setGoalAz(goalPosInDeg);
 		else stage.setGoalEl(goalPosInDeg);
-		
-		//long encPulses = encPulseToMove(goalPosInDeg);
 	    double goalEnc = degToEncVal(goalPosInDeg);
 		moveEncVal(goalEnc);
-//		pause(2000);
-//		waitWhileMoving();
-//		pause(1000);
-		
-//		double deltaEnc = degToEncVal(goalPosInDeg) - getPos();
-//		System.out.println(deltaEnc);
-//		if (Math.abs(deltaEnc) <= encTol) {
-//			System.out.println("finished moving");
-//		}
-//		else {
-//			System.out.println("recursion");
-//			moveAbsolute(goalPosInDeg);
-//		}
 	}
 	
 	public void moveRelative(double numDeg, String moveType) {
 		double goalDeg = goalPos(moveType, numDeg);
-		System.out.println("goalDeg=" + goalDeg);
-		System.out.println(numDeg);
 		moveAbsolute(goalDeg);
 	}
-	
-	//public void set
 	
 	public void moveEncoder(double numEncPulse) {
 		double goalDeg = goalPos("encoder", numEncPulse);
@@ -103,21 +75,12 @@ public class ActGalil implements ActInterface {
 	
 	//Not sure if this is even relevant to the Galil, but this should convert a desired encoder
 	public double encValToDeg(double encVal) {
-//		System.out.println(axisName);
-//		System.out.println(encVal);
-//		System.out.println(encPulsePerDeg);
-//		System.out.println(offset);
-//		System.out.println("\n");
 		return offset + encVal / encPulsePerDeg;
 	}
 	
 	//Inverse of encValToDeg
 	private double  degToEncVal(double degVal) {
 		return (degVal - offset)*encPulsePerDeg;
-	}
-	
-	private long encPulseToMove(double goalPosInDeg) {
-		return (long) ((goalPosInDeg - offset)*encPulsePerDeg);
 	}
 	
 	public void setVelocity(double vel) {
@@ -132,12 +95,6 @@ public class ActGalil implements ActInterface {
 	//Used so that the user knows where it will end up pointing, AND to verify that the move is valid.
 	private double goalPos(String moveType, double amount) {
 		double goalPos = currentPosDeg();
-		//System.out.println("currentDegPos: " + goalPos);
-		//System.out.println("moveType: " + moveType);
-		//System.out.println("current encoder count: " + degToEncVal(goalPos));
-		
-		
-		//System.out.println("current pos=" + goalPos);
 		switch (moveType) {
 			case "steps": //Galil: steps = enc pulses
 				goalPos += amount / encPulsePerDeg; break;
@@ -150,9 +107,6 @@ public class ActGalil implements ActInterface {
 			default :
 				System.out.println("Error in Galil.goalPos"); break;
 		}
-		//System.out.println("goalPos: " + goalPos);
-		//System.out.println("goalEnc: " + degToEncVal(goalPos));
-		//System.out.println();
 		return goalPos;
 	}
 	
@@ -168,12 +122,7 @@ public class ActGalil implements ActInterface {
 	}
 	
 	public void calibrate(double degVal) {
-		System.out.println("degVal: " + degVal);
-		System.out.println("currentPosDeg: " + currentPosDeg());
-		System.out.println("encPulsePerDeg: " + encPulsePerDeg);
 		offset = degVal - stage.encPos(axis) / encPulsePerDeg;
-		System.out.println("offset: " + offset);
-		System.out.println();
 	}
 	
 	public void index() {

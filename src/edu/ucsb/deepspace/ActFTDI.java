@@ -1,6 +1,5 @@
 package edu.ucsb.deepspace;
 
-import edu.ucsb.deepspace.DataGalil.GalilStatus;
 
 public class ActFTDI implements ActInterface {
 
