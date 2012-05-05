@@ -179,7 +179,7 @@ public class Stage {
 				System.out.println("az:  " + az);
 				System.out.println("el:  " + el);
 				System.out.println();
-				//for FTDI only: velocity of 0 means no motion has occured
+				//for FTDI only: velocity of 0 means no motion has occurred
 				//vel=1 currently at rest, but was moving forward
 				//vel=-1 currently at rest, but was moving backwards
 				if (Math.abs(velocity) == 1 || velocity == 0) {
