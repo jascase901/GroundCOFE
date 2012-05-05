@@ -135,6 +135,7 @@ public class Stage {
 
 	private void closeGalil() {
 		actSettings.setProperty("azOffset", String.valueOf(az.getOffset()));
+		actSettings.setProperty("elOffset", String.valueOf(el.getOffset()));
 		actSettings.setProperty("minAz", String.valueOf(minAz));
 		actSettings.setProperty("maxAz", String.valueOf(maxAz));
 		actSettings.setProperty("minEl", String.valueOf(minEl));
@@ -178,7 +179,7 @@ public class Stage {
 				System.out.println("az:  " + az);
 				System.out.println("el:  " + el);
 				System.out.println();
-				//for FTDI only: velocity of 0 means no motion has occured
+				//for FTDI only: velocity of 0 means no motion has occurred
 				//vel=1 currently at rest, but was moving forward
 				//vel=-1 currently at rest, but was moving backwards
 				if (Math.abs(velocity) == 1 || velocity == 0) {
@@ -203,8 +204,16 @@ public class Stage {
 				if (position != null ) {
 					azPos = az.encValToDeg(position.azPos());
 				}
+<<<<<<< HEAD
 				double elPos = 3;
 
+=======
+				double elPos = 0;
+				if (position != null ) {
+					elPos = el.encValToDeg(position.elPos());
+				}
+				
+>>>>>>> reed
 				double ra = baseLocation.azelToRa(azPos, elPos);
 				double dec = baseLocation.azelToDec(azPos, elPos);
 				double lst = baseLocation.lst();
@@ -215,8 +224,13 @@ public class Stage {
 				//double secLst = (minLst - (int)minLst)*60;
 				//String sLst = Formatters.lstFormatter(hourLst, minLst, secLst);
 				String sLst = Formatters.formatLst(lst);
+<<<<<<< HEAD
 
 				String out = "Az:  " + Formatters.DEGREE_POS.format(azPos);;
+=======
+				
+				String out = "Az:  " + Formatters.DEGREE_POS.format(azPos);
+>>>>>>> reed
 				out += "\nEl:  " + Formatters.DEGREE_POS.format(elPos);
 				out += "\nRA:  " + Formatters.FOUR_POINTS.format(ra);
 				out += "\nDec:  " + Formatters.THREE_POINTS.format(dec);
@@ -303,6 +317,7 @@ public class Stage {
 				else {
 					System.out.println("az not in range");
 				}
+<<<<<<< HEAD
 
 
 				//				System.out.println("should wait - stage");
@@ -317,6 +332,29 @@ public class Stage {
 				//				else {
 				//					System.out.println("el not in range");
 				//				}
+=======
+				if (el.allowedMove("absolute", minEl, maxEl, elDeg)) {
+					System.out.println("allowed el");
+					el.moveAbsolute(elDeg);
+				}
+				else {
+					System.out.println("el not in range");
+				}
+				
+				
+//				System.out.println("should wait - stage");
+//				while (!isAtRest()) {
+//					pause(100);
+//				}
+//				System.out.println("done waiting - stage");
+//				if (elDeg >= minEl && elDeg <= maxEl) {
+//					el.moveAbsolute(elDeg);
+//					System.out.println("allowed el");
+//				}
+//				else {
+//					System.out.println("el not in range");
+//				}
+>>>>>>> reed
 				window.enableMoveButtons();
 			}
 		});
@@ -381,7 +419,12 @@ public class Stage {
 	}
 
 	//probably not needed for galil
+	//NOTE!!! this isn't used by the calibrate popup
+	//that method is calibrate(Coordinate c)
 	public void calibrate(double azDeg, double elDeg) {
+		System.out.println("wtf");
+		System.out.println("azDeg: " + azDeg);
+		System.out.println("elDeg: " + elDeg);
 		az.calibrate(azDeg);
 		el.calibrate(elDeg);
 	}
@@ -520,8 +563,14 @@ public class Stage {
 		double azDeg = position.azPos();
 		return azDeg;
 	}
+<<<<<<< HEAD
 
 	public double degPos(axisType axisType) {
+=======
+	
+	//this doesn't give the position in degrees...
+	public double encPos(axisType axisType) {
+>>>>>>> reed
 		if (position == null) return 0;
 		switch (axisType) {
 		case AZ:
@@ -617,6 +666,7 @@ public class Stage {
 
 	public void calibrate(Coordinate c) {
 		az.calibrate(c.getAz());
+		el.calibrate(c.getEl());
 	}
 
 	public void buttonEnabler(String name) {

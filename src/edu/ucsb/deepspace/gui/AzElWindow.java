@@ -161,7 +161,9 @@ public class AzElWindow {
 					el += elSecVal/3600;
 				}
 				Coordinate c = new Coordinate(el, az);
+				
 				if (type.equals("calibrate")) {
+					System.out.println(type);
 					stage.calibrate(c);
 				}
 				else if (type.equals("gotopos")) {

@@ -864,11 +864,16 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     }
 	
 	public void buttonEnabler(String name) {
-		Button btn = buttonMap.get(name);
+		final Button btn = buttonMap.get(name);
 		if (btn == null) {
 			return;
 		}
-		btn.setEnabled(true);
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				btn.setEnabled(true);
+			}
+		});
 	}
 	
 	public void enableMoveButtons() {
