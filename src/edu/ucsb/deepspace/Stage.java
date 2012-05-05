@@ -135,6 +135,7 @@ public class Stage {
 	
 	private void closeGalil() {
 		actSettings.setProperty("azOffset", String.valueOf(az.getOffset()));
+		actSettings.setProperty("elOffset", String.valueOf(el.getOffset()));
 		actSettings.setProperty("minAz", String.valueOf(minAz));
 		actSettings.setProperty("maxAz", String.valueOf(maxAz));
 		actSettings.setProperty("minEl", String.valueOf(minEl));
@@ -203,7 +204,10 @@ public class Stage {
 				if (position != null ) {
 					azPos = az.encValToDeg(position.azPos());
 				}
-				double elPos = 3;
+				double elPos = 0;
+				if (position != null ) {
+					elPos = el.encValToDeg(position.elPos());
+				}
 				
 				double ra = baseLocation.azelToRa(azPos, elPos);
 				double dec = baseLocation.azelToDec(azPos, elPos);
@@ -216,7 +220,7 @@ public class Stage {
 				//String sLst = Formatters.lstFormatter(hourLst, minLst, secLst);
 				String sLst = Formatters.formatLst(lst);
 				
-				String out = "Az:  " + Formatters.DEGREE_POS.format(azPos);;
+				String out = "Az:  " + Formatters.DEGREE_POS.format(azPos);
 				out += "\nEl:  " + Formatters.DEGREE_POS.format(elPos);
 				out += "\nRA:  " + Formatters.FOUR_POINTS.format(ra);
 				out += "\nDec:  " + Formatters.THREE_POINTS.format(dec);
@@ -289,6 +293,13 @@ public class Stage {
 				}
 				else {
 					System.out.println("az not in range");
+				}
+				if (el.allowedMove("absolute", minEl, maxEl, elDeg)) {
+					System.out.println("allowed el");
+					el.moveAbsolute(elDeg);
+				}
+				else {
+					System.out.println("el not in range");
 				}
 				
 				
@@ -368,7 +379,12 @@ public class Stage {
 	}
 	
 	//probably not needed for galil
+	//NOTE!!! this isn't used by the calibrate popup
+	//that method is calibrate(Coordinate c)
 	public void calibrate(double azDeg, double elDeg) {
+		System.out.println("wtf");
+		System.out.println("azDeg: " + azDeg);
+		System.out.println("elDeg: " + elDeg);
 		az.calibrate(azDeg);
 		el.calibrate(elDeg);
 	}
@@ -508,7 +524,8 @@ public class Stage {
 		return azDeg;
 	}
 	
-	public double degPos(axisType axisType) {
+	//this doesn't give the position in degrees...
+	public double encPos(axisType axisType) {
 		if (position == null) return 0;
 		switch (axisType) {
 			case AZ:
@@ -604,6 +621,7 @@ public class Stage {
 	
 	public void calibrate(Coordinate c) {
 		az.calibrate(c.getAz());
+		el.calibrate(c.getEl());
 	}
 	
 	public void buttonEnabler(String name) {

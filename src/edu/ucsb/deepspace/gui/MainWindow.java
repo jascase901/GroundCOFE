@@ -43,7 +43,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private final Properties windowSettings = new Properties();
 	private Stage stage;
 	
-	private String moveType = "steps";
+	private String moveType = "degrees";
 	private long moveAmountVal = 0;
 	private boolean minsec = false;
 	private boolean continuousScanOn = false;
@@ -860,11 +860,16 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     }
 	
 	public void buttonEnabler(String name) {
-		Button btn = buttonMap.get(name);
+		final Button btn = buttonMap.get(name);
 		if (btn == null) {
 			return;
 		}
-		btn.setEnabled(true);
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				btn.setEnabled(true);
+			}
+		});
 	}
 	
 	public void enableMoveButtons() {

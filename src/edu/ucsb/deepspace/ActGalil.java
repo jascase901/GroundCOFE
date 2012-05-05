@@ -6,7 +6,7 @@ public class ActGalil implements ActInterface {
 	private Stage stage;
 	private CommGalil protocol;
 	private int encPulsePerRev;
-	private double encPulsePerDeg = ((double) encPulsePerRev) / 360d;
+	private double encPulsePerDeg;
 	private boolean indexing;
 	private String axisName = "";
 	private double offset = 0;
@@ -24,6 +24,7 @@ public class ActGalil implements ActInterface {
 			axisName = "B";
 			encPulsePerRev = 4000;
 		}
+		encPulsePerDeg = ((double) encPulsePerRev) / 360d;
 	}
 	
 	//I haven't found a need for this yet.  (Reed, 2/15/2012)
@@ -73,8 +74,8 @@ public class ActGalil implements ActInterface {
 	
 	public void moveRelative(double numDeg, String moveType) {
 		double goalDeg = goalPos(moveType, numDeg);
-		//System.out.println("goalDeg=" + goalDeg);
-		//System.out.println(numDeg);
+		System.out.println("goalDeg=" + goalDeg);
+		System.out.println(numDeg);
 		moveAbsolute(goalDeg);
 	}
 	
@@ -96,11 +97,16 @@ public class ActGalil implements ActInterface {
 	}
 	
 	private double currentPosDeg() {
-		return encValToDeg(stage.degPos(axis));
+		return encValToDeg(stage.encPos(axis));
 	}
 	
 	//Not sure if this is even relevant to the Galil, but this should convert a desired encoder
 	public double encValToDeg(double encVal) {
+//		System.out.println(axisName);
+//		System.out.println(encVal);
+//		System.out.println(encPulsePerDeg);
+//		System.out.println(offset);
+//		System.out.println("\n");
 		return offset + encVal / encPulsePerDeg;
 	}
 	
@@ -161,10 +167,24 @@ public class ActGalil implements ActInterface {
 	}
 	
 	public void calibrate(double degVal) {
-		offset = degVal - currentPosDeg() / encPulsePerDeg;
+		System.out.println("degVal: " + degVal);
+		System.out.println("currentPosDeg: " + currentPosDeg());
+		System.out.println("encPulsePerDeg: " + encPulsePerDeg);
+		offset = degVal - stage.encPos(axis) / encPulsePerDeg;
+		System.out.println("offset: " + offset);
+		System.out.println();
 	}
 	
 	public void index() {
+		switch (axis) {
+			case AZ:
+				indexGalilAz(); break;
+			case EL:
+				indexGalilEl(); break;
+		}
+	}
+	
+	private void indexGalilAz() {
 		// Save acceleration and jog speed values
 		protocol.sendRead("T1 = _JG" + axisName);
 		protocol.sendRead("T2 = _AC" + axisName);
@@ -173,6 +193,7 @@ public class ActGalil implements ActInterface {
 		protocol.sendRead("MG \"Homing\", T1");
 		double jg = 150000d;
 		jg = jg * encPulsePerRev / azEncPerRev;
+		System.out.println(jg);
 		protocol.sendRead("JG" + axisName + "=" + jg);
 		double ac = 50000d;
 		ac = ac * encPulsePerRev / azEncPerRev;
@@ -194,10 +215,29 @@ public class ActGalil implements ActInterface {
 		protocol.sendRead("BG" + axisName);
 		protocol.sendRead("AM" + axisName);
 		protocol.sendRead("MG \"Motion Done\";TP" + axisName);
-		
+
 		// Finally, restore accel and jog speeds from before routine was run
 		protocol.sendRead("JG" + axisName + "=T1");
 		protocol.sendRead("AC" + axisName + "=T2");
+	}
+	
+	private void indexGalilEl() {
+		System.out.println("hi");
+		System.out.println(axisName);
+		// Save acceleration and jog speed values
+		//protocol.sendRead("T1 = _JG" + axisName);
+		//protocol.sendRead("T2 = _AC" + axisName);
+		
+		double jg = 500d;
+		protocol.sendRead("JG" + axisName + "=" + jg);
+		
+		// Do the index search ("FI")
+		protocol.sendRead("FI" + axisName);
+		protocol.sendRead("BG" + axisName);
+		
+		// Finally, restore accel and jog speeds from before routine was run
+		//protocol.sendRead("JG" + axisName + "=T1");
+		//protocol.sendRead("AC" + axisName + "=T2");
 	}
 	
 	public void setEncInd(double encInd) {
