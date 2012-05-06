@@ -31,8 +31,8 @@ public interface ActInterface {
 	
 	public void index();
 	
-	public void setEncInd(double encInd);
-	public double getEncInd();
+//	public void setEncInd(double encInd);
+//	public double getEncInd();
 	
 	public void setOffset(double indexOffset);
 	public double getOffset();

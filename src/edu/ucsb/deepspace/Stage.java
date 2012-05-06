@@ -33,7 +33,6 @@ public class Stage {
 
 	private Timer raDecTracker, lstUpdater;
 	private final ExecutorService exec = Executors.newFixedThreadPool(2);
-	private boolean scanning = false;
 	private ActInterface az, el;
 	private MainWindow window;
 	private boolean commStatus = false;
@@ -235,85 +234,30 @@ public class Stage {
 		}, 0, 1000);
 	}
 	
-	public void reedstartScanning(final ScanCommand azSc, final ScanCommand elSc) {
+	public void startScanning(final ScanCommand azSc, final ScanCommand elSc) {
 		if (azSc == null && elSc == null) {
 			window.updateStatusArea("Fatal error.  The ScanCommands associated with Az and El are both null.\n");
 			return;
 		}
+		//I changed the size of the thread pool executor to 2.  This may have unintended consequences
+		//for other pieces of the code.  However, this is the only way I could get both to scan at
+		//the same time AND have the scanning done from inside the ActGalil class.
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
 				az.scan(azSc);
-				//el.scan(elSc);
 			}
 		});
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
-				//az.scan(azSc);
 				el.scan(elSc);
 			}
 		});
+		window.setScanEnabled(axisType.BOTH);
 	}
 	
-	public void startScanning(final double minScan, final double maxScan, final double time, final int reps, final axisType type, final boolean continuous ) {
-		System.out.println("min angle:  " + minScan);
-		System.out.println("max angle:  " + maxScan);
-		System.out.println("time:  " + time);
-		System.out.println("axis:  " + type.toString());
-
-		scanning = true;
-
-		exec.submit(new Runnable() {
-			@Override
-			public void run() {
-				double min = 0, max = 0;
-				ActInterface axis = null;
-				switch (type) {
-				case AZ:
-					axis = az; min = minAz; max = maxAz; break;
-				case EL:
-					axis = el; min = minEl; max = maxEl; break;
-				}
-				System.out.println(min +" "+ max);
-				if (minScan < min || maxScan > max) {
-					System.out.println("invalid minscan or maxscan");
-					return;
-				}
-				while(continuous){
-					if (scanning == false) break;
-					scan(minScan, maxScan, time, axis);
-				}
-
-				for (int i = 1; i <= reps; i++) {
-					if (scanning == false) break;
-					scan(minScan, maxScan, time, axis);
-				}
-
-				window.setScanEnabled(type);
-
-				stopScanning();
-
-			}
-		});
-	}
-
-	public void scan(double minScan, double maxScan,final double time,ActInterface axis){
-		axis.moveAbsolute(minScan);
-		pauseWhileMoving((long)time*1000);
-		axis.moveAbsolute(maxScan);
-		pauseWhileMoving((long)time*1000);
-	}
-
-	public void pauseWhileMoving(long time){
-		while (isMoving()){
-			//pause(500);
-		}
-		pause(time);
-
-	}
 	public void stopScanning() {
-		scanning = false;
 		az.stopScanning();
 		el.stopScanning();
 	}
@@ -338,7 +282,7 @@ public class Stage {
 					System.out.println("el not in range");
 				}
 				
-				window.enableMoveButtons();
+				window.controlMoveButtons(true);
 			}
 		});
 	}
@@ -377,7 +321,7 @@ public class Stage {
 				else{
 					window.displayErrorBox("Not allowed to move here");
 				}
-				window.enableMoveButtons();
+				window.controlMoveButtons(true);
 			}
 		});
 	}

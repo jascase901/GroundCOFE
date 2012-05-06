@@ -4,7 +4,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -39,6 +41,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
 public class MainWindow extends org.eclipse.swt.widgets.Composite {
+	public static enum buttonGroups {
+		SCAN, RELATIVE;
+	}
+	
 	private boolean debug = true;
 	private String debugAxis = "A";
 	
@@ -117,6 +123,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Button btnDebugEl;
 	private Text txtDebugVel;
 	private Text txtStatusArea;
+	private List<Text> scanAzTexts = new ArrayList<Text>();
+	private List<Text> scanElTexts = new ArrayList<Text>();
 
 	public MainWindow(Composite parent, int style, Stage stage, Stage.stageType stageType) {
 		super(parent, style);
@@ -179,7 +187,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	azMinus.setText("azMinus");
     	azMinus.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
-    			disableMoveButtons();
+    			controlMoveButtons(false);
     			stage.relative(axisType.AZ, moveType, -moveAmountVal);
     		}
     	});
@@ -189,7 +197,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	azPlus.setText("azPlus");
     	azPlus.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
-    			disableMoveButtons();
+    			controlMoveButtons(false);
     			stage.relative(axisType.AZ, moveType, moveAmountVal);
     		}
     	});
@@ -199,7 +207,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	elMinus.setText("elMinus");
     	elMinus.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
-    			disableMoveButtons();
+    			controlMoveButtons(false);
     			stage.relative(axisType.EL, moveType, -moveAmountVal);
     		}
     	});
@@ -209,7 +217,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	elPlus.setText("elPlus");
     	elPlus.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
-    			disableMoveButtons();
+    			controlMoveButtons(false);
     			stage.relative(axisType.EL, moveType, moveAmountVal);
     		}
     	});
@@ -603,21 +611,27 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	txtMinAzScan = new Text(grpScanning, SWT.BORDER);
     	txtMinAzScan.setBounds(59, 16, 43, 19);
+    	scanAzTexts.add(txtMinAzScan);
     	
     	txtMaxAzScan = new Text(grpScanning, SWT.BORDER);
     	txtMaxAzScan.setBounds(59, 41, 43, 19);
+    	scanAzTexts.add(txtMaxAzScan);
     	
     	txtTimeAzScan = new Text(grpScanning, SWT.BORDER);
     	txtTimeAzScan.setBounds(59, 66, 43, 19);
+    	scanAzTexts.add(txtTimeAzScan);
     	
     	txtMinElScan = new Text(grpScanning, SWT.BORDER);
     	txtMinElScan.setBounds(154, 16, 43, 19);
+    	scanElTexts.add(txtMinElScan);
     	
     	txtMaxElScan = new Text(grpScanning, SWT.BORDER);
     	txtMaxElScan.setBounds(154, 41, 43, 19);
+    	scanElTexts.add(txtMaxElScan);
     	
     	txtTimeElScan = new Text(grpScanning, SWT.BORDER);
     	txtTimeElScan.setBounds(154, 66, 43, 19);
+    	scanElTexts.add(txtTimeElScan);
     	
     	Label lblRepetitionsScan = new Label(grpScanning, SWT.NONE);
     	lblRepetitionsScan.setBounds(13, 96, 58, 19);
@@ -625,6 +639,9 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	txtRepScan = new Text(grpScanning, SWT.BORDER);
     	txtRepScan.setBounds(72, 96, 43, 19);
+    	scanAzTexts.add(txtRepScan);
+    	scanElTexts.add(txtRepScan);
+    	
     	
     	btnScanAz = new Button(grpScanning, SWT.NONE);
     	btnScanAz.setBounds(10, 121, 68, 23);
@@ -634,9 +651,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		public void mouseDown(MouseEvent e) {
     			if (btnScanAz.getText().equals("Stop Scan")) {
     				setScanEnabled(axisType.AZ);
+    				stage.stopScanning();
     			}
     			else {
-    				if (!validScanAzInput()) {
+    				if (!validateScanInput(scanAzTexts)) {
     					return;
     				}
     				
@@ -651,7 +669,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     				//stage.startScanning(min, max, time, reps, axisType.AZ, continuousScanOn);
     				
     				ScanCommand azSc = new ScanCommand(min, max, time, reps, continuousScanOn);
-    				stage.reedstartScanning(azSc, null);
+    				stage.startScanning(azSc, null);
     			}
     		}
     	});
@@ -664,10 +682,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		public void mouseDown(MouseEvent e) {
     			if (btnScanEl.getText().equals("Stop Scan")) {
     				setScanEnabled(axisType.EL);
-    				
+    				stage.stopScanning();
     			}
     			else {
-    				if (!validScanElInput()) {
+    				if (!validateScanInput(scanElTexts)) {
     					return;
     				}
     				
@@ -682,7 +700,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
         			//stage.startScanning(min, max, time, reps, axisType.EL,continuousScanOn);
         			
         			ScanCommand elSc = new ScanCommand(min, max, time, reps, continuousScanOn);
-        			stage.reedstartScanning(null, elSc);
+        			stage.startScanning(null, elSc);
     			}
     		}
     	});
@@ -696,9 +714,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     			if (btnScanBoth.getText().equals("Stop Scan")) {
     				enableScanButtons();
     				btnScanBoth.setText("Scan Both");
+    				stage.stopScanning();
     			}
     			else {
-    				if (!validScanAzInput() && !validScanElInput()) {
+    				if (!validateScanInput(scanAzTexts) && !validateScanInput(scanElTexts)) {
     					return;
     				}
     				
@@ -712,7 +731,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     				
     				ScanCommand azSc = new ScanCommand(minAz, maxAz, timeAz, reps, continuousScanOn);
     				ScanCommand elSc = new ScanCommand(minEl, maxEl, timeEl, reps, continuousScanOn);
-    				stage.reedstartScanning(azSc, elSc);
+    				stage.startScanning(azSc, elSc);
     				
     				btnScanBoth.setText("Stop Scan");
     				btnScanEl.setEnabled(false);
@@ -896,23 +915,16 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		});
 	}
 	
-	public void enableMoveButtons() {
+	public void controlMoveButtons(final boolean trueFalse) {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				azPlus.setEnabled(true);
-				azMinus.setEnabled(true);
-				elPlus.setEnabled(true);
-				elMinus.setEnabled(true);
+				azPlus.setEnabled(trueFalse);
+				azMinus.setEnabled(trueFalse);
+				elPlus.setEnabled(trueFalse);
+				elMinus.setEnabled(trueFalse);
 			}
 		});
-	}
-	
-	public void disableMoveButtons() {
-		azPlus.setEnabled(false);
-		azMinus.setEnabled(false);
-		elPlus.setEnabled(false);
-		elMinus.setEnabled(false);
 	}
 	
 	public void enableButtons() {
@@ -931,7 +943,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	btnDecimalMinutes.setEnabled(true);
     	btnRadioSteps.setEnabled(true);
     	btnRadioDegrees.setEnabled(true);
-    	btnEncoderSteps.setEnabled(true);
+    	//btnEncoderSteps.setEnabled(true);
     	txtEncTol.setEnabled(true);
     	if (radecOn) btnRaDecOff.setEnabled(true);
     	else if (txtRa.getText().equals("") && txtDec.getText().equals("")) {}
@@ -977,7 +989,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	btnDecimalMinutes.setEnabled(false);
     	btnRadioSteps.setEnabled(false);
     	btnRadioDegrees.setEnabled(false);
-    	btnEncoderSteps.setEnabled(false);
+    	//btnEncoderSteps.setEnabled(false);
     	txtEncTol.setEnabled(false);
     	btnRaDecOn.setEnabled(false);
     	btnGoToRaDec.setEnabled(false);
@@ -1008,7 +1020,6 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		btnScanAz.setEnabled(true);
 		btnScanEl.setEnabled(true);
 		btnScanBoth.setEnabled(true);
-		
 	}
 	
 	public void updateTxtPosInfo(final String info) {
@@ -1085,21 +1096,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 				case EL:
 					btnScanEl.setText("Scan El");
 				}
-				stage.stopScanning();
+				
 			}
 		});
-		
-		
 	}
-
-//	public void temp(final boolean asdf) {
-//		Display.getDefault().asyncExec(new Runnable() {
-//			@Override
-//			public void run() {
-//				btnCalibrate.setEnabled(asdf);
-//			}
-//		});
-//	}
 	
 	public void setRaDec(final double ra, final double dec) {
 		Display.getDefault().asyncExec(new Runnable() {
@@ -1130,51 +1130,15 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		}
 	}
 	
-	private boolean validScanAzInput() {
-		if (!isDouble(txtMinAzScan.getText())) {
-			updateStatusArea("This is not a valid number.\n");
-			txtMinAzScan.setFocus();
-			return false;
-		}
-		if (!isDouble(txtMaxAzScan.getText())) {
-			updateStatusArea("This is not a valid number.\n");
-			txtMaxAzScan.setFocus();
-			return false;
-		}
-		if (!isDouble(txtTimeAzScan.getText())) {
-			updateStatusArea("This is not a valid number.\n");
-			txtTimeAzScan.setFocus();
-			return false;
-		}
-		if (!isDouble(txtRepScan.getText())) {
-			updateStatusArea("This is not a valid number.\n");
-			txtRepScan.setFocus();
-			return false;
+	private boolean validateScanInput(List<Text> texts) {
+		for (Text t : texts) {
+			if (!isDouble(t.getText())) {
+				updateStatusArea("This is not a valid number.\n");
+				t.setFocus();
+				return false;
+			}
 		}
 		return true;
 	}
 	
-	private boolean validScanElInput() {
-		if (!isDouble(txtMinElScan.getText())) {
-			updateStatusArea("This is not a valid number.\n");
-			txtMinElScan.setFocus();
-			return false;
-		}
-		if (!isDouble(txtMaxElScan.getText())) {
-			updateStatusArea("This is not a valid number.\n");
-			txtMaxElScan.setFocus();
-			return false;
-		}
-		if (!isDouble(txtTimeElScan.getText())) {
-			updateStatusArea("This is not a valid number.\n");
-			txtTimeElScan.setFocus();
-			return false;
-		}
-		if (!isDouble(txtRepScan.getText())) {
-			updateStatusArea("This is not a valid number.\n");
-			txtRepScan.setFocus();
-			return false;
-		}
-		return true;
-	}
 }

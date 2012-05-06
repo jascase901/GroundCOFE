@@ -70,7 +70,6 @@ public class ActGalil implements ActInterface {
 		return encValToDeg(stage.encPos(axis));
 	}
 	
-	//Not sure if this is even relevant to the Galil, but this should convert a desired encoder
 	public double encValToDeg(double encVal) {
 		return offset + encVal / encPulsePerDeg;
 	}
@@ -111,10 +110,8 @@ public class ActGalil implements ActInterface {
 	public boolean allowedMove(String moveType, double min, double max, double amount) {
 		double goalPos = goalPos(moveType, amount);
 		if (goalPos >= min && goalPos <= max) {
-			//System.out.println("Allowed Move");
 			return true;
 		}
-		//System.out.println("Not Allowed move:golpos="+goalPos+" min="+min+" max="+max);
 		return false;
 	}
 	
@@ -169,8 +166,6 @@ public class ActGalil implements ActInterface {
 	}
 	
 	private void indexGalilEl() {
-		System.out.println("hi");
-		System.out.println(axisName);
 		// Save acceleration and jog speed values
 		//protocol.sendRead("T1 = _JG" + axisName);
 		//protocol.sendRead("T2 = _AC" + axisName);
@@ -187,14 +182,10 @@ public class ActGalil implements ActInterface {
 		//protocol.sendRead("AC" + axisName + "=T2");
 	}
 	
-	public void setEncInd(double encInd) {
-		
-	}
-	public double getEncInd() {return 0;}
-	
 	public void setOffset(double indexOffset) {
 		offset = indexOffset;
 	}
+	
 	public double getOffset() {return offset;}
 
 	public void scan(ScanCommand sc) {
