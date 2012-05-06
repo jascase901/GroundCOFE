@@ -31,11 +31,8 @@ public class Stage {
 	private double maxMoveRel = 360;
 	private int encTol = 10;
 
-	private int velocity;
-
 	private Timer raDecTracker, lstUpdater;
-	private final ExecutorService exec = Executors.newFixedThreadPool(1);
-	private boolean scanning = false;
+	private final ExecutorService exec = Executors.newFixedThreadPool(2);
 	private ActInterface az, el;
 	private MainWindow window;
 	private boolean commStatus = false;
@@ -70,8 +67,13 @@ public class Stage {
 			el.registerStage(this);
 			break;
 		case FTDI:
-			az = new ActFTDI();
-			el = new ActFTDI();
+			//These are commented out because I made the ActFTDI class abstract.
+			//I got tired of adding new functionality to the ActInterface and having to "implement" the method
+			//in ActFTDI.  Once abstract, I could no longer instantiate them.  Hence they are now commented out.
+			//Reed, 5/5/2012
+			
+			//az = new ActFTDI();
+			//el = new ActFTDI();
 			reader = new ReaderFTDI(this);
 			loadFTDI();
 			break;
@@ -81,6 +83,18 @@ public class Stage {
 			System.out.println("reader started");
 			reader.start();
 		}
+	}
+	
+	public String axisName(axisType axis) {
+		switch (axis) {
+		case AZ:
+			return "A";
+		case EL:
+			return "B";
+		default:
+			System.out.println("this should never happen.  Stage.axisName()");
+		}
+		return "error Stage.axisName()";
 	}
 
 	private void loadSettings() throws FileNotFoundException, IOException {
@@ -182,9 +196,10 @@ public class Stage {
 				//for FTDI only: velocity of 0 means no motion has occurred
 				//vel=1 currently at rest, but was moving forward
 				//vel=-1 currently at rest, but was moving backwards
-				if (Math.abs(velocity) == 1 || velocity == 0) {
-					moveAbsolute(az, el);
-				}
+//				if (Math.abs(velocity) == 1 || velocity == 0) {
+//					moveAbsolute(az, el);
+//				}
+				moveAbsolute(az, el);
 			}
 		}, 0, period);
 	}
@@ -200,13 +215,9 @@ public class Stage {
 			public void run() {		
 				Calendar local = Calendar.getInstance();
 
-				double azPos = 0;
+				double azPos = 0, elPos = 0;
 				if (position != null ) {
 					azPos = az.encValToDeg(position.azPos());
-				}
-
-				double elPos = 0;
-				if (position != null ) {
 					elPos = el.encValToDeg(position.elPos());
 				}
 				
@@ -220,7 +231,6 @@ public class Stage {
 				//double secLst = (minLst - (int)minLst)*60;
 				//String sLst = Formatters.lstFormatter(hourLst, minLst, secLst);
 				String sLst = Formatters.formatLst(lst);
-
 				
 				String out = "Az:  " + Formatters.DEGREE_POS.format(azPos);
 
@@ -235,68 +245,33 @@ public class Stage {
 			}
 		}, 0, 1000);
 	}
-
-	//Unknown functionality at the moment.  (2/13/2012)
-	public void startScanning(final double minScan, final double maxScan, final double time, final int reps, final axisType type, final boolean continuous ) {
-		System.out.println("min angle:  " + minScan);
-		System.out.println("max angle:  " + maxScan);
-		System.out.println("time:  " + time);
-		System.out.println("axis:  " + type.toString());
-
-		scanning = true;
-
+	
+	public void startScanning(final ScanCommand azSc, final ScanCommand elSc) {
+		if (azSc == null && elSc == null) {
+			window.updateStatusArea("Fatal error.  The ScanCommands associated with Az and El are both null.\n");
+			return;
+		}
+		//I changed the size of the thread pool executor to 2.  This may have unintended consequences
+		//for other pieces of the code.  However, this is the only way I could get both to scan at
+		//the same time AND have the scanning done from inside the ActGalil class.
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
-				double min = 0, max = 0;
-				ActInterface axis = null;
-				switch (type) {
-				case AZ:
-					axis = az; min = minAz; max = maxAz; break;
-				case EL:
-					axis = el; min = minEl; max = maxEl; break;
-				}
-				System.out.println(min +" "+ max);
-				if (minScan < min || maxScan > max) {
-					System.out.println("invalid minscan or maxscan");
-					return;
-				}
-				while(continuous){
-					if (scanning == false) break;
-					scan(minScan, maxScan, time, axis);
-
-				}
-
-				for (int i = 1; i <= reps; i++) {
-					if (scanning == false) break;
-					scan(minScan, maxScan, time, axis);
-				}
-
-				window.setScanEnabled(type);
-
-				stopScanning();
-
+				az.scan(azSc);
 			}
 		});
-
+		exec.submit(new Runnable() {
+			@Override
+			public void run() {
+				el.scan(elSc);
+			}
+		});
+		window.setScanEnabled(axisType.BOTH);
 	}
-
-	public void scan(double minScan, double maxScan,final double time,ActInterface axis){
-		axis.moveAbsolute(minScan);
-		pauseWhileMoving((long)time*1000);
-		axis.moveAbsolute(maxScan);
-		pauseWhileMoving((long)time*1000);
-	}
-
-	public void pauseWhileMoving(long time){
-		while (isMoving()){
-			//pause(500);
-		}
-		pause(time);
-
-	}
+	
 	public void stopScanning() {
-		scanning = false;
+		az.stopScanning();
+		el.stopScanning();
 	}
 
 	public void moveAbsolute(final double azDeg, final double elDeg) {
@@ -319,20 +294,7 @@ public class Stage {
 					System.out.println("el not in range");
 				}
 				
-				
-//				System.out.println("should wait - stage");
-//				while (!isAtRest()) {
-//					pause(100);
-//				}
-//				System.out.println("done waiting - stage");
-//				if (elDeg >= minEl && elDeg <= maxEl) {
-//					el.moveAbsolute(elDeg);
-//					System.out.println("allowed el");
-//				}
-//				else {
-//					System.out.println("el not in range");
-//				}
-				window.enableMoveButtons();
+				window.controlMoveButtons(true);
 			}
 		});
 	}
@@ -371,7 +333,7 @@ public class Stage {
 				else{
 					window.displayErrorBox("Not allowed to move here");
 				}
-				window.enableMoveButtons();
+				window.controlMoveButtons(true);
 			}
 		});
 	}
@@ -391,50 +353,15 @@ public class Stage {
 					break;
 				}
 			}
-
 		});
-	}
-
-	//probably not needed for galil
-	//NOTE!!! this isn't used by the calibrate popup
-	//that method is calibrate(Coordinate c)
-	public void calibrate(double azDeg, double elDeg) {
-		System.out.println("wtf");
-		System.out.println("azDeg: " + azDeg);
-		System.out.println("elDeg: " + elDeg);
-		az.calibrate(azDeg);
-		el.calibrate(elDeg);
-	}
-
-	//TODO probably not needed with Galil
-	public void previousCalibrate(final double previousAz, final double previousEl) {
-		exec.submit(new Runnable() {
-			@Override
-			public void run() {
-				pause(2000);
-				//				ActStatus azStatus = az.getStatus();
-				//				ActStatus elStatus = el.getStatus();
-				//				if (azStatus.allZero() && elStatus.allZero()) {
-				//					az.setOffset(previousAz);
-				//					el.setOffset(previousEl);
-				//				}
-			}
-		});
-	}
-
-	public void initializeValues(double azOffset, double elOffset, double azEncInd, double elEncInd) {
-		az.setOffset(azOffset);
-		az.setEncInd(azEncInd);
-		el.setOffset(elOffset);
-		el.setEncInd(elEncInd);
 	}
 
 	//should return true if something is moving, false if not
-	//FTDI functionality unknown (reed, 4/19/2012)
 	public boolean isMoving() {
 		switch (type) {
 		case FTDI:
-			return Math.abs(velocity) <= 1;
+			return true; //don't care about FTDI right now (5/5/2012, reed)
+			//return Math.abs(velocity) <= 1;
 		case Galil:
 			return position.moving();
 		default:
@@ -451,8 +378,6 @@ public class Stage {
 		}
 	}
 
-	public boolean ftdiRest() {return Math.abs(velocity) <= 1;}
-
 	private void pause(long waitTimeInMS) {
 		try {
 			Thread.sleep(waitTimeInMS);
@@ -460,30 +385,12 @@ public class Stage {
 			e.printStackTrace();
 		}
 	}
-
-	public int getVelocity() {
-		return velocity;
-	}
-
-	//	public void setStatuses(ActStatus azStatus, ActStatus elStatus, int velocity) {
-	//		az.setStatus(azStatus);
-	//		el.setStatus(elStatus);
-	//		this.velocity = velocity;
-	//		//System.out.println("velocity:  " + this.velocity);
-	//	}
-
-	//TODO unneeded?
-	//public double getMinAz() {return minAz;}
-	//public double getMaxAz() {return maxAz;}	
+	
 	public void setMinMaxAz(double minAz, double maxAz) {
 		this.minAz = minAz;
 		this.maxAz = maxAz;
-
 	}
 
-	//TODO unneeded?
-	//public double getMinEl() {return minEl;}
-	//public double getMaxEl() {return maxEl;}	
 	public void setMinMaxEl(double minEl, double maxEl) {
 		this.minEl = minEl;
 		this.maxEl = maxEl;
@@ -499,8 +406,6 @@ public class Stage {
 		String tellVel = "TV";
 		String azAxis = "A";
 		DataGalil data;
-		//TODO
-		//CommGalil protocol = CommGalil.getInstance();
 
 		String azPos = protocol.sendRead(tellPos + azAxis);
 		String azVel = protocol.sendRead(tellVel + azAxis);
@@ -512,37 +417,29 @@ public class Stage {
 	}
 
 	public void sendCommand(String command) {
-		//CommGalil protocol = CommGalil.getInstance();
 		System.out.println(protocol.sendRead(command));
 	}
 
 	public void queueSize() {
-		//CommGalil protocol = CommGalil.getInstance();
 		System.out.println(protocol.queueSize());
 	}
 
 	public void readQueue() {
-		//CommGalil protocol = CommGalil.getInstance();
 		protocol.test();
 	}
 
-	//TODO unneeded?
-	//probably don't need these since the settings files are written from stage
-	//	public double getAzOffset() {return az.getOffset();}
-	//	public double getElOffset() {return el.getOffset();}
-	//	public double getAzEncInd() {return az.getEncInd();}
-	//	public double getElEncInd() {return el.getEncInd();}
-
 	public double currentAzDeg() {
-		//		double azDeg = az.currentDegPos();
-		//		return azDeg;
 		if (position == null) return 0;
 		double azDeg = position.azPos();
 		return azDeg;
 	}
-
 	
-	//this doesn't give the position in degrees...
+	public double currentElDeg() {
+		if (position == null) return 0;
+		double azDeg = position.elPos();
+		return azDeg;
+	}
+
 	public double encPos(axisType axisType) {
 		if (position == null) return 0;
 		switch (axisType) {
@@ -553,14 +450,6 @@ public class Stage {
 		default:
 			return 0;
 		}
-	}
-
-	public double currentElDeg() {
-		//		double elDeg = el.currentDegPos();
-		//		return elDeg;
-		if (position == null) return 0;
-		double azDeg = position.elPos();
-		return azDeg;
 	}
 
 	public void indexingDone(axisType type) {
@@ -578,13 +467,22 @@ public class Stage {
 	}
 
 	public void setRaDecTracking(double ra, double dec) {
-
+		window.setRaDec(ra, dec);
 	}
 
+	public void setBaseLocation(LatLongAlt pos) {
+		baseLocation = pos;
+		calcAzElToBalloon();
+		window.updateBaseBalloonLoc();
+	}
+	
 	public void setBalloonLocation(LatLongAlt pos) {
 		balloonLocation = pos;
+		calcAzElToBalloon();
 		window.updateBaseBalloonLoc();
-
+	}
+	
+	private void calcAzElToBalloon() {
 		Coordinate base = new Coordinate(baseLocation);
 		Coordinate balloon = new Coordinate(balloonLocation);
 
@@ -607,11 +505,6 @@ public class Stage {
 		elToBalloon = Math.toDegrees(Math.atan2(zRel, xyRel));
 		azToBalloon = Math.toDegrees(Math.atan2(xRel, yRel));
 		if (azToBalloon < 0) azToBalloon = azToBalloon + 360;
-	}
-
-	public void setBaseLocation(LatLongAlt pos) {
-		baseLocation = pos;
-		window.updateBaseBalloonLoc();
 	}
 
 	public LatLongAlt getBalloonLocation() {
@@ -676,7 +569,6 @@ public class Stage {
 		switch (type) {
 		case Galil:
 			closeGalil();
-			//CommGalil.getInstance().close();
 			protocol.close();
 			break;
 		case FTDI:

@@ -148,17 +148,19 @@ public class AzElWindow {
 			public void mouseDown(MouseEvent evt) {
 				double azDegVal = Double.parseDouble(azDeg.getText());
 				double azMinVal = Double.parseDouble(azMin.getText());
+				double azMod = Math.signum(azDegVal);
 				double azSecVal;
 				double elDegVal = Double.parseDouble(elDeg.getText());
 				double elMinVal = Double.parseDouble(elMin.getText());
+				double elMod = Math.signum(elDegVal);
 				double elSecVal;
-				double az = azDegVal + azMinVal/60;
-				double el = elDegVal + elMinVal/60;
+				double az = azDegVal + azMod*azMinVal/60;
+				double el = elDegVal + elMod*elMinVal/60;
 				if (minsec) {
 					azSecVal = Double.parseDouble(azSec.getText());
 					elSecVal = Double.parseDouble(elSec.getText());
-					az += azSecVal/3600;
-					el += elSecVal/3600;
+					az += azMod*azSecVal/3600;
+					el += elMod*elSecVal/3600;
 				}
 				Coordinate c = new Coordinate(el, az);
 				
