@@ -199,16 +199,4 @@ public class ActGalil implements ActInterface {
 		offset = indexOffset;
 	}
 	public double getOffset() {return offset;}
-	
-//	public void setStatus(ActStatus status) {
-//		
-//	}
-	
-	private void pause(long waitTimeInMS) {
-		try {
-			Thread.sleep(waitTimeInMS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
 }

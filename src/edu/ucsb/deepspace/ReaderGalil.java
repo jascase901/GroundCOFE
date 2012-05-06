@@ -6,7 +6,6 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 	private CommGalil protocol;
 	private final Stage stage;
 	private String azAxis = "";
-	@SuppressWarnings("unused")
 	private String elAxis = "";
 	
 	public ReaderGalil(Stage stage) {

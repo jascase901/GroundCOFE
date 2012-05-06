@@ -115,6 +115,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 
 	private Button btnDebugEl;
 	private Text txtDebugVel;
+	private Text txtStatusArea;
 
 	public MainWindow(Composite parent, int style, Stage stage, Stage.stageType stageType) {
 		super(parent, style);
@@ -367,7 +368,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	txtPosInfo.setBounds(290, 17, 181, 226);
     	txtPosInfo.setText("Actuator Information\r\n");
     	
-    	final Text txtStatusArea = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
+    	txtStatusArea = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
     	txtStatusArea.setBounds(10, 294, 251, 208);
     	txtStatusArea.setText("StatusArea\n\n");
     	
@@ -625,34 +626,28 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	txtRepScan.setBounds(72, 96, 43, 19);
     	
     	btnScanAz = new Button(grpScanning, SWT.NONE);
-    	
-    	
     	btnScanAz.setBounds(10, 121, 68, 23);
     	btnScanAz.setText("Scan Az");
     	btnScanAz.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
     			if (btnScanAz.getText().equals("Stop Scan")) {
-
-    			
     				setScanEnabled(axisType.AZ);
-    			
-    				
-    				
     			}
     			else {
+    				if (!validScanAzInput()) {
+    					return;
+    				}
+    				
     				btnScanAz.setText("Stop Scan");
     				btnScanEl.setEnabled(false);
     				btnScanBoth.setEnabled(false);
-    				try {
-	    				double min = Double.parseDouble(txtMinAzScan.getText());
-	    				double max = Double.parseDouble(txtMaxAzScan.getText());
-	    				double time = Double.parseDouble(txtTimeAzScan.getText());
-	    				int reps = Integer.parseInt(txtRepScan.getText());
-	    				stage.startScanning(min, max, time, reps, axisType.AZ, continuousScanOn);
-    				} catch (NumberFormatException e1) {
-    					e1.printStackTrace();
-    				}
+    				
+    				double min = Double.parseDouble(txtMinAzScan.getText());
+    				double max = Double.parseDouble(txtMaxAzScan.getText());
+    				double time = Double.parseDouble(txtTimeAzScan.getText());
+    				int reps = Integer.parseInt(txtRepScan.getText());
+    				//stage.startScanning(min, max, time, reps, axisType.AZ, continuousScanOn);
     			}
     		}
     	});
@@ -668,18 +663,19 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     				
     			}
     			else {
+    				if (!validScanElInput()) {
+    					return;
+    				}
+    				
     				btnScanEl.setText("Stop Scan");
     				btnScanBoth.setEnabled(false);
         			btnScanAz.setEnabled(false);
-        			try {
-	        			double min = Double.parseDouble(txtMinElScan.getText());
-	    				double max = Double.parseDouble(txtMaxElScan.getText());
-	    				double time = Double.parseDouble(txtTimeElScan.getText());
-	    				int reps = Integer.parseInt(txtRepScan.getText());
-	        			stage.startScanning(min, max, time, reps, axisType.EL,continuousScanOn);
-        			} catch (NumberFormatException e1) {
-        				
-        			}
+        			
+        			double min = Double.parseDouble(txtMinElScan.getText());
+        			double max = Double.parseDouble(txtMaxElScan.getText());
+        			double time = Double.parseDouble(txtTimeElScan.getText());
+        			int reps = Integer.parseInt(txtRepScan.getText());
+        			//stage.startScanning(min, max, time, reps, axisType.EL,continuousScanOn);
     			}
     		}
     	});
@@ -695,6 +691,9 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     				btnScanBoth.setText("Scan Both");
     			}
     			else {
+    				if (!validScanAzInput() && !validScanElInput()) {
+    					return;
+    				}
     				btnScanBoth.setText("Stop Scan");
     				btnScanEl.setEnabled(false);
         			btnScanAz.setEnabled(false);
@@ -1093,5 +1092,71 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 				btnRaDecOn.setEnabled(true);
 			}
 		});
+	}
+	
+	public void updateStatusArea(final String message) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				txtStatusArea.append(message);
+			}
+		});
+	}
+	
+	public boolean isDouble(String input) {
+		try {
+			Double.parseDouble(input);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+	
+	private boolean validScanAzInput() {
+		if (!isDouble(txtMinAzScan.getText())) {
+			updateStatusArea("This is not a valid number.\n");
+			txtMinAzScan.setFocus();
+			return false;
+		}
+		if (!isDouble(txtMaxAzScan.getText())) {
+			updateStatusArea("This is not a valid number.\n");
+			txtMaxAzScan.setFocus();
+			return false;
+		}
+		if (!isDouble(txtTimeAzScan.getText())) {
+			updateStatusArea("This is not a valid number.\n");
+			txtTimeAzScan.setFocus();
+			return false;
+		}
+		if (!isDouble(txtRepScan.getText())) {
+			updateStatusArea("This is not a valid number.\n");
+			txtRepScan.setFocus();
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean validScanElInput() {
+		if (!isDouble(txtMinElScan.getText())) {
+			updateStatusArea("This is not a valid number.\n");
+			txtMinElScan.setFocus();
+			return false;
+		}
+		if (!isDouble(txtMaxElScan.getText())) {
+			updateStatusArea("This is not a valid number.\n");
+			txtMaxElScan.setFocus();
+			return false;
+		}
+		if (!isDouble(txtTimeElScan.getText())) {
+			updateStatusArea("This is not a valid number.\n");
+			txtTimeElScan.setFocus();
+			return false;
+		}
+		if (!isDouble(txtRepScan.getText())) {
+			updateStatusArea("This is not a valid number.\n");
+			txtRepScan.setFocus();
+			return false;
+		}
+		return true;
 	}
 }

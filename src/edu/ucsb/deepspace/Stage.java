@@ -199,15 +199,12 @@ public class Stage {
 			public void run() {		
 				Calendar local = Calendar.getInstance();
 
-				double azPos = 0;
+				double azPos = 0, elPos = 0;
 				if (position != null ) {
 					azPos = az.encValToDeg(position.azPos());
-				}
-
-				double elPos = 0;
-				if (position != null ) {
 					elPos = el.encValToDeg(position.elPos());
 				}
+				
 				double ra = baseLocation.azelToRa(azPos, elPos);
 				double dec = baseLocation.azelToDec(azPos, elPos);
 				double lst = baseLocation.lst();
@@ -218,7 +215,6 @@ public class Stage {
 				//double secLst = (minLst - (int)minLst)*60;
 				//String sLst = Formatters.lstFormatter(hourLst, minLst, secLst);
 				String sLst = Formatters.formatLst(lst);
-
 				
 				String out = "Az:  " + Formatters.DEGREE_POS.format(azPos);
 
@@ -233,8 +229,7 @@ public class Stage {
 			}
 		}, 0, 1000);
 	}
-
-	//Unknown functionality at the moment.  (2/13/2012)
+	
 	public void startScanning(final double minScan, final double maxScan, final double time, final int reps, final axisType type, final boolean continuous ) {
 		System.out.println("min angle:  " + minScan);
 		System.out.println("max angle:  " + maxScan);
@@ -317,19 +312,6 @@ public class Stage {
 					System.out.println("el not in range");
 				}
 				
-				
-//				System.out.println("should wait - stage");
-//				while (!isAtRest()) {
-//					pause(100);
-//				}
-//				System.out.println("done waiting - stage");
-//				if (elDeg >= minEl && elDeg <= maxEl) {
-//					el.moveAbsolute(elDeg);
-//					System.out.println("allowed el");
-//				}
-//				else {
-//					System.out.println("el not in range");
-//				}
 				window.enableMoveButtons();
 			}
 		});
@@ -465,10 +447,14 @@ public class Stage {
 	}
 
 	public double currentAzDeg() {
-		//		double azDeg = az.currentDegPos();
-		//		return azDeg;
 		if (position == null) return 0;
 		double azDeg = position.azPos();
+		return azDeg;
+	}
+	
+	public double currentElDeg() {
+		if (position == null) return 0;
+		double azDeg = position.elPos();
 		return azDeg;
 	}
 
@@ -482,14 +468,6 @@ public class Stage {
 		default:
 			return 0;
 		}
-	}
-
-	public double currentElDeg() {
-		//		double elDeg = el.currentDegPos();
-		//		return elDeg;
-		if (position == null) return 0;
-		double azDeg = position.elPos();
-		return azDeg;
 	}
 
 	public void indexingDone(axisType type) {
@@ -510,10 +488,19 @@ public class Stage {
 		window.setRaDec(ra, dec);
 	}
 
+	public void setBaseLocation(LatLongAlt pos) {
+		baseLocation = pos;
+		calcAzElToBalloon();
+		window.updateBaseBalloonLoc();
+	}
+	
 	public void setBalloonLocation(LatLongAlt pos) {
 		balloonLocation = pos;
+		calcAzElToBalloon();
 		window.updateBaseBalloonLoc();
-
+	}
+	
+	private void calcAzElToBalloon() {
 		Coordinate base = new Coordinate(baseLocation);
 		Coordinate balloon = new Coordinate(balloonLocation);
 
@@ -536,11 +523,6 @@ public class Stage {
 		elToBalloon = Math.toDegrees(Math.atan2(zRel, xyRel));
 		azToBalloon = Math.toDegrees(Math.atan2(xRel, yRel));
 		if (azToBalloon < 0) azToBalloon = azToBalloon + 360;
-	}
-
-	public void setBaseLocation(LatLongAlt pos) {
-		baseLocation = pos;
-		window.updateBaseBalloonLoc();
 	}
 
 	public LatLongAlt getBalloonLocation() {
