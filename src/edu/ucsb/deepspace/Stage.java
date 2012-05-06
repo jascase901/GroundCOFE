@@ -84,6 +84,18 @@ public class Stage {
 			reader.start();
 		}
 	}
+	
+	public String axisName(axisType axis) {
+		switch (axis) {
+		case AZ:
+			return "A";
+		case EL:
+			return "B";
+		default:
+			System.out.println("this should never happen.  Stage.axisName()");
+		}
+		return "error Stage.axisName()";
+	}
 
 	private void loadSettings() throws FileNotFoundException, IOException {
 		//read settings from file

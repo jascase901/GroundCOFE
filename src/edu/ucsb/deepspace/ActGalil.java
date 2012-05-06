@@ -17,11 +17,9 @@ public class ActGalil implements ActInterface {
 		this.axis = axis;
 		this.protocol = protocol;
 		if (axis == axisType.AZ) {
-			axisName = "A";
 			encPulsePerRev = 1000*1024;
 		}
 		else {
-			axisName = "B";
 			encPulsePerRev = 4000;
 		}
 		encPulsePerDeg = ((double) encPulsePerRev) / 360d;
@@ -29,6 +27,7 @@ public class ActGalil implements ActInterface {
 	
 	public void registerStage(Stage stage) {
 		this.stage = stage;
+		axisName = stage.axisName(axis);
 	}
 	
 	public void configure() {

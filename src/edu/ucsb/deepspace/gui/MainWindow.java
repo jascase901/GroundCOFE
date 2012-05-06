@@ -1084,7 +1084,6 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		});
 	}
 	
-
 	public void setScanEnabled(final axisType type){
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
@@ -1096,7 +1095,6 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 				case EL:
 					btnScanEl.setText("Scan El");
 				}
-				
 			}
 		});
 	}
