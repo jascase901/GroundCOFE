@@ -33,6 +33,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import edu.ucsb.deepspace.ActInterface.axisType;
 import edu.ucsb.deepspace.Formatters;
+import edu.ucsb.deepspace.ScanCommand;
 import edu.ucsb.deepspace.Stage;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -648,6 +649,9 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     				double time = Double.parseDouble(txtTimeAzScan.getText());
     				int reps = Integer.parseInt(txtRepScan.getText());
     				//stage.startScanning(min, max, time, reps, axisType.AZ, continuousScanOn);
+    				
+    				ScanCommand azSc = new ScanCommand(min, max, time, reps, continuousScanOn);
+    				stage.reedstartScanning(azSc, null);
     			}
     		}
     	});
@@ -676,6 +680,9 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
         			double time = Double.parseDouble(txtTimeElScan.getText());
         			int reps = Integer.parseInt(txtRepScan.getText());
         			//stage.startScanning(min, max, time, reps, axisType.EL,continuousScanOn);
+        			
+        			ScanCommand elSc = new ScanCommand(min, max, time, reps, continuousScanOn);
+        			stage.reedstartScanning(null, elSc);
     			}
     		}
     	});
@@ -694,6 +701,19 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     				if (!validScanAzInput() && !validScanElInput()) {
     					return;
     				}
+    				
+    				double minAz = Double.parseDouble(txtMinAzScan.getText());
+    				double maxAz = Double.parseDouble(txtMaxAzScan.getText());
+    				double timeAz = Double.parseDouble(txtTimeAzScan.getText());
+    				double minEl = Double.parseDouble(txtMinElScan.getText());
+        			double maxEl = Double.parseDouble(txtMaxElScan.getText());
+        			double timeEl = Double.parseDouble(txtTimeElScan.getText());
+    				int reps = Integer.parseInt(txtRepScan.getText());
+    				
+    				ScanCommand azSc = new ScanCommand(minAz, maxAz, timeAz, reps, continuousScanOn);
+    				ScanCommand elSc = new ScanCommand(minEl, maxEl, timeEl, reps, continuousScanOn);
+    				stage.reedstartScanning(azSc, elSc);
+    				
     				btnScanBoth.setText("Stop Scan");
     				btnScanEl.setEnabled(false);
         			btnScanAz.setEnabled(false);
@@ -1066,22 +1086,20 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 					btnScanEl.setText("Scan El");
 				}
 				stage.stopScanning();
-				
-				System.out.println("set text");
 			}
 		});
 		
 		
 	}
 
-	public void temp(final boolean asdf) {
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				btnCalibrate.setEnabled(asdf);
-			}
-		});
-	}
+//	public void temp(final boolean asdf) {
+//		Display.getDefault().asyncExec(new Runnable() {
+//			@Override
+//			public void run() {
+//				btnCalibrate.setEnabled(asdf);
+//			}
+//		});
+//	}
 	
 	public void setRaDec(final double ra, final double dec) {
 		Display.getDefault().asyncExec(new Runnable() {

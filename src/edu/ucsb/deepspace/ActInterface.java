@@ -3,7 +3,7 @@ package edu.ucsb.deepspace;
 public interface ActInterface {
 	
 	public static enum axisType {
-		AZ, EL;
+		AZ, EL, BOTH;
 	}
 	
 	//Associate the stage instance with the axes so that they can send information to the stage.
@@ -44,6 +44,10 @@ public interface ActInterface {
 	//public boolean isMoving();
 	
 	public double encValToDeg(double encVal);
+	
+	public void scan(ScanCommand sc);
+	
+	public void stopScanning();
 	
 	//public void update(DataGalil.GalilStatus status);
 

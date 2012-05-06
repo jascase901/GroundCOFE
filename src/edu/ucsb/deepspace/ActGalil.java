@@ -11,6 +11,7 @@ public class ActGalil implements ActInterface {
 	private String axisName = "";
 	private double offset = 0;
 	private double azEncPerRev=1000*1024;
+	private boolean scanning = false;
 
 	public ActGalil(axisType axis, CommGalil protocol) {
 		this.axis = axis;
@@ -22,14 +23,10 @@ public class ActGalil implements ActInterface {
 		else {
 			axisName = "B";
 			encPulsePerRev = 4000;
-			
 		}
 		encPulsePerDeg = ((double) encPulsePerRev) / 360d;
 	}
 	
-	//I haven't found a need for this yet.  (Reed, 2/15/2012)
-	//The FTDI actuator does make use of stage, however.
-	//Might as well leave it here for now.
 	public void registerStage(Stage stage) {
 		this.stage = stage;
 	}
@@ -199,4 +196,48 @@ public class ActGalil implements ActInterface {
 		offset = indexOffset;
 	}
 	public double getOffset() {return offset;}
+
+	public void scan(ScanCommand sc) {
+		if (sc == null) return;
+		
+		double firstMoveDelta = Math.abs(sc.getMin() - currentPosDeg());
+		firstMoveDelta *= encPulsePerDeg;
+		
+		double delta = sc.getMax() - sc.getMin();
+		delta *= encPulsePerDeg;
+		
+		double vel = delta / sc.getTime();
+		setVelocity(vel);
+		
+		scanning = true;
+		
+		moveAbsolute(sc.getMin());
+		pause(1000*(firstMoveDelta/vel + .1));
+		moveAbsolute(sc.getMax());
+		pause(1000*(sc.getTime()+ .1));
+		
+		int i = 1;
+		while (scanning) {
+			moveAbsolute(sc.getMin());
+			pause(1000*(sc.getTime()+ .1));
+			
+			moveAbsolute(sc.getMax());
+			pause(1000*(sc.getTime()+ .1));
+			
+			i++;
+			if (i >= sc.getReps() && !sc.getContinuous()) scanning = false;
+		}
+	}
+	
+	public void stopScanning() {
+		this.scanning = false;
+	}
+	
+	private void pause(double timeInMS) {
+		try {
+			Thread.sleep((long) timeInMS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 }

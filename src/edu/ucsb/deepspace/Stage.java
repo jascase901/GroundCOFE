@@ -32,7 +32,7 @@ public class Stage {
 	private int encTol = 10;
 
 	private Timer raDecTracker, lstUpdater;
-	private final ExecutorService exec = Executors.newFixedThreadPool(1);
+	private final ExecutorService exec = Executors.newFixedThreadPool(2);
 	private boolean scanning = false;
 	private ActInterface az, el;
 	private MainWindow window;
@@ -68,8 +68,13 @@ public class Stage {
 			el.registerStage(this);
 			break;
 		case FTDI:
-			az = new ActFTDI();
-			el = new ActFTDI();
+			//These are commented out because I made the ActFTDI class abstract.
+			//I got tired of adding new functionality to the ActInterface and having to "implement" the method
+			//in ActFTDI.  Once abstract, I could no longer instantiate them.  Hence they are now commented out.
+			//Reed, 5/5/2012
+			
+			//az = new ActFTDI();
+			//el = new ActFTDI();
 			reader = new ReaderFTDI(this);
 			loadFTDI();
 			break;
@@ -230,6 +235,27 @@ public class Stage {
 		}, 0, 1000);
 	}
 	
+	public void reedstartScanning(final ScanCommand azSc, final ScanCommand elSc) {
+		if (azSc == null && elSc == null) {
+			window.updateStatusArea("Fatal error.  The ScanCommands associated with Az and El are both null.\n");
+			return;
+		}
+		exec.submit(new Runnable() {
+			@Override
+			public void run() {
+				az.scan(azSc);
+				//el.scan(elSc);
+			}
+		});
+		exec.submit(new Runnable() {
+			@Override
+			public void run() {
+				//az.scan(azSc);
+				el.scan(elSc);
+			}
+		});
+	}
+	
 	public void startScanning(final double minScan, final double maxScan, final double time, final int reps, final axisType type, final boolean continuous ) {
 		System.out.println("min angle:  " + minScan);
 		System.out.println("max angle:  " + maxScan);
@@ -257,7 +283,6 @@ public class Stage {
 				while(continuous){
 					if (scanning == false) break;
 					scan(minScan, maxScan, time, axis);
-
 				}
 
 				for (int i = 1; i <= reps; i++) {
@@ -271,7 +296,6 @@ public class Stage {
 
 			}
 		});
-
 	}
 
 	public void scan(double minScan, double maxScan,final double time,ActInterface axis){
@@ -290,6 +314,8 @@ public class Stage {
 	}
 	public void stopScanning() {
 		scanning = false;
+		az.stopScanning();
+		el.stopScanning();
 	}
 
 	public void moveAbsolute(final double azDeg, final double elDeg) {

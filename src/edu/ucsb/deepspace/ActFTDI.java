@@ -1,7 +1,7 @@
 package edu.ucsb.deepspace;
 
 
-public class ActFTDI implements ActInterface {
+public abstract class ActFTDI implements ActInterface {
 
 	@Override
 	public void registerStage(Stage stage) {
