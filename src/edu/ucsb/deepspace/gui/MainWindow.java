@@ -1091,10 +1091,13 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 				enableScanButtons();
 				switch (type) {
 				case AZ:
-					btnScanAz.setText("Scan Az" );
+					btnScanAz.setText("Scan Az" ); break;
 				case EL:
-					btnScanEl.setText("Scan El");
+					btnScanEl.setText("Scan El"); break;
+				case BOTH:
+					btnScanBoth.setText("Scan Both"); break;
 				}
+				
 			}
 		});
 	}
