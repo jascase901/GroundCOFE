@@ -218,8 +218,8 @@ public class Stage {
 
 				double azPos = 0, elPos = 0;
 				if (position != null ) {
-					azPos = az.encValToDeg(position.azPos());
-					elPos = el.encValToDeg(position.elPos());
+					azPos = az.encValToDegUser(position.azPos());
+					elPos = el.encValToDegUser(position.elPos());
 				}
 				
 				double ra = baseLocation.azelToRa(azPos, elPos);

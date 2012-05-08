@@ -37,10 +37,12 @@ public class ActGalil implements ActInterface {
 	public String info() {
 		return "info: blank";
 	}
-	
+	//TODO
 	public void moveAbsolute(double goalPosInDeg) {
+		
 	    if (axis == axisType.AZ) stage.setGoalAz(goalPosInDeg);
 		else stage.setGoalEl(goalPosInDeg);
+	    goalPosInDeg = goalPosInDeg + currentPosDeg();
 	    double goalEnc = degToEncVal(goalPosInDeg);
 		moveEncVal(goalEnc);
 	}
@@ -88,6 +90,7 @@ public class ActGalil implements ActInterface {
 	
 	//This method will be used to calculate the final position as a result of a move command.
 	//Used so that the user knows where it will end up pointing, AND to verify that the move is valid.
+	//TODO
 	private double goalPos(String moveType, double amount) {
 		double goalPos = currentPosDeg();
 		switch (moveType) {
@@ -221,6 +224,10 @@ public class ActGalil implements ActInterface {
 	
 	public void stopScanning() {
 		this.scanning = false;
+	}
+	
+	public double encValToDegUser(double encVal){
+		return encValToDeg(encVal) %360;
 	}
 	
 	private void pause(double timeInMS) {
