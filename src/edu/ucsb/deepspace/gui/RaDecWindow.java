@@ -175,17 +175,20 @@ public class RaDecWindow {
 			public void mouseDown(MouseEvent evt) {
 				double raHourVal = Double.parseDouble(raHour.getText());
 				double raMinVal = Double.parseDouble(raMin.getText());
+				double raMod = Math.signum(raHourVal);
 				double raSecVal;
+				
 				double decDegVal = Double.parseDouble(decDeg.getText());
 				double decMinVal = Double.parseDouble(decMin.getText());
+				double decMod = Math.signum(decDegVal);
 				double decSecVal;
-				double ra = raHourVal + raMinVal/60;
-				double dec = decDegVal + decMinVal/60;
+				double ra = raHourVal + raMod*raMinVal/60;
+				double dec = decDegVal + decMod*decMinVal/60;
 				if (minsec) {
 					raSecVal = Double.parseDouble(raSec.getText());
 					decSecVal = Double.parseDouble(decSec.getText());
-					ra += raSecVal/3600;
-					dec += decSecVal/3600;
+					ra += raMod*raSecVal/3600;
+					dec += decMod*decSecVal/3600;
 				}
 				raVal = ra;
 				decVal = dec;

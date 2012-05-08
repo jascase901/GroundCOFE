@@ -21,6 +21,12 @@ public class DataGalil implements DataInterface {
 	}
 	
 	void makeEl(String pos, String vel) {
+		if (pos.equals("")) {
+			pos = "0";
+		}
+		if (vel.equals("")) {
+			vel = "0";
+		}
 		double dPos = Double.parseDouble(pos);
 		double dVel = Double.parseDouble(vel); 
 		el = new GalilStatus(dPos, dVel);
