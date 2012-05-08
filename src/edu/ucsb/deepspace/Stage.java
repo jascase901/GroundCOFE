@@ -42,7 +42,7 @@ public class Stage {
 	private final Properties settings = new Properties();
 	private LatLongAlt baseLocation, balloonLocation;
 	private double azToBalloon = 0, elToBalloon = 0;
-	private CommGalil protocol;
+	private CommGalil protocol, protocolTest;
 
 	public Stage() {
 		try {
@@ -59,8 +59,9 @@ public class Stage {
 		switch (type) {
 		case Galil:
 			protocol = new CommGalil(1337);
+			protocolTest = new CommGalil(1338);
 			az = new ActGalil(axisType.AZ, protocol);
-			el = new ActGalil(axisType.EL, protocol);
+			el = new ActGalil(axisType.EL, protocolTest);
 			reader = new ReaderGalil(this);
 			loadGalil();
 			az.registerStage(this);
@@ -266,6 +267,12 @@ public class Stage {
 				el.scan(elSc);
 			}
 		});
+		if (elSc == null) {
+			window.setScanEnabled(axisType.AZ);
+		}
+		else if (azSc == null) {
+			window.setScanEnabled(axisType.EL);
+		}
 		window.setScanEnabled(axisType.BOTH);
 	}
 	
