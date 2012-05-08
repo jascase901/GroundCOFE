@@ -29,6 +29,39 @@ Running From within java
 	3)Hit the f-11 key on your keyboard
 	test
 			
+			
+			
+How to pull master
+1: 	reset master last pull(deletes code changes in master)
+	git reset --hard
+2: pull master branch from git
+	git pull origin master
+
+How to add code
+1:pull from master
+	see pull from master
+2:make a new branch for your code
+	git branch <name_of_branch>
+3:switch to that branch
+	git checkout <name_of_branch>
+4: make your changes to that branch
+	type code into eclipse
+5: switch to master
+	git checkout master
+6:  pull master
+	see how to pull master
+7: merge branches
+	git merge <name_of_branch>
+7a:if no conflicts  then push branch
+	git push origin master
+7b:if it says cant merge do to conflict
+	type in git mergetool
+	
+	
+
+
+	
+	
 
 Todo:	
 	
