@@ -550,6 +550,10 @@ public class Stage {
 		position = data;
 		window.updateTxtPosInfo(position.info());
 	}
+	
+	void updateVelAcc(String azVel, String azAcc, String elVel, String elAcc) {
+		window.updateVelAcc(azVel, azAcc, elVel, elAcc);
+	}
 
 	void toggleReader() {
 		reader.togglePauseFlag();

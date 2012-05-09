@@ -21,6 +21,8 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
@@ -32,13 +34,10 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-
 import edu.ucsb.deepspace.ActInterface.axisType;
 import edu.ucsb.deepspace.Formatters;
 import edu.ucsb.deepspace.ScanCommand;
 import edu.ucsb.deepspace.Stage;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 
 public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	public static enum buttonGroups {
@@ -126,6 +125,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Text txtStatusArea;
 	private List<Text> scanAzTexts = new ArrayList<Text>();
 	private List<Text> scanElTexts = new ArrayList<Text>();
+	private Text txtVelAz;
+	private Text txtAccAz;
+	private Text txtVelEl;
+	private Text txtAccEl;
 
 	public MainWindow(Composite parent, int style, Stage stage, Stage.stageType stageType) {
 		super(parent, style);
@@ -162,7 +165,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
         Group area = new Group(this, SWT.NONE);
         area.setText("");
         area.setLayout(null);
-        area.setBounds(10, 10, 724, 727);
+        area.setBounds(10, 10, 724, 872);
         
 //--------------------------------------------------------------------------------------------------------------------
     	Group grpJoystick = new Group(area, SWT.NONE);
@@ -389,7 +392,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	txtPosInfo.setText("Actuator Information\r\n");
     	
     	txtStatusArea = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
-    	txtStatusArea.setBounds(10, 294, 251, 208);
+    	txtStatusArea.setBounds(10, 453, 251, 208);
     	txtStatusArea.setText("StatusArea\n\n");
     	
     	txtBalloonLocation = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI);
@@ -594,7 +597,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	Group grpScanning = new Group(area, SWT.NONE);
     	grpScanning.setText("Scanning");
-    	grpScanning.setBounds(10, 524, 359, 193);
+    	grpScanning.setBounds(10, 669, 359, 193);
     	
     	Label lblMinAzScan = new Label(grpScanning, SWT.NONE);
     	lblMinAzScan.setBounds(13, 16, 40, 19);
@@ -879,6 +882,19 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
+    	txtVelAz = new Text(area, SWT.BORDER);
+    	txtVelAz.setBounds(10, 318, 49, 19);
+    	
+    	txtAccAz = new Text(area, SWT.BORDER);
+    	txtAccAz.setBounds(65, 318, 49, 19);
+    	
+    	txtVelEl = new Text(area, SWT.BORDER);
+    	txtVelEl.setBounds(10, 344, 49, 19);
+    	
+    	txtAccEl = new Text(area, SWT.BORDER);
+    	txtAccEl.setBounds(65, 344, 49, 19);
+    	
+    	
     	
     	//TODO hide the debug stuff
     	if (debug) {
@@ -1161,5 +1177,18 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 			}
 		}
 		return true;
+	}
+	
+	public void updateVelAcc(final String azVel, final String azAcc, final String elVel, final String elAcc) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				//System.out.println("adsf");
+				txtVelAz.setText(azVel);
+				txtAccAz.setText(azAcc);
+				txtVelEl.setText(elVel);
+				txtAccEl.setText(elAcc);
+			}
+		});
 	}
 }
