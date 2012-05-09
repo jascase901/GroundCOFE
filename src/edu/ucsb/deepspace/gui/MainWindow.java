@@ -56,6 +56,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private long moveAmountVal = 0;
 	private boolean minsec = false;
 	private boolean continuousScanOn = false;
+	private boolean rasterScan = false;
 	private double minAz, maxAz, minEl, maxEl;
 	private int encTol;
 	private boolean radecOn = false;
@@ -161,7 +162,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
         Group area = new Group(this, SWT.NONE);
         area.setText("");
         area.setLayout(null);
-        area.setBounds(10, 10, 724, 690);
+        area.setBounds(10, 10, 724, 727);
         
 //--------------------------------------------------------------------------------------------------------------------
     	Group grpJoystick = new Group(area, SWT.NONE);
@@ -290,6 +291,11 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnCalibrate = new Button(area, SWT.PUSH | SWT.CENTER);
+    	btnCalibrate.addSelectionListener(new SelectionAdapter() {
+    		@Override
+    		public void widgetSelected(SelectionEvent e) {
+    		}
+    	});
     	btnCalibrate.setText("Calibrate");
     	btnCalibrate.setBounds(296, 471, 87, 31);
     	buttonMap.put("calibrate", btnCalibrate);
@@ -301,6 +307,11 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnGoToPosition = new Button(area, SWT.NONE);
+    	btnGoToPosition.addSelectionListener(new SelectionAdapter() {
+    		@Override
+    		public void widgetSelected(SelectionEvent e) {
+    		}
+    	});
     	btnGoToPosition.setBounds(384, 471, 87, 31);
     	btnGoToPosition.setText("Go to Position");
     	buttonMap.put("gotopos", btnGoToPosition);
@@ -583,7 +594,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	Group grpScanning = new Group(area, SWT.NONE);
     	grpScanning.setText("Scanning");
-    	grpScanning.setBounds(118, 524, 251, 156);
+    	grpScanning.setBounds(10, 524, 359, 193);
     	
     	Label lblMinAzScan = new Label(grpScanning, SWT.NONE);
     	lblMinAzScan.setBounds(13, 16, 40, 19);
@@ -741,12 +752,22 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnContinuousScan = new Button(grpScanning, SWT.CHECK);
-    	btnContinuousScan.setBounds(141, 91, 100, 24);
+    	btnContinuousScan.setBounds(203, 13, 100, 24);
     	btnContinuousScan.setText("Continuous Scan");
     	btnContinuousScan.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
     			continuousScanOn = !continuousScanOn;
+    		}
+    	});
+    	
+    	Button btnScnRaster = new Button(grpScanning, SWT.CHECK);
+    	btnScnRaster.setBounds(203, 44, 85, 16);
+    	btnScnRaster.setText("Raster Scan");
+    	btnScnRaster.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			rasterScan = !rasterScan;
     		}
     	});
     	
@@ -1141,5 +1162,4 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		}
 		return true;
 	}
-	
 }

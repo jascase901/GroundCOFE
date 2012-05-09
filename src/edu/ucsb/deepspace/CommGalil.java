@@ -21,6 +21,7 @@ public class CommGalil implements CommInterface {
 	boolean connection = false;
 	
 	public CommGalil(int port) {
+		System.out.println("hi from CommGalil constructor");
 		try {
 			socket = new Socket();
 			socket.connect(new InetSocketAddress("192.168.1.200", port), 3000);

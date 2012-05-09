@@ -28,13 +28,34 @@ Running From within java
 	2)select Main.java
 	3)Hit the f-11 key on your keyboard
 	test
+	
+Reed  5/8
+two ERRORS right now
+Weird "?" error
+velocity / position are sometimes flipped.  this error can be reproduced by indexing az, and then indexing el
+
 			
 
 Todo:	
-	
-different move types in joystick section
-degrees modulus 360
+maximum velocity and acceleration display and control.  something similar to min/max az/el
+joystick should be a pure move relative, without going through Stage.moveAbsolute
+ra/dec calibration
 redo popup window text entry
+
+status area.  the user needs information about what's going on in the program
+
+
+debug needs to show absolute position
+
+raster scan
+
+data output.  during ra/dec tracking and scanning.  into some sort of text file
+
+
+ra/dec + raster scan
+fool proof.  try breaking the program
+
+
 
 
 customize user interface for galil or ftdi?
