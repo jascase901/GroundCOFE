@@ -499,18 +499,6 @@ public class Stage {
 		protocol.test();
 	}
 
-//	public double currentAzDeg() {
-//		if (position == null) return 0;
-//		double azDeg = position.azPos();
-//		return azDeg;
-//	}
-	
-//	public double currentElDeg() {
-//		if (position == null) return 0;
-//		double azDeg = position.elPos();
-//		return azDeg;
-//	}
-
 	public double encPos(axisType axisType) {
 		if (position == null) return 0;
 		switch (axisType) {
@@ -612,7 +600,13 @@ public class Stage {
 
 	void updatePosition(DataInterface data) {
 		position = data;
-		window.updateTxtPosInfo(position.info());
+		String info = position.info();
+		if (window.debug) {
+			info += "Az AbsPos: " + Formatters.TWO_POINTS.format(az.absolutePos()) + "\n";
+			info += "El AbsPos: " + Formatters.TWO_POINTS.format(el.absolutePos()) + "\n";
+		}
+		window.updateTxtPosInfo(info);
+		
 	}
 	
 	void updateVelAcc(String azVel, String azAcc, String elVel, String elAcc) {
@@ -623,23 +617,16 @@ public class Stage {
 		reader.togglePauseFlag();
 	}
 
-	void setGoalAz(double goalAz) {
-		window.setGoalAz(goalAz);
-	}
-
-	void setGoalEl(double goalEl) {
-		window.setGoalEl(goalEl);
-	}
+//	void setGoalAz(double goalAz) {
+//		window.setGoalAz(goalAz);
+//	}
+//
+//	void setGoalEl(double goalEl) {
+//		window.setGoalEl(goalEl);
+//	}
 	
 	void setGoalPos(double deg, axisType axis) {
-		switch (axis) {
-			case AZ:
-				window.setGoalAz(deg); break;
-			case EL:
-				window.setGoalEl(deg); break;
-			default:
-				System.out.println("error Stage.setGoalPos");
-		}
+		window.setGoalPos(Formatters.TWO_POINTS.format(deg), axis);
 	}
 
 	public void shutdown() {

@@ -47,7 +47,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		SCAN, RELATIVE;
 	}
 	
-	private boolean debug = true;
+	public boolean debug = true;
 	private String debugAxis = "A";
 	
 	private Shell shell;
@@ -1114,20 +1114,36 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		});
 	}
 	
-	public void setGoalAz(final double goalAz) {
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				txtGoalAz.setText(String.valueOf(goalAz));
-			}
-		});
-	}
+//	public void setGoalAz(final double goalAz) {
+//		Display.getDefault().asyncExec(new Runnable() {
+//			@Override
+//			public void run() {
+//				txtGoalAz.setText(String.valueOf(goalAz));
+//			}
+//		});
+//	}
+//	
+//	public void setGoalEl(final double goalEl) {
+//		Display.getDefault().asyncExec(new Runnable() {
+//			@Override
+//			public void run() {
+//				txtGoalEl.setText(String.valueOf(goalEl));
+//			}
+//		});
+//	}
 	
-	public void setGoalEl(final double goalEl) {
+	public void setGoalPos(final String goalDeg, final axisType axis) {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				txtGoalEl.setText(String.valueOf(goalEl));
+				switch (axis) {
+					case AZ:
+						txtGoalAz.setText(goalDeg); break;
+					case EL:
+						txtGoalEl.setText(goalDeg); break;
+					default:
+						System.out.println("error MainWindow.setGoalPos");
+				}
 			}
 		});
 	}

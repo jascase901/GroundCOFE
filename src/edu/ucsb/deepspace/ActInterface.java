@@ -24,6 +24,12 @@ public interface ActInterface {
 	public boolean validMove(MoveCommand mc, double min, double max);
 	
 	/**
+	 * 
+	 * @return the absolute position in degrees
+	 */
+	double absolutePos();
+	
+	/**
 	 * Moves relative to the current position. <P>
 	 * If type is is encoder, simply moves by amount. <BR>
 	 * If type is degree, first converts amount to encoder pulses and then moves.

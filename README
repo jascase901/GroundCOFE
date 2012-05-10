@@ -36,60 +36,17 @@ velocity / position are sometimes flipped.  this error can be reproduced by inde
 
 Todo:	
 maximum velocity and acceleration display and control.  something similar to min/max az/el
-joystick should be a pure move relative, without going through Stage.moveAbsolute
 ra/dec calibration
 redo popup window text entry
-
 status area.  the user needs information about what's going on in the program
-
-
-debug needs to show absolute position
-
 raster scan
-
 data output.  during ra/dec tracking and scanning.  into some sort of text file
-
-
 ra/dec + raster scan
 fool proof.  try breaking the program
 seperate GUI for FTDI and GALIL
-refactor moving
 
 
 
-ActGalil
-
-encoderRelative  PR
-encoderAbsolute  PA
-
-moveAbsolute (pos in degrees)
-  calls encoderAbsolute
-moveRelative (pos in encoder or degrees)
-  calls encoderRelative
-
-validateMove
-
-
-
-
-
-
-Stage
-
-move(MC)
-  MainWindow calls this
-stage will examine the MC to determine what to do
-if (relative)
-  axis.MoveRelative(MC)
-
-
-
-
-
-MoveCommand
-type (degrees or encoder)
-relative or absolute
-azValue & elValue
 
 
 

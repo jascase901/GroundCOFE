@@ -164,14 +164,14 @@ public class ActGalil implements ActInterface {
 //			case ABSOLUTE:
 //				goal = mc.getAmount(); break;
 //		}
-		return goal;
+		return absDegToUserDeg(goal);
 	}
 
 	/**
 	 * 
 	 * @return the absolute position in degrees
 	 */
-	private double absolutePos() {
+	public double absolutePos() {
 		double encPos = stage.encPos(axis);
 		double absDeg = encToAbsDeg(encPos);
 		return absDeg;
@@ -184,9 +184,10 @@ public class ActGalil implements ActInterface {
 	 * @return absolutePos() % 360
 	 */
 	public double userPos() {
-		double absPos = absolutePos();
-		double userPos = absPos % 360;
-		return userPos;
+//		double absPos = absolutePos();
+//		double userPos = absPos % 360;
+//		return userPos;
+		return absDegToUserDeg(absolutePos());
 		//return absolutePos() % 360;
 	}
 	
@@ -228,6 +229,15 @@ public class ActGalil implements ActInterface {
 	 */
 	private double userDegToAbsDeg(double deg) {
 		return absolutePos() - userPos() + deg;
+	}
+	
+	/**
+	 * Converts absolute degrees into user degrees.
+	 * @param deg
+	 * @return
+	 */
+	private double absDegToUserDeg(double deg) {
+		return deg % 360;
 	}
 	
 	/**
