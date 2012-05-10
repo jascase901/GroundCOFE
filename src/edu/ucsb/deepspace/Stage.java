@@ -220,13 +220,8 @@ public class Stage {
 
 				double azPos = 0, elPos = 0;
 				if (position != null ) {
-<<<<<<< HEAD
-					azPos = az.encValToDegUser(position.azPos());
-					elPos = el.encValToDegUser(position.elPos());
-=======
 					azPos = az.userPos();
 					elPos = el.userPos();
->>>>>>> newbranch
 				}
 				
 				double ra = baseLocation.azelToRa(azPos, elPos);
