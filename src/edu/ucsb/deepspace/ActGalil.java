@@ -1,5 +1,8 @@
 package edu.ucsb.deepspace;
 
+import edu.ucsb.deepspace.MoveCommand.MoveMode;
+import edu.ucsb.deepspace.MoveCommand.MoveType;
+
 public class ActGalil implements ActInterface {
 	
 	private axisType axis;
@@ -129,18 +132,38 @@ public class ActGalil implements ActInterface {
 	 * @param mc
 	 * @return
 	 */
-	//TODO this only works if mc.getType is degree
+	//TODO this works, but it's really ugly
 	private double goalUserDeg(MoveCommand mc) {
 		double goal = 0;
-		switch (mc.getMode()) {
-			case RELATIVE:
-				double userPos = userPos();
-				double amount = mc.getAmount();
-				//goal = userPos() + mc.getAmount(); break;
-				goal = userPos + amount; break;
-			case ABSOLUTE:
-				goal = mc.getAmount(); break;
+		
+		if (mc.getMode() == MoveMode.RELATIVE) {
+			if (mc.getType() == MoveType.ENCODER) {
+				goal = userPos() + convEncToDeg(mc.getAmount());
+			}
+			else if (mc.getType() == MoveType.DEGREE) {
+				goal = userPos() + mc.getAmount();
+			}
 		}
+		else if (mc.getMode() == MoveMode.ABSOLUTE) {
+			if (mc.getType() == MoveType.ENCODER) {
+				goal = convEncToDeg(mc.getAmount());
+			}
+			else if (mc.getType() == MoveType.DEGREE) {
+				goal = mc.getAmount();
+			}
+		}
+		
+		
+		
+//		switch (mc.getMode()) {
+//			case RELATIVE:
+//				double userPos = userPos();
+//				double amount = mc.getAmount();
+//				//goal = userPos() + mc.getAmount(); break;
+//				goal = userPos + amount; break;
+//			case ABSOLUTE:
+//				goal = mc.getAmount(); break;
+//		}
 		return goal;
 	}
 
@@ -174,7 +197,7 @@ public class ActGalil implements ActInterface {
 	 * @return absolute degree position
 	 */
 	private double encToAbsDeg(double enc) {
-		return offset + enc / encPulsePerDeg;
+		return offset + convEncToDeg(enc);
 	}
 	
 	/**
@@ -184,7 +207,7 @@ public class ActGalil implements ActInterface {
 	 * @return encoder value
 	 */
 	private double absDegToEnc(double deg) {
-		return (deg - offset) * encPulsePerDeg;
+		return convDegToEnc(deg - offset);
 	}
 	
 	/**
@@ -243,16 +266,26 @@ public class ActGalil implements ActInterface {
 		protocol.sendRead("BG" + axisName);
 	}
 	
+	/**
+	 * Moves relative to the current position. <P>
+	 * If type is is encoder, simply moves by amount. <BR>
+	 * If type is degree, first converts amount to encoder pulses and then moves.
+	 */
 	public void moveRelative(MoveCommand mc) {
+		stage.setGoalPos(goalUserDeg(mc), axis);
 		switch (mc.getType()) {
 			case ENCODER:
 				encoderRelative(mc.getAmount()); break;
 			case DEGREE:
-				encoderRelative(mc.getAmount() * encPulsePerDeg); break;
+				encoderRelative(convDegToEnc(mc.getAmount())); break;
 		}
 	}
 	
+	/**
+	 * Moves to the absolute position specified by the mc. <P>
+	 */
 	public void moveAbsolute(MoveCommand mc) {
+		stage.setGoalPos(goalUserDeg(mc), axis);
 		switch (mc.getType()) {
 			case ENCODER:
 				encoderAbsolute(mc.getAmount()); break;
@@ -279,7 +312,7 @@ public class ActGalil implements ActInterface {
 	public boolean indexing() {return indexing;}
 	public void setIndexing(boolean indexing) {this.indexing = indexing;}
 	public void calibrate(double degVal) {
-		offset = degVal - stage.encPos(axis) / encPulsePerDeg;
+		offset = degVal - convEncToDeg(stage.encPos(axis));
 	}
 	
 	public void index() {

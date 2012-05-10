@@ -311,9 +311,10 @@ public class Stage {
 			default:
 				System.out.println("error Stage.move");
 		}
-		System.out.println(act.validMove(mc, min, max));
+		
 		if (!act.validMove(mc, min, max)) {
 			System.out.println("this is an invalid move");
+			window.controlMoveButtons(true);
 			return;
 		}
 		
@@ -628,6 +629,17 @@ public class Stage {
 
 	void setGoalEl(double goalEl) {
 		window.setGoalEl(goalEl);
+	}
+	
+	void setGoalPos(double deg, axisType axis) {
+		switch (axis) {
+			case AZ:
+				window.setGoalAz(deg); break;
+			case EL:
+				window.setGoalEl(deg); break;
+			default:
+				System.out.println("error Stage.setGoalPos");
+		}
 	}
 
 	public void shutdown() {
