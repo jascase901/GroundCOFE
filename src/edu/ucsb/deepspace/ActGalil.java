@@ -196,17 +196,25 @@ public class ActGalil implements ActInterface {
 	private double userDegToAbsDeg(double deg) {
 		return absolutePos() - userPos() + deg;
 	}
-
+	
+	/**
+	 * Moves the actuator to the specified absolute position.
+	 * @param value
+	 */
 	private void encoderAbsolute(double value) {
 		protocol.send("PA" + axisName + "=" + value);
 		protocol.sendRead("BG" + axisName);
 	}
-
+	
+	/**
+	 * Moves the actuator relative to the current position by the specified amount.
+	 * @param value
+	 */
 	private void encoderRelative(double value) {
 		protocol.send("PR" + axisName + "=" + value);
 		protocol.sendRead("BG" + axisName);
 	}
-
+	
 	public void moveRelative(MoveCommand mc) {
 		switch (mc.getType()) {
 			case ENCODER:
@@ -215,7 +223,7 @@ public class ActGalil implements ActInterface {
 				encoderRelative(mc.getAmount() * encPulsePerDeg); break;
 		}
 	}
-
+	
 	public void moveAbsolute(MoveCommand mc) {
 		switch (mc.getType()) {
 			case ENCODER:

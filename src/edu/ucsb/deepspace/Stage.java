@@ -30,7 +30,7 @@ public class Stage {
 	}
 
 	private double minAz, maxAz, minEl, maxEl;
-	private double maxMoveRel = 360;
+	//TODO private double maxMoveRel = 360;
 	private int encTol = 10;
 
 	private Timer raDecTracker, lstUpdater;
@@ -281,6 +281,21 @@ public class Stage {
 	}
 	
 	public void raster(ScanCommand azSc, ScanCommand elSc) {
+		moveAbsolute(azSc.getMin(), elSc.getMin());
+		double deltaAz = azSc.getMax() - azSc.getMin();
+		double deltaEl = elSc.getMax() - elSc.getMin();
+		double reps = azSc.getReps();
+		
+		
+//		moveAbsolute(minAz, minEl)
+//		int i = 1
+//		int mask = 0
+//		int parity = 1
+//		while (i<2*reps) {
+//		  moveRelative(parity*deltaAz, mask*deltaEl/reps)
+//		  parity = -1*parity
+//		  mask++
+//		  mask%2
 		
 	}
 	
