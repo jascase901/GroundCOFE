@@ -220,13 +220,8 @@ public class Stage {
 
 				double azPos = 0, elPos = 0;
 				if (position != null ) {
-<<<<<<< HEAD
-					azPos = az.encValToDegUser(position.azPos());
-					elPos = el.encValToDegUser(position.elPos());
-=======
 					azPos = az.userPos();
 					elPos = el.userPos();
->>>>>>> newbranch
 				}
 				
 				double ra = baseLocation.azelToRa(azPos, elPos);
@@ -244,7 +239,7 @@ public class Stage {
 				out += "\nLST:  " + sLst;
 				out += "\nUTC:  " + gmt;
 				out += "\nLocal:  " + Formatters.HOUR_MIN_SEC.format(local.getTime());
-
+				
 				window.updateTxtAzElRaDec(out);
 			}
 		}, 0, 1000);
@@ -334,6 +329,11 @@ public class Stage {
 		window.controlMoveButtons(true);
 	}
 	
+	/**
+	 * Convenience method that 
+	 * @param azDeg
+	 * @param elDeg
+	 */
 	private void moveAbsolute(double azDeg, double elDeg) {
 		final MoveCommand mcAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, axisType.AZ, azDeg);
 		final MoveCommand mcEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, axisType.EL, elDeg);
@@ -348,72 +348,7 @@ public class Stage {
 			}
 		});
 	}
-
-
-//	public void moveAbsolute(final double azDeg, final double elDeg) {
-//		exec.submit(new Runnable() {
-//			@Override
-//			public void run() {	
-//				if (az.allowedMove("absolute", minAz, maxAz, azDeg)) {
-//					System.out.println("allowed az");
-//					az.moveAbsolute(azDeg);
-//				}
-//				else {
-//					System.out.println("az not in range");
-//				}
-//
-//				if (el.allowedMove("absolute", minEl, maxEl, elDeg)) {
-//					System.out.println("allowed el");
-//					el.moveAbsolute(elDeg);
-//				}
-//				else {
-//					System.out.println("el not in range");
-//				}
-//				
-//				window.controlMoveButtons(true);
-//			}
-//		});
-//	}
-
-//	public void relative(final axisType type, final String moveType, final double amount) {
-//		exec.submit(new Runnable() {
-//			@Override
-//			public void run() {
-//				double min = 0, max = 0;
-//				ActInterface axis = null;
-//				switch (type) {
-//				case AZ:
-//					axis = az; min = minAz; max = maxAz; break;
-//				case EL:
-//					axis = el; min = minEl; max = maxEl; break;
-//				}
-//				if(axis.allowedMove(moveType, min, max, amount)){
-//					if (moveType.equals("steps")) {
-//						axis.moveRelative(amount, "steps");
-//						//System.out.println(amount);
-//					}
-//					else if (moveType.equals("degrees")) {
-//						if (amount <= maxMoveRel) {
-//							axis.moveRelative(amount, "degrees");
-//						}
-//						else {
-//							//message to user saying that moving that much isn't allowed
-//
-//						}
-//					}
-//					else if (moveType.equals("encoder")) {
-//						//axis.moveRelative(amount, "encoder");
-//						System.out.println("hi");
-//					}
-//				}
-//				else{
-//					window.displayErrorBox("Not allowed to move here");
-//				}
-//				window.controlMoveButtons(true);
-//			}
-//		});
-//	}
-
+	
 	public void index(final axisType type) {
 		exec.submit(new Runnable() {
 			@Override

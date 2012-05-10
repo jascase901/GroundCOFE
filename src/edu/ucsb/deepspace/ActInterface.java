@@ -70,20 +70,8 @@ public interface ActInterface {
 	
 	//public boolean isMoving();
 	
-<<<<<<< HEAD
-	public double encValToDeg(double encVal);
-	/***
-	 * Take encVal and mods it with 360 in order to normalize of display of degrees
-	 * 
-	 * @param encVal
-	 * @return  encVal%360
-	 */
-
-	public double encValToDegUser(double encVal);
-=======
 //	public double encValToDeg(double encVal);
 	
->>>>>>> newbranch
 	public void scan(ScanCommand sc);
 	
 	public void stopScanning();
