@@ -12,6 +12,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import edu.ucsb.deepspace.ActInterface.axisType;
+import edu.ucsb.deepspace.MoveCommand.MoveMode;
+import edu.ucsb.deepspace.MoveCommand.MoveType;
 import edu.ucsb.deepspace.gui.MainWindow;
 
 public class Stage {
@@ -28,7 +30,7 @@ public class Stage {
 	}
 
 	private double minAz, maxAz, minEl, maxEl;
-	private double maxMoveRel = 360;
+	//TODO private double maxMoveRel = 360;
 	private int encTol = 10;
 
 	private Timer raDecTracker, lstUpdater;
@@ -218,8 +220,13 @@ public class Stage {
 
 				double azPos = 0, elPos = 0;
 				if (position != null ) {
+<<<<<<< HEAD
 					azPos = az.encValToDegUser(position.azPos());
 					elPos = el.encValToDegUser(position.elPos());
+=======
+					azPos = az.userPos();
+					elPos = el.userPos();
+>>>>>>> newbranch
 				}
 				
 				double ra = baseLocation.azelToRa(azPos, elPos);
@@ -227,10 +234,6 @@ public class Stage {
 				double lst = baseLocation.lst();
 				String gmt = baseLocation.gmt();
 
-				//double hourLst = (int) lst;
-				//double minLst = (lst - hourLst)*60;
-				//double secLst = (minLst - (int)minLst)*60;
-				//String sLst = Formatters.lstFormatter(hourLst, minLst, secLst);
 				String sLst = Formatters.formatLst(lst);
 				
 				String out = "Az:  " + Formatters.DEGREE_POS.format(azPos);
@@ -267,6 +270,7 @@ public class Stage {
 				el.scan(elSc);
 			}
 		});
+		//TODO is this correct?
 		if (elSc == null) {
 			window.setScanEnabled(axisType.AZ);
 		}
@@ -280,70 +284,135 @@ public class Stage {
 		az.stopScanning();
 		el.stopScanning();
 	}
-
-	public void moveAbsolute(final double azDeg, final double elDeg) {
-		exec.submit(new Runnable() {
-			@Override
-			public void run() {	
-				if (az.allowedMove("absolute", minAz, maxAz, azDeg)) {
-					System.out.println("allowed az");
-					az.moveAbsolute(azDeg);
-				}
-				else {
-					System.out.println("az not in range");
-				}
-
-				if (el.allowedMove("absolute", minEl, maxEl, elDeg)) {
-					System.out.println("allowed el");
-					el.moveAbsolute(elDeg);
-				}
-				else {
-					System.out.println("el not in range");
-				}
-				
-				window.controlMoveButtons(true);
-			}
-		});
+	
+	public void raster(ScanCommand azSc, ScanCommand elSc) {
+		moveAbsolute(azSc.getMin(), elSc.getMin());
+		double deltaAz = azSc.getMax() - azSc.getMin();
+		double deltaEl = elSc.getMax() - elSc.getMin();
+		double reps = azSc.getReps();
+		
+		
+//		moveAbsolute(minAz, minEl)
+//		int i = 1
+//		int mask = 0
+//		int parity = 1
+//		while (i<2*reps) {
+//		  moveRelative(parity*deltaAz, mask*deltaEl/reps)
+//		  parity = -1*parity
+//		  mask++
+//		  mask%2
+		
 	}
-
-	public void relative(final axisType type, final String moveType, final double amount) {
+	
+	public void move(MoveCommand mc) {
+		ActInterface act = null;
+		double min = 0, max = 0;
+		
+		switch (mc.getAxis()) {
+			case AZ:
+				act = az; min = minAz; max = maxAz; break;
+			case EL:
+				act = el; min = minEl; max = maxEl; break;
+			default:
+				System.out.println("error Stage.move");
+		}
+		
+		if (!act.validMove(mc, min, max)) {
+			System.out.println("this is an invalid move");
+			window.controlMoveButtons(true);
+			return;
+		}
+		
+		switch (mc.getMode()) {
+			case RELATIVE:
+				act.moveRelative(mc); break;
+			case ABSOLUTE:
+				act.moveAbsolute(mc); break;
+			default:
+				System.out.println("error Stage.move");
+		}
+		window.controlMoveButtons(true);
+	}
+	
+	private void moveAbsolute(double azDeg, double elDeg) {
+		final MoveCommand mcAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, axisType.AZ, azDeg);
+		final MoveCommand mcEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, axisType.EL, elDeg);
 		exec.submit(new Runnable() {
-			@Override
 			public void run() {
-				double min = 0, max = 0;
-				ActInterface axis = null;
-				switch (type) {
-				case AZ:
-					axis = az; min = minAz; max = maxAz; break;
-				case EL:
-					axis = el; min = minEl; max = maxEl; break;
-				}
-				if(axis.allowedMove(moveType, min, max, amount)){
-					if (moveType.equals("steps")) {
-						axis.moveRelative(amount, "steps");
-						//System.out.println(amount);
-					}
-					else if (moveType.equals("degrees")) {
-						if (amount <= maxMoveRel) {
-							axis.moveRelative(amount, "degrees");
-						}
-						else {
-							//message to user saying that moving that much isn't allowed
-
-						}
-					}
-					else if (moveType.equals("encoder")) {
-						//axis.moveRelative(amount, "encoder");
-						System.out.println("hi");
-					}
-				}
-				else{
-					window.displayErrorBox("Not allowed to move here");
-				}
-				window.controlMoveButtons(true);
+				move(mcAz);
+			}
+		});
+		exec.submit(new Runnable() {
+			public void run() {
+				move(mcEl);
 			}
 		});
 	}
+
+
+//	public void moveAbsolute(final double azDeg, final double elDeg) {
+//		exec.submit(new Runnable() {
+//			@Override
+//			public void run() {	
+//				if (az.allowedMove("absolute", minAz, maxAz, azDeg)) {
+//					System.out.println("allowed az");
+//					az.moveAbsolute(azDeg);
+//				}
+//				else {
+//					System.out.println("az not in range");
+//				}
+//
+//				if (el.allowedMove("absolute", minEl, maxEl, elDeg)) {
+//					System.out.println("allowed el");
+//					el.moveAbsolute(elDeg);
+//				}
+//				else {
+//					System.out.println("el not in range");
+//				}
+//				
+//				window.controlMoveButtons(true);
+//			}
+//		});
+//	}
+
+//	public void relative(final axisType type, final String moveType, final double amount) {
+//		exec.submit(new Runnable() {
+//			@Override
+//			public void run() {
+//				double min = 0, max = 0;
+//				ActInterface axis = null;
+//				switch (type) {
+//				case AZ:
+//					axis = az; min = minAz; max = maxAz; break;
+//				case EL:
+//					axis = el; min = minEl; max = maxEl; break;
+//				}
+//				if(axis.allowedMove(moveType, min, max, amount)){
+//					if (moveType.equals("steps")) {
+//						axis.moveRelative(amount, "steps");
+//						//System.out.println(amount);
+//					}
+//					else if (moveType.equals("degrees")) {
+//						if (amount <= maxMoveRel) {
+//							axis.moveRelative(amount, "degrees");
+//						}
+//						else {
+//							//message to user saying that moving that much isn't allowed
+//
+//						}
+//					}
+//					else if (moveType.equals("encoder")) {
+//						//axis.moveRelative(amount, "encoder");
+//						System.out.println("hi");
+//					}
+//				}
+//				else{
+//					window.displayErrorBox("Not allowed to move here");
+//				}
+//				window.controlMoveButtons(true);
+//			}
+//		});
+//	}
 
 	public void index(final axisType type) {
 		exec.submit(new Runnable() {
@@ -433,18 +502,6 @@ public class Stage {
 
 	public void readQueue() {
 		protocol.test();
-	}
-
-	public double currentAzDeg() {
-		if (position == null) return 0;
-		double azDeg = position.azPos();
-		return azDeg;
-	}
-	
-	public double currentElDeg() {
-		if (position == null) return 0;
-		double azDeg = position.elPos();
-		return azDeg;
 	}
 
 	public double encPos(axisType axisType) {
@@ -548,19 +605,33 @@ public class Stage {
 
 	void updatePosition(DataInterface data) {
 		position = data;
-		window.updateTxtPosInfo(position.info());
+		String info = position.info();
+		if (window.debug) {
+			info += "Az AbsPos: " + Formatters.TWO_POINTS.format(az.absolutePos()) + "\n";
+			info += "El AbsPos: " + Formatters.TWO_POINTS.format(el.absolutePos()) + "\n";
+		}
+		window.updateTxtPosInfo(info);
+		
+	}
+	
+	void updateVelAcc(String azVel, String azAcc, String elVel, String elAcc) {
+		window.updateVelAcc(azVel, azAcc, elVel, elAcc);
 	}
 
 	void toggleReader() {
 		reader.togglePauseFlag();
 	}
 
-	void setGoalAz(double goalAz) {
-		window.setGoalAz(goalAz);
-	}
-
-	void setGoalEl(double goalEl) {
-		window.setGoalEl(goalEl);
+//	void setGoalAz(double goalAz) {
+//		window.setGoalAz(goalAz);
+//	}
+//
+//	void setGoalEl(double goalEl) {
+//		window.setGoalEl(goalEl);
+//	}
+	
+	void setGoalPos(double deg, axisType axis) {
+		window.setGoalPos(Formatters.TWO_POINTS.format(deg), axis);
 	}
 
 	public void shutdown() {

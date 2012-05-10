@@ -21,6 +21,8 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
@@ -32,20 +34,20 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-
 import edu.ucsb.deepspace.ActInterface.axisType;
 import edu.ucsb.deepspace.Formatters;
+import edu.ucsb.deepspace.MoveCommand;
+import edu.ucsb.deepspace.MoveCommand.MoveMode;
+import edu.ucsb.deepspace.MoveCommand.MoveType;
 import edu.ucsb.deepspace.ScanCommand;
 import edu.ucsb.deepspace.Stage;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 
 public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	public static enum buttonGroups {
 		SCAN, RELATIVE;
 	}
 	
-	private boolean debug = true;
+	public boolean debug = true;
 	private String debugAxis = "A";
 	
 	private Shell shell;
@@ -56,6 +58,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private long moveAmountVal = 0;
 	private boolean minsec = false;
 	private boolean continuousScanOn = false;
+	private boolean rasterScan = false;
 	private double minAz, maxAz, minEl, maxEl;
 	private int encTol;
 	private boolean radecOn = false;
@@ -125,6 +128,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Text txtStatusArea;
 	private List<Text> scanAzTexts = new ArrayList<Text>();
 	private List<Text> scanElTexts = new ArrayList<Text>();
+	private Text txtVelAz;
+	private Text txtAccAz;
+	private Text txtVelEl;
+	private Text txtAccEl;
 
 	public MainWindow(Composite parent, int style, Stage stage, Stage.stageType stageType) {
 		super(parent, style);
@@ -161,7 +168,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
         Group area = new Group(this, SWT.NONE);
         area.setText("");
         area.setLayout(null);
-        area.setBounds(10, 10, 724, 690);
+        area.setBounds(10, 10, 724, 872);
         
 //--------------------------------------------------------------------------------------------------------------------
     	Group grpJoystick = new Group(area, SWT.NONE);
@@ -188,7 +195,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	azMinus.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
     			controlMoveButtons(false);
-    			stage.relative(axisType.AZ, moveType, -moveAmountVal);
+    			//stage.relative(axisType.AZ, moveType, -moveAmountVal);
+    			stage.move(makeRelativeMC(axisType.AZ, -moveAmountVal));
     		}
     	});
     	
@@ -198,7 +206,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	azPlus.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
     			controlMoveButtons(false);
-    			stage.relative(axisType.AZ, moveType, moveAmountVal);
+    			//stage.relative(axisType.AZ, moveType, moveAmountVal);
+    			stage.move(makeRelativeMC(axisType.AZ, moveAmountVal));
     		}
     	});
     	
@@ -208,7 +217,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	elMinus.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
     			controlMoveButtons(false);
-    			stage.relative(axisType.EL, moveType, -moveAmountVal);
+    			//stage.relative(axisType.EL, moveType, -moveAmountVal);
+    			stage.move(makeRelativeMC(axisType.EL, -moveAmountVal));
     		}
     	});
     	
@@ -218,7 +228,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	elPlus.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
     			controlMoveButtons(false);
-    			stage.relative(axisType.EL, moveType, moveAmountVal);
+    			//stage.relative(axisType.EL, moveType, moveAmountVal);
+    			stage.move(makeRelativeMC(axisType.EL, moveAmountVal));
     		}
     	});
     	
@@ -232,6 +243,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
+    	if (stageType.equals(Stage.stageType.Galil)) {
+	    	btnRadioSteps.setVisible(false);
+    	}
+    	
     	btnRadioDegrees = new Button(grpJoystick, SWT.RADIO);
     	btnRadioDegrees.setSelection(true);
     	btnRadioDegrees.setBounds(106, 29, 55, 16);
@@ -243,17 +258,17 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
-    	if (stageType.equals(Stage.stageType.FTDI)) {
-	    	btnEncoderSteps = new Button(grpJoystick, SWT.RADIO);
-	    	btnEncoderSteps.setBounds(106, 50, 83, 16);
-	    	btnEncoderSteps.setText("encoder steps");
-	    	btnEncoderSteps.addMouseListener(new MouseAdapter() {
-	    		@Override
-	    		public void mouseDown(MouseEvent e) {
-	    			moveType = "encoder";
-	    		}
-	    	});
-    	}
+    	btnEncoderSteps = new Button(grpJoystick, SWT.RADIO);
+    	btnEncoderSteps.setBounds(106, 50, 83, 16);
+    	btnEncoderSteps.setText("encoder steps");
+    	btnEncoderSteps.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			moveType = "encoder";
+    		}
+    	});
+    	
+
 //--------------------------------------------------------------------------------------------------------------------
     	
     	status = new Button(area, SWT.PUSH | SWT.CENTER);
@@ -290,6 +305,11 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnCalibrate = new Button(area, SWT.PUSH | SWT.CENTER);
+    	btnCalibrate.addSelectionListener(new SelectionAdapter() {
+    		@Override
+    		public void widgetSelected(SelectionEvent e) {
+    		}
+    	});
     	btnCalibrate.setText("Calibrate");
     	btnCalibrate.setBounds(296, 471, 87, 31);
     	buttonMap.put("calibrate", btnCalibrate);
@@ -301,6 +321,11 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnGoToPosition = new Button(area, SWT.NONE);
+    	btnGoToPosition.addSelectionListener(new SelectionAdapter() {
+    		@Override
+    		public void widgetSelected(SelectionEvent e) {
+    		}
+    	});
     	btnGoToPosition.setBounds(384, 471, 87, 31);
     	btnGoToPosition.setText("Go to Position");
     	buttonMap.put("gotopos", btnGoToPosition);
@@ -378,7 +403,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	txtPosInfo.setText("Actuator Information\r\n");
     	
     	txtStatusArea = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
-    	txtStatusArea.setBounds(10, 294, 251, 208);
+    	txtStatusArea.setBounds(10, 453, 251, 208);
     	txtStatusArea.setText("StatusArea\n\n");
     	
     	txtBalloonLocation = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI);
@@ -583,7 +608,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	Group grpScanning = new Group(area, SWT.NONE);
     	grpScanning.setText("Scanning");
-    	grpScanning.setBounds(118, 524, 251, 156);
+    	grpScanning.setBounds(10, 669, 359, 193);
     	
     	Label lblMinAzScan = new Label(grpScanning, SWT.NONE);
     	lblMinAzScan.setBounds(13, 16, 40, 19);
@@ -741,12 +766,22 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnContinuousScan = new Button(grpScanning, SWT.CHECK);
-    	btnContinuousScan.setBounds(141, 91, 100, 24);
+    	btnContinuousScan.setBounds(203, 13, 100, 24);
     	btnContinuousScan.setText("Continuous Scan");
     	btnContinuousScan.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
     			continuousScanOn = !continuousScanOn;
+    		}
+    	});
+    	
+    	Button btnScnRaster = new Button(grpScanning, SWT.CHECK);
+    	btnScnRaster.setBounds(203, 44, 85, 16);
+    	btnScnRaster.setText("Raster Scan");
+    	btnScnRaster.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			rasterScan = !rasterScan;
     		}
     	});
     	
@@ -857,6 +892,19 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     			stage.sendCommand(out);
     		}
     	});
+    	
+    	txtVelAz = new Text(area, SWT.BORDER);
+    	txtVelAz.setBounds(10, 318, 49, 19);
+    	
+    	txtAccAz = new Text(area, SWT.BORDER);
+    	txtAccAz.setBounds(65, 318, 49, 19);
+    	
+    	txtVelEl = new Text(area, SWT.BORDER);
+    	txtVelEl.setBounds(10, 344, 49, 19);
+    	
+    	txtAccEl = new Text(area, SWT.BORDER);
+    	txtAccEl.setBounds(65, 344, 49, 19);
+    	
     	
     	
     	//TODO hide the debug stuff
@@ -1066,20 +1114,36 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		});
 	}
 	
-	public void setGoalAz(final double goalAz) {
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				txtGoalAz.setText(String.valueOf(goalAz));
-			}
-		});
-	}
+//	public void setGoalAz(final double goalAz) {
+//		Display.getDefault().asyncExec(new Runnable() {
+//			@Override
+//			public void run() {
+//				txtGoalAz.setText(String.valueOf(goalAz));
+//			}
+//		});
+//	}
+//	
+//	public void setGoalEl(final double goalEl) {
+//		Display.getDefault().asyncExec(new Runnable() {
+//			@Override
+//			public void run() {
+//				txtGoalEl.setText(String.valueOf(goalEl));
+//			}
+//		});
+//	}
 	
-	public void setGoalEl(final double goalEl) {
+	public void setGoalPos(final String goalDeg, final axisType axis) {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				txtGoalEl.setText(String.valueOf(goalEl));
+				switch (axis) {
+					case AZ:
+						txtGoalAz.setText(goalDeg); break;
+					case EL:
+						txtGoalEl.setText(goalDeg); break;
+					default:
+						System.out.println("error MainWindow.setGoalPos");
+				}
 			}
 		});
 	}
@@ -1142,4 +1206,35 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		return true;
 	}
 	
+	public void updateVelAcc(final String azVel, final String azAcc, final String elVel, final String elAcc) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				//System.out.println("adsf");
+				txtVelAz.setText(azVel);
+				txtAccAz.setText(azAcc);
+				txtVelEl.setText(elVel);
+				txtAccEl.setText(elAcc);
+			}
+		});
+	}
+	
+	/**
+	 * Utility method to generate a MoveCommand for relative motion. <P>
+	 * Used by the joystick buttons.
+	 * @param axis az or el
+	 * @param amount to move in degrees
+	 * @return
+	 */
+	private MoveCommand makeRelativeMC(axisType axis, double amount) {
+		MoveType type = null;
+		switch (moveType) {
+			case "degrees":
+				type = MoveType.DEGREE; break;
+			case "encoder":
+				type = MoveType.ENCODER; break;
+		}
+		MoveCommand mc = new MoveCommand(MoveMode.RELATIVE, type, axis, amount);
+		return mc;
+	}
 }

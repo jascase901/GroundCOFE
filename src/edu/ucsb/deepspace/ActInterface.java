@@ -15,17 +15,44 @@ public interface ActInterface {
 	
 	public String info();
 	
-	public void moveAbsolute(double goalPosInDeg);
+//	public void moveAbsolute(double goalPosInDeg);
+//	
+//	public void moveRelative(double numDeg, String moveType);
+//	
+//	public void moveEncoder(double numEncPulse);
 	
-	public void moveRelative(double numDeg, String moveType);
+	public boolean validMove(MoveCommand mc, double min, double max);
 	
-	public void moveEncoder(double numEncPulse);
+	/**
+	 * 
+	 * @return the absolute position in degrees
+	 */
+	double absolutePos();
+	
+	/**
+	 * Moves relative to the current position. <P>
+	 * If type is is encoder, simply moves by amount. <BR>
+	 * If type is degree, first converts amount to encoder pulses and then moves.
+	 */
+	public void moveRelative(MoveCommand mc);
+	
+	/**
+	 * Moves to the absolute position specified by the mc. <P>
+	 */
+	public void moveAbsolute(MoveCommand mc);
+	
+	/**
+	 * The position of the actuator in degrees. <P>
+	 * Prevents the user from ever seeing a position like 540 degrees.
+	 * @return absolutePos() % 360
+	 */
+	public double userPos();
 	
 	//public void moveEncVal(double numSteps);
 	
 	//public double currentDegPos();
 	
-	public boolean allowedMove(String moveType, double min, double max, double amount);
+//	public boolean allowedMove(String moveType, double min, double max, double amount);
 	
 	public void calibrate(double degVal);
 	
@@ -43,6 +70,7 @@ public interface ActInterface {
 	
 	//public boolean isMoving();
 	
+<<<<<<< HEAD
 	public double encValToDeg(double encVal);
 	/***
 	 * Take encVal and mods it with 360 in order to normalize of display of degrees
@@ -52,6 +80,10 @@ public interface ActInterface {
 	 */
 
 	public double encValToDegUser(double encVal);
+=======
+//	public double encValToDeg(double encVal);
+	
+>>>>>>> newbranch
 	public void scan(ScanCommand sc);
 	
 	public void stopScanning();

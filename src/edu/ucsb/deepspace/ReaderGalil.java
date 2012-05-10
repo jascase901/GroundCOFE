@@ -42,6 +42,13 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 				data.makeAz(azPos, azVel);
 				data.makeEl(elPos, elVel);
 				stage.updatePosition(data);
+				
+				azVel = protocol.sendRead("JG?");
+				String azAcc = protocol.sendRead("AC?");
+				elVel = protocol.sendRead("JG,?");
+				String elAcc = protocol.sendRead("AC,?");
+				
+				stage.updateVelAcc(azVel, azAcc, elVel, elAcc);
 			}
 			pause(1000);
 		}
