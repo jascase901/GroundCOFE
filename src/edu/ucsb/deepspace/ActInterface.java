@@ -15,17 +15,30 @@ public interface ActInterface {
 	
 	public String info();
 	
-	public void moveAbsolute(double goalPosInDeg);
+//	public void moveAbsolute(double goalPosInDeg);
+//	
+//	public void moveRelative(double numDeg, String moveType);
+//	
+//	public void moveEncoder(double numEncPulse);
 	
-	public void moveRelative(double numDeg, String moveType);
+	public boolean validMove(MoveCommand mc, double min, double max);
 	
-	public void moveEncoder(double numEncPulse);
+	public void moveRelative(MoveCommand mc);
+	
+	public void moveAbsolute(MoveCommand mc);
+	
+	/**
+	 * The position of the actuator in degrees. <P>
+	 * Prevents the user from ever seeing a position like 540 degrees.
+	 * @return absolutePos() % 360
+	 */
+	public double userPos();
 	
 	//public void moveEncVal(double numSteps);
 	
 	//public double currentDegPos();
 	
-	public boolean allowedMove(String moveType, double min, double max, double amount);
+//	public boolean allowedMove(String moveType, double min, double max, double amount);
 	
 	public void calibrate(double degVal);
 	
@@ -43,7 +56,7 @@ public interface ActInterface {
 	
 	//public boolean isMoving();
 	
-	public double encValToDeg(double encVal);
+//	public double encValToDeg(double encVal);
 	
 	public void scan(ScanCommand sc);
 	

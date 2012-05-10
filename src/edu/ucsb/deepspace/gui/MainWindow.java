@@ -36,6 +36,9 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import edu.ucsb.deepspace.ActInterface.axisType;
 import edu.ucsb.deepspace.Formatters;
+import edu.ucsb.deepspace.MoveCommand;
+import edu.ucsb.deepspace.MoveCommand.MoveMode;
+import edu.ucsb.deepspace.MoveCommand.MoveType;
 import edu.ucsb.deepspace.ScanCommand;
 import edu.ucsb.deepspace.Stage;
 
@@ -192,7 +195,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	azMinus.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
     			controlMoveButtons(false);
-    			stage.relative(axisType.AZ, moveType, -moveAmountVal);
+    			//stage.relative(axisType.AZ, moveType, -moveAmountVal);
+    			stage.move(makeRelativeMC(axisType.AZ, -moveAmountVal));
     		}
     	});
     	
@@ -202,7 +206,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	azPlus.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
     			controlMoveButtons(false);
-    			stage.relative(axisType.AZ, moveType, moveAmountVal);
+    			//stage.relative(axisType.AZ, moveType, moveAmountVal);
+    			stage.move(makeRelativeMC(axisType.AZ, moveAmountVal));
     		}
     	});
     	
@@ -212,7 +217,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	elMinus.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
     			controlMoveButtons(false);
-    			stage.relative(axisType.EL, moveType, -moveAmountVal);
+    			//stage.relative(axisType.EL, moveType, -moveAmountVal);
+    			stage.move(makeRelativeMC(axisType.EL, -moveAmountVal));
     		}
     	});
     	
@@ -222,7 +228,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	elPlus.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
     			controlMoveButtons(false);
-    			stage.relative(axisType.EL, moveType, moveAmountVal);
+    			//stage.relative(axisType.EL, moveType, moveAmountVal);
+    			stage.move(makeRelativeMC(axisType.EL, moveAmountVal));
     		}
     	});
     	
@@ -1190,5 +1197,24 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 				txtAccEl.setText(elAcc);
 			}
 		});
+	}
+	
+	/**
+	 * Utility method to generate a MoveCommand for relative motion. <P>
+	 * Used by the joystick buttons.
+	 * @param axis az or el
+	 * @param amount to move in degrees
+	 * @return
+	 */
+	private MoveCommand makeRelativeMC(axisType axis, double amount) {
+		MoveType type = null;
+		switch (moveType) {
+			case "degrees":
+				type = MoveType.DEGREE; break;
+			case "encoder":
+				type = MoveType.ENCODER; break;
+		}
+		MoveCommand mc = new MoveCommand(MoveMode.RELATIVE, type, axis, amount);
+		return mc;
 	}
 }

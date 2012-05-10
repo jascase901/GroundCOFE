@@ -38,45 +38,202 @@ public class ActGalil implements ActInterface {
 		return "info: blank";
 	}
 	
-	public void moveAbsolute(double goalPosInDeg) {
-	    if (axis == axisType.AZ) stage.setGoalAz(goalPosInDeg);
-		else stage.setGoalEl(goalPosInDeg);
-	    double goalEnc = degToEncVal(goalPosInDeg);
-		moveEncVal(goalEnc);
+//	public void moveAbsolute(double goalPosInDeg) {
+//	    if (axis == axisType.AZ) stage.setGoalAz(goalPosInDeg);
+//		else stage.setGoalEl(goalPosInDeg);
+//	    double goalEnc = degToEncVal(goalPosInDeg);
+//		moveEncVal(goalEnc);
+//	}
+//	
+//	public void moveRelative(double numDeg, String moveType) {
+//		double goalDeg = goalPos(moveType, numDeg);
+//		moveAbsolute(goalDeg);
+//	}
+//	
+//	public void moveEncoder(double numEncPulse) {
+//		double goalDeg = goalPos("encoder", numEncPulse);
+//		moveAbsolute(goalDeg);
+//	}
+//	
+//	//Lowest level move command
+//	//This is the method that makes use of the GalilComm instance, "protocol".
+//	public void moveEncVal(double numEncPulses) {
+//		String out = "PA" + axisName;
+//		out += "=" + numEncPulses;
+//		//System.out.println(out);
+//		protocol.sendRead(out);
+//		protocol.sendRead("BG"+axisName);
+//	}
+//	
+//	private double currentPosDeg() {
+//		return encValToDeg(stage.encPos(axis));
+//	}
+//	
+//	public double encValToDeg(double encVal) {
+//		return offset + encVal / encPulsePerDeg;
+//	}
+//	
+//	//Inverse of encValToDeg
+//	private double  degToEncVal(double degVal) {
+//		return (degVal - offset)*encPulsePerDeg;
+//	}
+	
+	//This method will be used to calculate the final position as a result of a move command.
+	//Used so that the user knows where it will end up pointing, AND to verify that the move is valid.
+//	private double goalPos(String moveType, double amount) {
+//		double goalPos = currentPosDeg();
+//		switch (moveType) {
+//			case "steps": //Galil: steps = enc pulses
+//				goalPos += amount / encPulsePerDeg; break;
+//			case "degrees": //If degrees, add the move amount to current position.
+//				goalPos += amount; break;
+//			case "encoder": //Galil: encoder pulses = steps
+//				goalPos += amount / encPulsePerDeg; break;
+//			case "absolute": //If absolute, final position is the absolute position; do nothing.
+//				goalPos = amount; break;
+//			default :
+//				System.out.println("Error in Galil.goalPos"); break;
+//		}
+//		return goalPos;
+//	}
+	
+	//Check to see if the move is allowed.
+//	public boolean allowedMove(String moveType, double min, double max, double amount) {
+//		double goalPos = goalPos(moveType, amount);
+//		if (goalPos >= min && goalPos <= max) {
+//			return true;
+//		}
+//		return false;
+//	}
+	
+	
+	/**
+	 * Returns true if the move is valid. <P>
+	 * A move is valid if the goal position falls between min and max.
+	 */
+	public boolean validMove(MoveCommand mc, double min, double max) {
+		double goal = goalUserDeg(mc);
+		if (min <= goal && goal <= max) {
+			return true;
+		}
+		return false;
 	}
 	
-	public void moveRelative(double numDeg, String moveType) {
-		double goalDeg = goalPos(moveType, numDeg);
-		moveAbsolute(goalDeg);
+	@SuppressWarnings("unused")
+	private double goalAbsDeg(MoveCommand mc) {
+		return userDegToAbsDeg(goalUserDeg(mc));
 	}
 	
-	public void moveEncoder(double numEncPulse) {
-		double goalDeg = goalPos("encoder", numEncPulse);
-		moveAbsolute(goalDeg);
+	/**
+	 * Calculates where the motion will end, assuming the current move succeeds.
+	 * @param mc
+	 * @return
+	 */
+	private double goalUserDeg(MoveCommand mc) {
+		double goal = 0;
+		switch (mc.getMode()) {
+			case RELATIVE:
+				goal = userPos() + mc.getAmount(); break;
+			case ABSOLUTE:
+				goal = mc.getAmount(); break;
+		}
+		return goal;
+	}
+
+	/**
+	 * 
+	 * @return the absolute position in degrees
+	 */
+	private double absolutePos() {
+		return encToAbsDeg(stage.encPos(axis));
 	}
 	
-	//Lowest level move command
-	//This is the method that makes use of the GalilComm instance, "protocol".
-	public void moveEncVal(double numEncPulses) {
-		String out = "PA" + axisName;
-		out += "=" + numEncPulses;
-		//System.out.println(out);
-		protocol.sendRead(out);
-		protocol.sendRead("BG"+axisName);
+	/**
+	 * The position of the actuator in degrees. <P>
+	 * Prevents the user from ever seeing a position like 540 degrees.
+	 * @return absolutePos() % 360
+	 */
+	public double userPos() {
+		return absolutePos() % 360;
 	}
 	
-	private double currentPosDeg() {
-		return encValToDeg(stage.encPos(axis));
+	/**
+	 * Converts an encoder value into the absolute position. <P>
+	 * Inverse of absDegToEnc()
+	 * @param enc value of encoder
+	 * @return absolute degree position
+	 */
+	private double encToAbsDeg(double enc) {
+		return offset + enc / encPulsePerDeg;
 	}
 	
-	public double encValToDeg(double encVal) {
-		return offset + encVal / encPulsePerDeg;
+	/**
+	 * Converts an absolute degree position into an encoder value. <P>
+	 * Inverse of encToAbsDeg
+	 * @param deg position in degrees
+	 * @return encoder value
+	 */
+	private double absDegToEnc(double deg) {
+		return (deg - offset) * encPulsePerDeg;
 	}
 	
-	//Inverse of encValToDeg
-	private double  degToEncVal(double degVal) {
-		return (degVal - offset)*encPulsePerDeg;
+	/**
+	 * Converts user degrees into encoder value. <P>
+	 * First converts user degrees into absolute degrees.
+	 * @param deg
+	 * @return
+	 */
+	private double userDegToEnc(double deg) {
+		double absDeg = userDegToAbsDeg(deg);
+		return absDegToEnc(absDeg);
 	}
+	
+	/**
+	 * Converts user degrees into absolute degrees.
+	 * @param deg
+	 * @return 
+	 */
+	private double userDegToAbsDeg(double deg) {
+		return absolutePos() - userPos() + deg;
+	}
+
+	private void encoderAbsolute(double value) {
+		protocol.send("PA" + axisName + "=" + value);
+		protocol.sendRead("BG" + axisName);
+	}
+
+	private void encoderRelative(double value) {
+		protocol.send("PR" + axisName + "=" + value);
+		protocol.sendRead("BG" + axisName);
+	}
+
+	public void moveRelative(MoveCommand mc) {
+		switch (mc.getType()) {
+			case ENCODER:
+				encoderRelative(mc.getAmount()); break;
+			case DEGREE:
+				encoderRelative(mc.getAmount() * encPulsePerDeg); break;
+		}
+	}
+
+	public void moveAbsolute(MoveCommand mc) {
+		switch (mc.getType()) {
+			case ENCODER:
+				encoderAbsolute(mc.getAmount()); break;
+			case DEGREE:
+				double enc = userDegToEnc(mc.getAmount());
+				encoderAbsolute(enc); break;
+		}
+	}
+	
+	void motorOn() {
+		protocol.send("SH" + axisName);
+	}
+	
+	void motorOff() {
+		protocol.send("MO" + axisName);
+	}
+	
 	
 	public void setVelocity(double vel) {
 		String out = "JG" + axisName + "=" + vel;
@@ -85,35 +242,6 @@ public class ActGalil implements ActInterface {
 	
 	public boolean indexing() {return indexing;}
 	public void setIndexing(boolean indexing) {this.indexing = indexing;}
-	
-	//This method will be used to calculate the final position as a result of a move command.
-	//Used so that the user knows where it will end up pointing, AND to verify that the move is valid.
-	private double goalPos(String moveType, double amount) {
-		double goalPos = currentPosDeg();
-		switch (moveType) {
-			case "steps": //Galil: steps = enc pulses
-				goalPos += amount / encPulsePerDeg; break;
-			case "degrees": //If degrees, add the move amount to current position.
-				goalPos += amount; break;
-			case "encoder": //Galil: encoder pulses = steps
-				goalPos += amount / encPulsePerDeg; break;
-			case "absolute": //If absolute, final position is the absolute position; do nothing.
-				goalPos = amount; break;
-			default :
-				System.out.println("Error in Galil.goalPos"); break;
-		}
-		return goalPos;
-	}
-	
-	//Check to see if the move is allowed.
-	public boolean allowedMove(String moveType, double min, double max, double amount) {
-		double goalPos = goalPos(moveType, amount);
-		if (goalPos >= min && goalPos <= max) {
-			return true;
-		}
-		return false;
-	}
-	
 	public void calibrate(double degVal) {
 		offset = degVal - stage.encPos(axis) / encPulsePerDeg;
 	}
@@ -190,7 +318,8 @@ public class ActGalil implements ActInterface {
 	public void scan(ScanCommand sc) {
 		if (sc == null) return;
 		
-		double firstMoveDelta = Math.abs(sc.getMin() - currentPosDeg());
+		//TODO
+		double firstMoveDelta = 0;//Math.abs(sc.getMin() - currentPosDeg());
 		firstMoveDelta *= encPulsePerDeg;
 		
 		double delta = sc.getMax() - sc.getMin();
@@ -201,17 +330,17 @@ public class ActGalil implements ActInterface {
 		
 		scanning = true;
 		
-		moveAbsolute(sc.getMin());
+		//moveAbsolute(sc.getMin());
 		pause(1000*(firstMoveDelta/vel + .1));
-		moveAbsolute(sc.getMax());
+		//moveAbsolute(sc.getMax());
 		pause(1000*(sc.getTime()+ .1));
 		
 		int i = 1;
 		while (scanning) {
-			moveAbsolute(sc.getMin());
+			//moveAbsolute(sc.getMin());
 			pause(1000*(sc.getTime()+ .1));
 			
-			moveAbsolute(sc.getMax());
+			//moveAbsolute(sc.getMax());
 			pause(1000*(sc.getTime()+ .1));
 			
 			i++;
@@ -230,4 +359,5 @@ public class ActGalil implements ActInterface {
 			e.printStackTrace();
 		}
 	}
+
 }
