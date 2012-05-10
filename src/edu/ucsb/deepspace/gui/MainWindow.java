@@ -243,6 +243,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
+    	if (stageType.equals(Stage.stageType.Galil)) {
+	    	btnRadioSteps.setVisible(false);
+    	}
+    	
     	btnRadioDegrees = new Button(grpJoystick, SWT.RADIO);
     	btnRadioDegrees.setSelection(true);
     	btnRadioDegrees.setBounds(106, 29, 55, 16);
@@ -254,17 +258,17 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
-    	if (stageType.equals(Stage.stageType.FTDI)) {
-	    	btnEncoderSteps = new Button(grpJoystick, SWT.RADIO);
-	    	btnEncoderSteps.setBounds(106, 50, 83, 16);
-	    	btnEncoderSteps.setText("encoder steps");
-	    	btnEncoderSteps.addMouseListener(new MouseAdapter() {
-	    		@Override
-	    		public void mouseDown(MouseEvent e) {
-	    			moveType = "encoder";
-	    		}
-	    	});
-    	}
+    	btnEncoderSteps = new Button(grpJoystick, SWT.RADIO);
+    	btnEncoderSteps.setBounds(106, 50, 83, 16);
+    	btnEncoderSteps.setText("encoder steps");
+    	btnEncoderSteps.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			moveType = "encoder";
+    		}
+    	});
+    	
+
 //--------------------------------------------------------------------------------------------------------------------
     	
     	status = new Button(area, SWT.PUSH | SWT.CENTER);

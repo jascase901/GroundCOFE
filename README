@@ -34,8 +34,6 @@ two ERRORS right now
 Weird "?" error
 velocity / position are sometimes flipped.  this error can be reproduced by indexing az, and then indexing el
 
-			asdfas
-
 Todo:	
 maximum velocity and acceleration display and control.  something similar to min/max az/el
 joystick should be a pure move relative, without going through Stage.moveAbsolute

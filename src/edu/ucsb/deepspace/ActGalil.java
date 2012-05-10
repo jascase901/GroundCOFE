@@ -129,11 +129,15 @@ public class ActGalil implements ActInterface {
 	 * @param mc
 	 * @return
 	 */
+	//TODO this only works if mc.getType is degree
 	private double goalUserDeg(MoveCommand mc) {
 		double goal = 0;
 		switch (mc.getMode()) {
 			case RELATIVE:
-				goal = userPos() + mc.getAmount(); break;
+				double userPos = userPos();
+				double amount = mc.getAmount();
+				//goal = userPos() + mc.getAmount(); break;
+				goal = userPos + amount; break;
 			case ABSOLUTE:
 				goal = mc.getAmount(); break;
 		}
@@ -145,7 +149,10 @@ public class ActGalil implements ActInterface {
 	 * @return the absolute position in degrees
 	 */
 	private double absolutePos() {
-		return encToAbsDeg(stage.encPos(axis));
+		double encPos = stage.encPos(axis);
+		double absDeg = encToAbsDeg(encPos);
+		return absDeg;
+		//return encToAbsDeg(stage.encPos(axis));
 	}
 	
 	/**
@@ -154,7 +161,10 @@ public class ActGalil implements ActInterface {
 	 * @return absolutePos() % 360
 	 */
 	public double userPos() {
-		return absolutePos() % 360;
+		double absPos = absolutePos();
+		double userPos = absPos % 360;
+		return userPos;
+		//return absolutePos() % 360;
 	}
 	
 	/**
@@ -195,6 +205,24 @@ public class ActGalil implements ActInterface {
 	 */
 	private double userDegToAbsDeg(double deg) {
 		return absolutePos() - userPos() + deg;
+	}
+	
+	/**
+	 * Converts a number of encoder pulses into degrees.
+	 * @param enc
+	 * @return
+	 */
+	private double convEncToDeg(double enc) {
+		return enc / encPulsePerDeg;
+	}
+	
+	/**
+	 * Converts degrees into encoder pulses.
+	 * @param deg
+	 * @return
+	 */
+	private double convDegToEnc(double deg) {
+		return deg * encPulsePerDeg;
 	}
 	
 	/**

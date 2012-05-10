@@ -311,7 +311,7 @@ public class Stage {
 			default:
 				System.out.println("error Stage.move");
 		}
-		
+		System.out.println(act.validMove(mc, min, max));
 		if (!act.validMove(mc, min, max)) {
 			System.out.println("this is an invalid move");
 			return;
@@ -325,6 +325,7 @@ public class Stage {
 			default:
 				System.out.println("error Stage.move");
 		}
+		window.controlMoveButtons(true);
 	}
 	
 	private void moveAbsolute(double azDeg, double elDeg) {

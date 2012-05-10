@@ -57,83 +57,60 @@ public class AzElWindow {
 				stage.buttonEnabler(type);
 			}
 		});
-		
+
 		azDeg = new Text(shell, SWT.BORDER);
 		azDeg.setBounds(53, 147, 37, 18);
 		azDeg.setMessage("");
 		azDeg.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, azDeg,minsec );
+			}});
 
-		      public void modifyText(ModifyEvent evt1) {
-		      
-		        checkHandler(evt1, azDeg,minsec );
-		        
-		      }});
-		
-
-		
 		azMin = new Text(shell, SWT.BORDER);
 		azMin.setBounds(96, 147, 37, 18);
 		//azMin.setEnabled(false);
 		azMin.setMessage("");
 		azMin.addModifyListener(new ModifyListener(){
-
-		      public void modifyText(ModifyEvent evt1) {
-		      
-		        checkHandler(evt1, azDeg,minsec );
-		        
-		      }});
-		
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, azDeg,minsec );
+			}});
 
 		azSec = new Text(shell, SWT.BORDER);
 		azSec.setBounds(139, 147, 37, 18);
-		
 		azSec.setMessage("");
 		azSec.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, azDeg,minsec );
+			}});
 
-		      public void modifyText(ModifyEvent evt1) {
-		      
-		        checkHandler(evt1, azDeg,minsec );
-		        
-		      }});
 
-		
 		elDeg = new Text(shell, SWT.BORDER);
 		elDeg.setBounds(53, 168, 37, 18);
 		//elDeg.setEnabled(false);
 		elDeg.setMessage("");
 		elDeg.addModifyListener(new ModifyListener(){
 
-		      public void modifyText(ModifyEvent evt1) {
-		      
-		        checkHandler(evt1, azDeg,minsec );
-		        
-		      }});
-		
+			public void modifyText(ModifyEvent evt1) {
+
+				checkHandler(evt1, azDeg,minsec );
+
+			}});
+
 
 		elMin = new Text(shell, SWT.BORDER);
 		elMin.setBounds(96, 168, 37, 18);
 		elMin.setMessage("");
 		elMin.addModifyListener(new ModifyListener(){
-
-		      public void modifyText(ModifyEvent evt1) {
-		      
-		        checkHandler(evt1, azDeg,minsec );
-		        
-		      }});
-		
-
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, azDeg,minsec );
+			}});
 		
 		elSec = new Text(shell, SWT.BORDER);
 		elSec.setBounds(139, 168, 37, 18);
-		
 		elSec.addModifyListener(new ModifyListener(){
-
-		      public void modifyText(ModifyEvent evt1) {
-		      
-		        checkHandler(evt1, azDeg,minsec );
-		        
-		      }});
-		
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, azDeg,minsec );
+			}});
 
 		action = new Button(shell, SWT.PUSH | SWT.CENTER);
 		if (type.equals("calibrate")) {
@@ -163,7 +140,7 @@ public class AzElWindow {
 					el += elMod*elSecVal/3600;
 				}
 				Coordinate c = new Coordinate(el, az);
-				
+
 				if (type.equals("calibrate")) {
 					System.out.println(type);
 					stage.calibrate(c);
@@ -174,7 +151,6 @@ public class AzElWindow {
 				close();
 			}
 		});
-		
 		
 		deg = new Label(shell, SWT.NONE);
 		deg.setText("deg");
@@ -196,21 +172,16 @@ public class AzElWindow {
 		el.setText("el:");
 		el.setBounds(10, 168, 37, 13);
 		
-
 		if (!minsec) {
-			
 			sec.setVisible(false);
 			azSec.setVisible(false);	
 			elSec.setVisible(false);
 		}
 		
-;
-		
 		lblDirections = new Label(shell, SWT.WRAP);
 		lblDirections.setBounds(27, 27, 149, 80);
 		//lblDirections.setText("azimuth is from 0 to 360.  positive is counter-clockwise.  el is currently 0 straight up.  positive is downwards.");
 	}
-	
 	
 	//Enables calibrate if all the fields are filled.
 	public void checkHandler(ModifyEvent evt, Text text, boolean minOrSecFlag){
@@ -224,14 +195,11 @@ public class AzElWindow {
 		if((elDeg.getText().equals("") || azDeg.getText().equals("")||azDeg.getText().equals("")
 				||azMin.getText().equals("")||elMin.getText().equals("")||min_sec_check)){
 			action.setEnabled(false);
-			System.out.println("gah");
-
 		}
 		else{
 			action.setEnabled(true);
 		}
-
-
+		
 	}
 		
 }
