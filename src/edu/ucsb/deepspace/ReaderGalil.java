@@ -25,25 +25,19 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 	private boolean pauseFlag = false;
 	
 	public void togglePauseFlag() {
-		System.out.println("hi");
 		this.pauseFlag = !pauseFlag;
 	}
 	
 	public void run() {
-		pause(1000);
 		while (flag) {
 			if (!pauseFlag) {
 				String azPos = protocol.sendRead(tellPos + azAxis);
 				String azVel = protocol.sendRead(tellVel + azAxis);
-				String elPos = protocol.sendRead(tellPos + elAxis);
-				String elVel = protocol.sendRead(tellVel + elAxis);
-				
-				//if (elPos == null || elPos == "") {elPos="0";}
-				
-				
-				
 				String azJg = protocol.sendRead("JG?");
 				String azAc = protocol.sendRead("AC?");
+				
+				String elPos = protocol.sendRead(tellPos + elAxis);
+				String elVel = protocol.sendRead(tellVel + elAxis);
 				String elJg = protocol.sendRead("JG,?");
 				String elAc = protocol.sendRead("AC,?");
 				
@@ -51,7 +45,6 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 				data.make(azPos, azVel, azJg, azAc, axisType.AZ);
 				data.make(elPos, elVel, elJg, elAc, axisType.EL);
 				stage.updatePosition(data);
-				//stage.updateVelAcc(azVel, azAcc, elVel, elAcc);
 			}
 			pause(1000);
 		}

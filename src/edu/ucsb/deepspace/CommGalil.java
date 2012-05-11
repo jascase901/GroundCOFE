@@ -22,7 +22,6 @@ public class CommGalil implements CommInterface {
 	String previousCommand = "";
 	
 	public CommGalil(int port) {
-		//System.out.println("hi from CommGalil constructor" + port);
 		try {
 			socket = new Socket();
 			socket.connect(new InetSocketAddress("192.168.1.200", port), 3000);

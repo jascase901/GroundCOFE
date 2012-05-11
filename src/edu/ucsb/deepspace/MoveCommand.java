@@ -6,7 +6,7 @@ package edu.ucsb.deepspace;
  *
  */
 public class MoveCommand {
-	
+	//
 	/**
 	 * Represents relative or absolute motion.
 	 * @author Reed

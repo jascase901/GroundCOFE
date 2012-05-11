@@ -30,6 +30,7 @@ public class Stage {
 	}
 
 	private double minAz, maxAz, minEl, maxEl;
+	private double velAz, accAz, velEl, accEl;
 	//TODO private double maxMoveRel = 360;
 	private int encTol = 10;
 
@@ -160,10 +161,15 @@ public class Stage {
 		maxAz = Double.parseDouble(actSettings.getProperty("maxAz"));
 		minEl = Double.parseDouble(actSettings.getProperty("minEl"));
 		maxEl = Double.parseDouble(actSettings.getProperty("maxEl"));
+		velAz = Double.parseDouble(actSettings.getProperty("velAz"));
+		accAz = Double.parseDouble(actSettings.getProperty("accAz"));
+		velEl = Double.parseDouble(actSettings.getProperty("velEl"));
+		accEl = Double.parseDouble(actSettings.getProperty("accEl"));
 		encTol = Integer.parseInt(actSettings.getProperty("encTol"));
 		az.setOffset(azOffset);
 		el.setOffset(elOffset);
 		window.setMinMaxAzEl(minAz, maxAz, minEl, maxEl);
+		window.setVelAccAzEl(velAz, accAz, velEl, accEl);
 	}
 
 	private void closeGalil() {
@@ -173,6 +179,10 @@ public class Stage {
 		actSettings.setProperty("maxAz", String.valueOf(maxAz));
 		actSettings.setProperty("minEl", String.valueOf(minEl));
 		actSettings.setProperty("maxEl", String.valueOf(maxEl));
+		actSettings.setProperty("velAz", String.valueOf(velAz));
+		actSettings.setProperty("accAz", String.valueOf(accAz));
+		actSettings.setProperty("velEl", String.valueOf(velEl));
+		actSettings.setProperty("accEl", String.valueOf(accEl));
 		actSettings.setProperty("encTol", String.valueOf(encTol));
 		try {
 			actSettings.store(new FileOutputStream("Galil.ini"), "");
@@ -262,7 +272,7 @@ public class Stage {
 				out += "\nLST:  " + sLst;
 				out += "\nUTC:  " + gmt;
 				out += "\nLocal:  " + Formatters.HOUR_MIN_SEC.format(local.getTime());
-
+				
 				window.updateTxtAzElRaDec(out);
 			}
 		}, 0, 1000);
@@ -303,23 +313,23 @@ public class Stage {
 		el.stopScanning();
 	}
 	
-	public void raster(ScanCommand azSc, ScanCommand elSc) {
-		moveAbsolute(azSc.getMin(), elSc.getMin());
-		double deltaAz = azSc.getMax() - azSc.getMin();
-		double deltaEl = elSc.getMax() - elSc.getMin();
-		double reps = azSc.getReps();
-		double lines = 3;
-		
-		
-		moveAbsolute(minAz, minEl);
-		int i = 1;
-		int mask = 0;
-		int parity = 1;
-		while (i<reps) {
-		  //moveRelative(deltaAz, 0);
-		  //moveRelative(-deltaAz, -deltaEl/lines);
-		}
-	}
+//	public void raster(ScanCommand azSc, ScanCommand elSc) {
+//		moveAbsolute(azSc.getMin(), elSc.getMin());
+//		double deltaAz = azSc.getMax() - azSc.getMin();
+//		double deltaEl = elSc.getMax() - elSc.getMin();
+//		double reps = azSc.getReps();
+//		double lines = 3;
+//		
+//		
+//		moveAbsolute(minAz, minEl);
+//		int i = 1;
+//		int mask = 0;
+//		int parity = 1;
+//		while (i<reps) {
+//		  //moveRelative(deltaAz, 0);
+//		  //moveRelative(-deltaAz, -deltaEl/lines);
+//		}
+//	}
 	
 	public void move(MoveCommand mc) {
 		ActInterface act = null;
@@ -355,6 +365,11 @@ public class Stage {
 		window.controlMoveButtons(true);
 	}
 	
+	/**
+	 * Convenience method that 
+	 * @param azDeg
+	 * @param elDeg
+	 */
 	private void moveAbsolute(double azDeg, double elDeg) {
 		final MoveCommand mcAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, axisType.AZ, azDeg);
 		final MoveCommand mcEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, axisType.EL, elDeg);
@@ -374,6 +389,7 @@ public class Stage {
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
+				reader.togglePauseFlag();
 				switch (axis) {
 					case AZ:
 						az.index();
@@ -384,6 +400,7 @@ public class Stage {
 						buttonEnabler("indexEl");
 						break;
 				}
+				reader.togglePauseFlag();
 			}
 		});
 	}
@@ -427,6 +444,16 @@ public class Stage {
 		this.minEl = minEl;
 		this.maxEl = maxEl;
 	}
+	
+	public void setVelAccAz(double velAz, double accAz) {
+		this.velAz = velAz;
+		this.accAz = accAz;
+	}
+	
+	public void setVelAccEl(double velEl, double accEl) {
+		this.velEl = velEl;
+		this.accEl = accEl;
+	}
 
 	public int getEncTol() {return encTol;}
 	public void setEncTol(int encTol) {
@@ -434,15 +461,15 @@ public class Stage {
 	}
 
 	public void status() {
-		String tellPos = "TP";
-		String tellVel = "TV";
-		String azAxis = "A";
-		DataGalil data;
-
-		String azPos = protocol.sendRead(tellPos + azAxis);
-		String azVel = protocol.sendRead(tellVel + azAxis);
-
-		data = new DataGalil();
+//		String tellPos = "TP";
+//		String tellVel = "TV";
+//		String azAxis = "A";
+//		DataGalil data;
+//
+//		String azPos = protocol.sendRead(tellPos + azAxis);
+//		String azVel = protocol.sendRead(tellVel + azAxis);
+//
+//		data = new DataGalil();
 		//data.makeAz(azPos, azVel);
 		//position = data;
 		//window.updateTxtPosInfo(position.info());
