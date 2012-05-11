@@ -10,6 +10,8 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Button;
@@ -34,8 +36,6 @@ public class RaDecWindow {
 	private Text raHour, raMin, raSec;
 	private Text decDeg, decMin, decSec;
 	private Label dec, min, ra, sec, hourdeg, lblDirections;
-	private Control current;
-	private List<Control> order = new ArrayList<Control>();
 	private boolean minsec;
 	private LatLongAlt baseLocation;
 	private double az = 0, el = 0, raVal = 0, decVal = 0;
@@ -75,92 +75,57 @@ public class RaDecWindow {
 		
 		raHour = new Text(shell, SWT.BORDER);
 		raHour.setBounds(53, 89, 37, 18);
-		raHour.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, raHour, false);
-			}
-		});
-		raHour.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = raHour;
-			}
-		});
+		raHour.setMessage("");
+		raHour.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, raHour,minsec);
+			}});
+		
 		
 		raMin = new Text(shell, SWT.BORDER);
 		raMin.setBounds(96, 89, 37, 18);
-		raMin.setEnabled(false);
-		raMin.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, raMin, true);
-			}
-		});
-		raMin.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = raMin;
-			}
-		});
+		raMin.setMessage("");
+		raMin.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, raMin,minsec);
+			}});
+		
+	
 		
 		raSec = new Text(shell, SWT.BORDER);
 		raSec.setBounds(139, 89, 37, 18);
-		raSec.setEnabled(false);
-		raSec.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, raSec, true);
-			}
-		});
-		raSec.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = raSec;
-			}
-		});
+		raSec.setMessage("");
+		raSec.setVisible(minsec);
+		raSec.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, raSec,minsec);
+			}});
 		
 		decDeg = new Text(shell, SWT.BORDER);
 		decDeg.setBounds(53, 110, 37, 18);
-		decDeg.setEnabled(false);
-		decDeg.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, decDeg, false);
-			}
-		});
-		decDeg.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = decDeg;
-			}
-		});
+		decDeg.setMessage("");
+		decDeg.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, decDeg,minsec);
+			}});
 		
 		decMin = new Text(shell, SWT.BORDER);
 		decMin.setBounds(96, 110, 37, 18);
-		decMin.setEnabled(false);
-		decMin.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, decMin, true);
-			}
-		});
-		decMin.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = decMin;
-			}
-		});
+		decMin.setMessage("");
+		decMin.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, decMin,minsec);
+			}});
+		
 		
 		decSec = new Text(shell, SWT.BORDER);
 		decSec.setBounds(139, 110, 37, 18);
-		decSec.setEnabled(false);
-		decSec.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, decSec, true);
-			}
-		});
-		decSec.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = decSec;
-			}
-		});
+		decSec.setMessage("");
+		decSec.setVisible(minsec);
+		decSec.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, decSec,minsec);
+			}});
 		
 		action = new Button(shell, SWT.PUSH | SWT.CENTER);
 		action.addSelectionListener(new SelectionAdapter() {
@@ -207,6 +172,7 @@ public class RaDecWindow {
 		
 		sec = new Label(shell, SWT.NONE);
 		sec.setText("sec");
+		sec.setVisible(minsec);
 		sec.setBounds(139, 70, 37, 13);
 		
 		min = new Label(shell, SWT.NONE);
@@ -221,19 +187,7 @@ public class RaDecWindow {
 		dec.setText("dec:");
 		dec.setBounds(10, 110, 37, 13);
 		
-		order.add(raHour);
-		order.add(raMin);
-		if (minsec) {
-			order.add(raSec);
-		}
-		order.add(decDeg);
-		order.add(decMin);
-		if (minsec) {
-			order.add(decSec);
-		}
-		
-		order.add(action);
-		current = raHour;
+	
 		
 		lblDirections = new Label(shell, SWT.WRAP);
 		lblDirections.setBounds(27, 27, 149, 80);
@@ -269,6 +223,30 @@ public class RaDecWindow {
 		});
 	}
 	
+	
+	//Enables calibrate if all the fields are filled.
+			public void checkHandler(ModifyEvent evt, Text text, boolean minOrSecFlag){
+				
+			
+				
+				boolean min_sec_check = false;
+				if (minOrSecFlag){
+					if(raSec.getText().equals("")||decSec.getText().equals("")){
+						min_sec_check = true;
+					}
+			
+				}
+				if (decDeg.getText().equals("") || decMin.getText().equals("") || raHour.getText().equals("")
+						 || raMin.getText().equals("") || min_sec_check){
+					action.setEnabled(false);
+					
+				}
+				else{
+					action.setEnabled(true);
+				}
+				
+				
+			}
 	@SuppressWarnings("unused")
 	public void handler(KeyEvent evt, Text text, boolean minOrSecFlag) {
 		double rangeMin = 0;
@@ -281,30 +259,9 @@ public class RaDecWindow {
 			rangeMin = -180;
 			rangeMax = 180;
 		}
-		int pos = order.indexOf(current);
-		final Control next = order.get(pos+1);
+		
 		if (evt.keyCode == 16777296 || evt.keyCode == 13) {
-			try {
-				Double val = Double.parseDouble(text.getText());
-				//if ((val >= rangeMin) && (val <= rangeMax)) {
-					Display.getCurrent().asyncExec(new Runnable() {
-						public void run() {
-							next.setEnabled(true);
-							next.setFocus();
-						}
-					});
-					current = next;
-					return;
-				//}
-			} catch (NumberFormatException e) {
-				if (text.getText()== null) {
-					
-				}
-				else if (text.getText().equals("")) {
-					
-				}
-				System.out.println("enter an integer between -180 and 180");
-			} 
+			
 		}
 	}
 }

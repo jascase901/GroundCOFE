@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.swing.JOptionPane;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -138,6 +136,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Button btnMotorEl;
 	private Button btnMotorAz;
 	private Button btnStopAz;
+	private Group area;
 
 	public MainWindow(Composite parent, int style, Stage stage, Stage.stageType stageType) {
 		super(parent, style);
@@ -171,111 +170,16 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
             public void controlMoved(ControlEvent evt) {saveShellBounds();}
         });
         
-        Group area = new Group(this, SWT.NONE);
+        area = new Group(this, SWT.NONE);
         area.setText("");
         area.setLayout(null);
         area.setBounds(10, 10, 726, 872);
         
-//--------------------------------------------------------------------------------------------------------------------
-    	Group grpJoystick = new Group(area, SWT.NONE);
-    	grpJoystick.setText("Joystick");
-    	grpJoystick.setBounds(76, 17, 208, 178);
-    	
-    	moveAmount = new Text(grpJoystick, SWT.BORDER);
-    	moveAmount.setBounds(10, 28, 90, 16);
-    	moveAmount.setText("amount to move");
-    	moveAmount.addModifyListener(new ModifyListener() {
-    		public void modifyText(ModifyEvent e) {
-    			Long temp = moveAmountVal;
-    			try {
-    				moveAmountVal = Long.parseLong(moveAmount.getText());
-    			} catch (NumberFormatException e1) {
-    				moveAmountVal = temp;
-    			}
-    		}
-    	});
-    	
-    	azMinus = new Button(grpJoystick, SWT.PUSH | SWT.CENTER);
-    	azMinus.setBounds(19, 106, 67, 31);
-    	azMinus.setText("azMinus");
-    	azMinus.addMouseListener(new MouseAdapter() {
-    		public void mouseDown(MouseEvent evt) {
-    			controlMoveButtons(false);
-    			//stage.relative(axisType.AZ, moveType, -moveAmountVal);
-    			stage.move(makeRelativeMC(axisType.AZ, -moveAmountVal));
-    		}
-    	});
-    	
-    	azPlus = new Button(grpJoystick, SWT.PUSH | SWT.CENTER);
-    	azPlus.setBounds(79, 106, 67, 31);
-    	azPlus.setText("azPlus");
-    	azPlus.addMouseListener(new MouseAdapter() {
-    		public void mouseDown(MouseEvent evt) {
-    			controlMoveButtons(false);
-    			//stage.relative(axisType.AZ, moveType, moveAmountVal);
-    			stage.move(makeRelativeMC(axisType.AZ, moveAmountVal));
-    		}
-    	});
-    	
-    	elMinus = new Button(grpJoystick, SWT.PUSH | SWT.CENTER);
-    	elMinus.setBounds(49, 137, 67, 31);
-    	elMinus.setText("elMinus");
-    	elMinus.addMouseListener(new MouseAdapter() {
-    		public void mouseDown(MouseEvent evt) {
-    			controlMoveButtons(false);
-    			//stage.relative(axisType.EL, moveType, -moveAmountVal);
-    			stage.move(makeRelativeMC(axisType.EL, -moveAmountVal));
-    		}
-    	});
-    	
-    	elPlus = new Button(grpJoystick, SWT.CENTER);
-    	elPlus.setBounds(49, 72, 67, 31);
-    	elPlus.setText("elPlus");
-    	elPlus.addMouseListener(new MouseAdapter() {
-    		public void mouseDown(MouseEvent evt) {
-    			controlMoveButtons(false);
-    			//stage.relative(axisType.EL, moveType, moveAmountVal);
-    			stage.move(makeRelativeMC(axisType.EL, moveAmountVal));
-    		}
-    	});
-    	
-    	btnRadioSteps = new Button(grpJoystick, SWT.RADIO);
-    	btnRadioSteps.setBounds(106, 10, 47, 16);
-    	btnRadioSteps.setText("steps");
-    	btnRadioSteps.addMouseListener(new MouseAdapter() {
-    		@Override
-    		public void mouseDown(MouseEvent e) {
-    			moveType = "steps";
-    		}
-    	});
-    	
-    	if (stageType.equals(Stage.stageType.Galil)) {
-	    	btnRadioSteps.setVisible(false);
-    	}
-    	
-    	btnRadioDegrees = new Button(grpJoystick, SWT.RADIO);
-    	btnRadioDegrees.setSelection(true);
-    	btnRadioDegrees.setBounds(106, 29, 55, 16);
-    	btnRadioDegrees.setText("degrees");
-    	btnRadioDegrees.addMouseListener(new MouseAdapter() {
-    		@Override
-    		public void mouseDown(MouseEvent e) {
-    			moveType = "degrees";
-    		}
-    	});
-    	
-    	btnEncoderSteps = new Button(grpJoystick, SWT.RADIO);
-    	btnEncoderSteps.setBounds(106, 50, 83, 16);
-    	btnEncoderSteps.setText("encoder steps");
-    	btnEncoderSteps.addMouseListener(new MouseAdapter() {
-    		@Override
-    		public void mouseDown(MouseEvent e) {
-    			moveType = "encoder";
-    		}
-    	});
-    	
-
-//--------------------------------------------------------------------------------------------------------------------
+        guiJoystick();
+        guiRaDec();
+        guiScanning();
+        guiAxisControl();
+        guiDebug();
     	
     	status = new Button(area, SWT.PUSH | SWT.CENTER);
     	status.setText("status");
@@ -287,11 +191,6 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnCalibrate = new Button(area, SWT.PUSH | SWT.CENTER);
-    	btnCalibrate.addSelectionListener(new SelectionAdapter() {
-    		@Override
-    		public void widgetSelected(SelectionEvent e) {
-    		}
-    	});
     	btnCalibrate.setText("Calibrate");
     	btnCalibrate.setBounds(296, 471, 87, 31);
     	popupWindowButtons.put("calibrate", btnCalibrate);
@@ -303,11 +202,6 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnGoToPosition = new Button(area, SWT.NONE);
-    	btnGoToPosition.addSelectionListener(new SelectionAdapter() {
-    		@Override
-    		public void widgetSelected(SelectionEvent e) {
-    		}
-    	});
     	btnGoToPosition.setBounds(384, 471, 87, 31);
     	btnGoToPosition.setText("Go to Position");
     	popupWindowButtons.put("gotopos", btnGoToPosition);
@@ -443,6 +337,146 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	txtAzElRaDec.setFont(SWTResourceManager.getFont("Tahoma", 16, SWT.NORMAL));
     	txtAzElRaDec.setBounds(477, 17, 237, 217);
     	
+    	btnQuit = new Button(area, SWT.NONE);
+    	btnQuit.setBounds(2, 171, 68, 23);
+    	btnQuit.setText("QUIT");
+    	btnQuit.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			shell.close();
+    		}
+    	});
+    	
+    	Text txtStaticActInfo = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI);
+    	txtStaticActInfo.setBounds(477, 242, 137, 110);
+    	txtStaticActInfo.setText(actInfo);
+    		
+    	btnGoToBalloon = new Button(area, SWT.NONE);
+    	btnGoToBalloon.setBounds(477, 471, 78, 31);
+    	btnGoToBalloon.setText("Go to Balloon");
+    	btnGoToBalloon.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			stage.goToBalloon();
+    		}
+    	});
+    	
+    	txtGoalAz = new Text(area, SWT.BORDER | SWT.READ_ONLY);
+    	txtGoalAz.setBounds(620, 242, 94, 17);
+    	
+    	txtGoalEl = new Text(area, SWT.BORDER | SWT.READ_ONLY);
+    	txtGoalEl.setBounds(620, 269, 94, 17);
+    	
+    	txtStatusArea = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
+    	txtStatusArea.setBounds(10, 686, 704, 176);
+    	txtStatusArea.setText("StatusArea\n\n");
+
+    	//TODO hide the debug stuff
+    	if (debug) {
+    	}
+    	
+	}
+	
+	private void guiJoystick() {
+    	Group grpJoystick = new Group(area, SWT.NONE);
+    	grpJoystick.setText("Joystick");
+    	grpJoystick.setBounds(76, 17, 208, 178);
+    	
+    	moveAmount = new Text(grpJoystick, SWT.BORDER);
+    	moveAmount.setBounds(10, 28, 90, 16);
+    	moveAmount.setText("amount to move");
+    	moveAmount.addModifyListener(new ModifyListener() {
+    		public void modifyText(ModifyEvent e) {
+    			Long temp = moveAmountVal;
+    			try {
+    				moveAmountVal = Long.parseLong(moveAmount.getText());
+    			} catch (NumberFormatException e1) {
+    				moveAmountVal = temp;
+    			}
+    		}
+    	});
+    	
+    	azMinus = new Button(grpJoystick, SWT.PUSH | SWT.CENTER);
+    	azMinus.setBounds(19, 106, 67, 31);
+    	azMinus.setText("azMinus");
+    	azMinus.addMouseListener(new MouseAdapter() {
+    		public void mouseDown(MouseEvent evt) {
+    			controlMoveButtons(false);
+    			//stage.relative(axisType.AZ, moveType, -moveAmountVal);
+    			stage.move(makeRelativeMC(axisType.AZ, -moveAmountVal));
+    		}
+    	});
+    	
+    	azPlus = new Button(grpJoystick, SWT.PUSH | SWT.CENTER);
+    	azPlus.setBounds(79, 106, 67, 31);
+    	azPlus.setText("azPlus");
+    	azPlus.addMouseListener(new MouseAdapter() {
+    		public void mouseDown(MouseEvent evt) {
+    			controlMoveButtons(false);
+    			//stage.relative(axisType.AZ, moveType, moveAmountVal);
+    			stage.move(makeRelativeMC(axisType.AZ, moveAmountVal));
+    		}
+    	});
+    	
+    	elMinus = new Button(grpJoystick, SWT.PUSH | SWT.CENTER);
+    	elMinus.setBounds(49, 137, 67, 31);
+    	elMinus.setText("elMinus");
+    	elMinus.addMouseListener(new MouseAdapter() {
+    		public void mouseDown(MouseEvent evt) {
+    			controlMoveButtons(false);
+    			//stage.relative(axisType.EL, moveType, -moveAmountVal);
+    			stage.move(makeRelativeMC(axisType.EL, -moveAmountVal));
+    		}
+    	});
+    	
+    	elPlus = new Button(grpJoystick, SWT.CENTER);
+    	elPlus.setBounds(49, 72, 67, 31);
+    	elPlus.setText("elPlus");
+    	elPlus.addMouseListener(new MouseAdapter() {
+    		public void mouseDown(MouseEvent evt) {
+    			controlMoveButtons(false);
+    			//stage.relative(axisType.EL, moveType, moveAmountVal);
+    			stage.move(makeRelativeMC(axisType.EL, moveAmountVal));
+    		}
+    	});
+    	
+    	btnRadioSteps = new Button(grpJoystick, SWT.RADIO);
+    	btnRadioSteps.setBounds(106, 10, 47, 16);
+    	btnRadioSteps.setText("steps");
+    	btnRadioSteps.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			moveType = "steps";
+    		}
+    	});
+    	
+    	if (stageType.equals(Stage.stageType.Galil)) {
+	    	btnRadioSteps.setVisible(false);
+    	}
+    	
+    	btnRadioDegrees = new Button(grpJoystick, SWT.RADIO);
+    	btnRadioDegrees.setSelection(true);
+    	btnRadioDegrees.setBounds(106, 29, 55, 16);
+    	btnRadioDegrees.setText("degrees");
+    	btnRadioDegrees.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			moveType = "degrees";
+    		}
+    	});
+    	
+    	btnEncoderSteps = new Button(grpJoystick, SWT.RADIO);
+    	btnEncoderSteps.setBounds(106, 50, 83, 16);
+    	btnEncoderSteps.setText("encoder steps");
+    	btnEncoderSteps.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			moveType = "encoder";
+    		}
+    	});
+	}
+	
+	private void guiRaDec() {
     	Group grpRaDec = new Group(area, SWT.NONE);
     	grpRaDec.setText("RA / Dec Tracking");
     	grpRaDec.setBounds(497, 357, 217, 108);
@@ -504,37 +538,192 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     			new RaDecWindow(minsec, "tracking", stage);
     		}
     	});
+	}
+	
+	private void guiAxisControl() {
+    	Group grpAxisControl = new Group(area, SWT.NONE);
+    	grpAxisControl.setText("Axis Control");
+    	grpAxisControl.setBounds(10, 201, 274, 301);
     	
-    	btnQuit = new Button(area, SWT.NONE);
-    	btnQuit.setBounds(2, 171, 68, 23);
-    	btnQuit.setText("QUIT");
-    	btnQuit.addMouseListener(new MouseAdapter() {
+    	txtMinEl = new Text(grpAxisControl, SWT.BORDER);
+    	txtMinEl.setBounds(215, 42, 49, 19);
+    	txtMinEl.setText(String.valueOf(minEl));
+    	
+    	txtMaxEl = new Text(grpAxisControl, SWT.BORDER);
+    	txtMaxEl.setBounds(215, 67, 49, 19);
+    	txtMaxEl.setText(String.valueOf(maxEl));
+    	
+    	txtMaxAz = new Text(grpAxisControl, SWT.BORDER);
+    	txtMaxAz.setBounds(110, 67, 49, 19);
+    	txtMaxAz.setText(String.valueOf(maxAz));
+    	
+    	txtMinAz = new Text(grpAxisControl, SWT.BORDER);
+    	txtMinAz.setBounds(110, 42, 49, 19);
+    	txtMinAz.setText(String.valueOf(minAz));
+    	
+    	btnSetMinMaxEl = new Button(grpAxisControl, SWT.NONE);
+    	btnSetMinMaxEl.setBounds(181, 92, 83, 23);
+    	btnSetMinMaxEl.setText("Set Min/Max El");
+    	btnSetMinMaxEl.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
-    			shell.close();
+    			try {
+    				double minEl = Double.parseDouble(txtMinEl.getText());
+    				double maxEl = Double.parseDouble(txtMaxEl.getText());
+    				stage.setMinMaxEl(minEl, maxEl);
+    			} catch (NumberFormatException e1) {
+    				txtStatusArea.append("Must input a number.\n");
+    			}
     		}
     	});
     	
-    	Text txtStaticActInfo = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI);
-    	txtStaticActInfo.setBounds(477, 242, 137, 110);
-    	txtStaticActInfo.setText(actInfo);
-    		
-    	btnGoToBalloon = new Button(area, SWT.NONE);
-    	btnGoToBalloon.setBounds(477, 471, 78, 31);
-    	btnGoToBalloon.setText("Go to Balloon");
-    	btnGoToBalloon.addMouseListener(new MouseAdapter() {
+    	btnSetMinMaxAz = new Button(grpAxisControl, SWT.NONE);
+    	btnSetMinMaxAz.setBounds(94, 92, 83, 23);
+    	btnSetMinMaxAz.setText("Set Min/Max Az");
+    	btnSetMinMaxAz.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
-    			stage.goToBalloon();
+    			try {
+    				double minAz = Double.parseDouble(txtMinAz.getText());
+    				double maxAz = Double.parseDouble(txtMaxAz.getText());
+    				stage.setMinMaxAz(minAz, maxAz);
+    				
+    			} catch (NumberFormatException e1) {
+    				txtStatusArea.append("Must input a number.\n");
+    			}
     		}
     	});
     	
-    	txtGoalAz = new Text(area, SWT.BORDER | SWT.READ_ONLY);
-    	txtGoalAz.setBounds(620, 242, 94, 17);
+    	txtAccAz = new Text(grpAxisControl, SWT.BORDER);
+    	txtAccAz.setBounds(110, 146, 60, 19);
     	
-    	txtGoalEl = new Text(area, SWT.BORDER | SWT.READ_ONLY);
-    	txtGoalEl.setBounds(620, 269, 94, 17);
+    	txtVelAz = new Text(grpAxisControl, SWT.BORDER);
+    	txtVelAz.setBounds(110, 121, 60, 19);
     	
+    	txtVelEl = new Text(grpAxisControl, SWT.BORDER);
+    	txtVelEl.setBounds(204, 121, 60, 19);
+    	
+    	txtAccEl = new Text(grpAxisControl, SWT.BORDER);
+    	txtAccEl.setBounds(204, 146, 60, 19);
+    	
+    	Label lblAzimuth = new Label(grpAxisControl, SWT.NONE);
+    	lblAzimuth.setBounds(110, 23, 49, 13);
+    	lblAzimuth.setText("Azimuth");
+    	
+    	Label lblElevation = new Label(grpAxisControl, SWT.NONE);
+    	lblElevation.setBounds(215, 23, 49, 13);
+    	lblElevation.setText("Elevation");
+    	
+    	Label lblDescription = new Label(grpAxisControl, SWT.NONE);
+    	lblDescription.setBounds(10, 23, 60, 13);
+    	lblDescription.setText("Description");
+    	
+    	Label lblMinAngle = new Label(grpAxisControl, SWT.NONE);
+    	lblMinAngle.setBounds(10, 42, 49, 13);
+    	lblMinAngle.setText("Min Angle");
+    	
+    	Label lblMaxAngle = new Label(grpAxisControl, SWT.NONE);
+    	lblMaxAngle.setBounds(10, 67, 49, 13);
+    	lblMaxAngle.setText("Max Angle");
+    	
+    	Label lblMaxVelocity = new Label(grpAxisControl, SWT.NONE);
+    	lblMaxVelocity.setBounds(10, 121, 72, 13);
+    	lblMaxVelocity.setText("Max Velocity");
+    	
+    	Label lblMaxAcceleration = new Label(grpAxisControl, SWT.NONE);
+    	lblMaxAcceleration.setBounds(10, 146, 83, 13);
+    	lblMaxAcceleration.setText("Max Acceleration");
+    	
+    	indexAz = new Button(grpAxisControl, SWT.PUSH | SWT.CENTER);
+    	indexAz.setBounds(110, 235, 65, 25);
+    	indexAz.setText("Index Az");
+    	popupWindowButtons.put("indexAz", indexAz);
+    	indexAz.addMouseListener(new MouseAdapter() {
+    		public void mouseDown(MouseEvent evt) {
+    			indexAz.setEnabled(false);
+    			stage.index(axisType.AZ);
+    		}
+    	});
+    	
+    	indexEl = new Button(grpAxisControl, SWT.PUSH | SWT.CENTER);
+    	indexEl.setBounds(199, 235, 65, 25);
+    	indexEl.setText("Index El");
+    	popupWindowButtons.put("indexEl", indexEl);
+    	indexEl.addMouseListener(new MouseAdapter() {
+    		public void mouseDown(MouseEvent evt) {
+    			indexEl.setEnabled(false);
+    			stage.index(axisType.EL);
+    		}
+    	});
+    	
+    	btnMotorAz = new Button(grpAxisControl, SWT.NONE);
+    	btnMotorAz.setBounds(110, 204, 65, 25);
+    	btnMotorAz.setText("MotorAzOnOff");
+    	btnMotorAz.addMouseListener(new MouseAdapter() {
+    		public void mouseDown(MouseEvent evt) {
+    			stage.motorControl(axisType.AZ);
+    		}
+    	});
+    	
+    	btnMotorEl = new Button(grpAxisControl, SWT.NONE);
+    	btnMotorEl.setBounds(199, 204, 65, 25);
+    	btnMotorEl.setText("MotorElOnOff");
+    	btnMotorEl.addMouseListener(new MouseAdapter() {
+    		public void mouseDown(MouseEvent evt) {
+    			stage.motorControl(axisType.EL);
+    		}
+    	});
+    	
+    	btnStopAz = new Button(grpAxisControl, SWT.NONE);
+    	btnStopAz.setBounds(110, 266, 65, 25);
+    	btnStopAz.setText("Stop Az");
+    	btnStopAz.addMouseListener(new MouseAdapter() {
+    		public void mouseDown(MouseEvent evt) {
+    			stage.stop(axisType.EL);
+    		}
+    	});
+    	
+    	btnStopEl = new Button(grpAxisControl, SWT.NONE);
+    	btnStopEl.setBounds(199, 266, 65, 25);
+    	btnStopEl.setText("Stop El");
+    	btnStopEl.addMouseListener(new MouseAdapter() {
+    		public void mouseDown(MouseEvent evt) {
+    			stage.stop(axisType.EL);
+    		}
+    	});
+    	
+    	btnSetMaxVelAccAz = new Button(grpAxisControl, SWT.NONE);
+    	btnSetMaxVelAccAz.setBounds(52, 171, 104, 23);
+    	btnSetMaxVelAccAz.setText("Set Max Vel/Acc Az");
+    	btnSetMaxVelAccAz.addMouseListener(new MouseAdapter() {
+    		public void mouseDown(MouseEvent evt) {
+    			try {
+    				double velAz = Double.parseDouble(txtVelAz.getText());
+    				double accAz = Double.parseDouble(txtAccAz.getText());
+    				stage.setVelAccAz(velAz, accAz);
+    			} catch (NumberFormatException e1) {
+    				txtStatusArea.append("Must input a number.\n");
+    			}
+    		}
+    	});
+    	
+    	btnSetMaxVelAccEl = new Button(grpAxisControl, SWT.NONE);
+    	btnSetMaxVelAccEl.setBounds(162, 171, 102, 23);
+    	btnSetMaxVelAccEl.setText("Set Max Vel/Acc El");
+    	btnSetMaxVelAccEl.addMouseListener(new MouseAdapter() {
+    		public void mouseDown(MouseEvent evt) {
+    			try {
+    				double velEl = Double.parseDouble(txtVelEl.getText());
+    				double accEl = Double.parseDouble(txtAccEl.getText());
+    				stage.setVelAccEl(velEl, accEl);
+    			} catch (NumberFormatException e1) {
+    				txtStatusArea.append("Must input a number.\n");
+    			}
+    		}
+    	});
+	}
+	
+	private void guiScanning() {
     	Group grpScanning = new Group(area, SWT.NONE);
     	grpScanning.setText("Scanning");
     	grpScanning.setBounds(10, 508, 311, 172);
@@ -713,7 +902,9 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     			rasterScan = !rasterScan;
     		}
     	});
-    	
+	}
+
+	private void guiDebug() {
     	Group grpDebug = new Group(area, SWT.NONE);
     	grpDebug.setText("Debug");
     	grpDebug.setBounds(384, 524, 330, 156);
@@ -821,180 +1012,6 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     			stage.sendCommand(out);
     		}
     	});
-    	
-    	
-    	txtStatusArea = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
-    	txtStatusArea.setBounds(10, 686, 704, 176);
-    	txtStatusArea.setText("StatusArea\n\n");
-
-    	Group grpAxisControl = new Group(area, SWT.NONE);
-    	grpAxisControl.setText("Axis Control");
-    	grpAxisControl.setBounds(10, 201, 274, 301);
-    	
-    	txtMinEl = new Text(grpAxisControl, SWT.BORDER);
-    	txtMinEl.setBounds(215, 42, 49, 19);
-    	txtMinEl.setText(String.valueOf(minEl));
-    	
-    	txtMaxEl = new Text(grpAxisControl, SWT.BORDER);
-    	txtMaxEl.setBounds(215, 67, 49, 19);
-    	txtMaxEl.setText(String.valueOf(maxEl));
-    	
-    	txtMaxAz = new Text(grpAxisControl, SWT.BORDER);
-    	txtMaxAz.setBounds(110, 67, 49, 19);
-    	txtMaxAz.setText(String.valueOf(maxAz));
-    	
-    	txtMinAz = new Text(grpAxisControl, SWT.BORDER);
-    	txtMinAz.setBounds(110, 42, 49, 19);
-    	txtMinAz.setText(String.valueOf(minAz));
-    	
-    	btnSetMinMaxEl = new Button(grpAxisControl, SWT.NONE);
-    	btnSetMinMaxEl.setBounds(181, 92, 83, 23);
-    	btnSetMinMaxEl.setText("Set Min/Max El");
-    	btnSetMinMaxEl.addMouseListener(new MouseAdapter() {
-    		@Override
-    		public void mouseDown(MouseEvent e) {
-    			try {
-    				double minEl = Double.parseDouble(txtMinEl.getText());
-    				double maxEl = Double.parseDouble(txtMaxEl.getText());
-    				stage.setMinMaxEl(minEl, maxEl);
-    			} catch (NumberFormatException e1) {
-    				txtStatusArea.append("Must input a number.\n");
-    			}
-    		}
-    	});
-    	
-    	btnSetMinMaxAz = new Button(grpAxisControl, SWT.NONE);
-    	btnSetMinMaxAz.setBounds(94, 92, 83, 23);
-    	btnSetMinMaxAz.setText("Set Min/Max Az");
-    	btnSetMinMaxAz.addMouseListener(new MouseAdapter() {
-    		@Override
-    		public void mouseDown(MouseEvent e) {
-    			try {
-    				double minAz = Double.parseDouble(txtMinAz.getText());
-    				double maxAz = Double.parseDouble(txtMaxAz.getText());
-    				stage.setMinMaxAz(minAz, maxAz);
-    				
-    			} catch (NumberFormatException e1) {
-    				txtStatusArea.append("Must input a number.\n");
-    			}
-    		}
-    	});
-    	
-    	txtAccAz = new Text(grpAxisControl, SWT.BORDER);
-    	txtAccAz.setBounds(110, 146, 60, 19);
-    	
-    	txtVelAz = new Text(grpAxisControl, SWT.BORDER);
-    	txtVelAz.setBounds(110, 121, 60, 19);
-    	
-    	txtVelEl = new Text(grpAxisControl, SWT.BORDER);
-    	txtVelEl.setBounds(204, 121, 60, 19);
-    	
-    	txtAccEl = new Text(grpAxisControl, SWT.BORDER);
-    	txtAccEl.setBounds(204, 146, 60, 19);
-    	
-    	Label lblAzimuth = new Label(grpAxisControl, SWT.NONE);
-    	lblAzimuth.setBounds(110, 23, 49, 13);
-    	lblAzimuth.setText("Azimuth");
-    	
-    	Label lblElevation = new Label(grpAxisControl, SWT.NONE);
-    	lblElevation.setBounds(215, 23, 49, 13);
-    	lblElevation.setText("Elevation");
-    	
-    	Label lblDescription = new Label(grpAxisControl, SWT.NONE);
-    	lblDescription.setBounds(10, 23, 60, 13);
-    	lblDescription.setText("Description");
-    	
-    	Label lblMinAngle = new Label(grpAxisControl, SWT.NONE);
-    	lblMinAngle.setBounds(10, 42, 49, 13);
-    	lblMinAngle.setText("Min Angle");
-    	
-    	Label lblMaxAngle = new Label(grpAxisControl, SWT.NONE);
-    	lblMaxAngle.setBounds(10, 67, 49, 13);
-    	lblMaxAngle.setText("Max Angle");
-    	
-    	Label lblMaxVelocity = new Label(grpAxisControl, SWT.NONE);
-    	lblMaxVelocity.setBounds(10, 121, 72, 13);
-    	lblMaxVelocity.setText("Max Velocity");
-    	
-    	Label lblMaxAcceleration = new Label(grpAxisControl, SWT.NONE);
-    	lblMaxAcceleration.setBounds(10, 146, 83, 13);
-    	lblMaxAcceleration.setText("Max Acceleration");
-    	
-    	indexAz = new Button(grpAxisControl, SWT.PUSH | SWT.CENTER);
-    	indexAz.setBounds(110, 235, 65, 25);
-    	indexAz.setText("Index Az");
-    	popupWindowButtons.put("indexAz", indexAz);
-    	indexAz.addMouseListener(new MouseAdapter() {
-    		public void mouseDown(MouseEvent evt) {
-    			indexAz.setEnabled(false);
-    			stage.index(axisType.AZ);
-    		}
-    	});
-    	
-    	indexEl = new Button(grpAxisControl, SWT.PUSH | SWT.CENTER);
-    	indexEl.setBounds(199, 235, 65, 25);
-    	indexEl.setText("Index El");
-    	popupWindowButtons.put("indexEl", indexEl);
-    	indexEl.addMouseListener(new MouseAdapter() {
-    		public void mouseDown(MouseEvent evt) {
-    			indexEl.setEnabled(false);
-    			stage.index(axisType.EL);
-    		}
-    	});
-    	
-    	btnMotorAz = new Button(grpAxisControl, SWT.NONE);
-    	btnMotorAz.setBounds(110, 204, 65, 25);
-    	btnMotorAz.setText("MotorAzOnOff");
-    	btnMotorAz.addMouseListener(new MouseAdapter() {
-    		public void mouseDown(MouseEvent evt) {
-    			stage.motorControl(axisType.AZ);
-    		}
-    	});
-    	
-    	btnMotorEl = new Button(grpAxisControl, SWT.NONE);
-    	btnMotorEl.setBounds(199, 204, 65, 25);
-    	btnMotorEl.setText("MotorElOnOff");
-    	btnMotorEl.addMouseListener(new MouseAdapter() {
-    		public void mouseDown(MouseEvent evt) {
-    			stage.motorControl(axisType.EL);
-    		}
-    	});
-    	
-    	btnStopAz = new Button(grpAxisControl, SWT.NONE);
-    	btnStopAz.setBounds(110, 266, 65, 25);
-    	btnStopAz.setText("Stop Az");
-    	btnStopAz.addMouseListener(new MouseAdapter() {
-    		public void mouseDown(MouseEvent evt) {
-    			stage.index(axisType.EL);
-    		}
-    	});
-    	
-    	btnStopEl = new Button(grpAxisControl, SWT.NONE);
-    	btnStopEl.setBounds(199, 266, 65, 25);
-    	btnStopEl.setText("Stop El");
-    	btnStopEl.addMouseListener(new MouseAdapter() {
-    		public void mouseDown(MouseEvent evt) {
-    			stage.index(axisType.EL);
-    		}
-    	});
-    	
-    	btnSetMaxVelAccAz = new Button(grpAxisControl, SWT.NONE);
-    	btnSetMaxVelAccAz.setBounds(52, 171, 104, 23);
-    	btnSetMaxVelAccAz.setText("Set Max Vel/Acc Az");
-    	
-    	btnSetMaxVelAccEl = new Button(grpAxisControl, SWT.NONE);
-    	btnSetMaxVelAccEl.setBounds(162, 171, 102, 23);
-    	btnSetMaxVelAccEl.setText("Set Max Vel/Acc El");
-    	
-    	
-    	
-    	
-    	
-    	
-    	//TODO hide the debug stuff
-    	if (debug) {
-    	}
-    	
 	}
 	
 	private void shellWidgetDisposed() {
@@ -1181,9 +1198,6 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 			}
 		});
 	}
-	public void displayErrorBox(String message){
-		JOptionPane.showMessageDialog(null, message,"Error ", JOptionPane.ERROR_MESSAGE);
-	}
 	
 	public void setMinMaxAzEl(final double minAz, final double maxAz, final double minEl, final double maxEl) {
 		Display.getDefault().asyncExec(new Runnable() {
@@ -1193,6 +1207,18 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 				txtMaxAz.setText(String.valueOf(maxAz));
 				txtMinEl.setText(String.valueOf(minEl));
 				txtMaxEl.setText(String.valueOf(maxEl));
+			}
+		});
+	}
+	
+	public void setVelAccAzEl(final double velAz, final double accAz, final double velEl, final double accEl) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				txtVelAz.setText(String.valueOf(velAz));
+				txtAccAz.setText(String.valueOf(accAz));
+				txtVelEl.setText(String.valueOf(velEl));
+				txtAccEl.setText(String.valueOf(accEl));
 			}
 		});
 	}

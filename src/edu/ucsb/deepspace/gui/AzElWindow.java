@@ -68,7 +68,7 @@ public class AzElWindow {
 
 		azMin = new Text(shell, SWT.BORDER);
 		azMin.setBounds(96, 147, 37, 18);
-		//azMin.setEnabled(false);
+
 		azMin.setMessage("");
 		azMin.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent evt1) {

@@ -41,7 +41,7 @@ public class ActGalil implements ActInterface {
 	public String info() {
 		return "info: blank";
 	}
-	
+
 	/**
 	 * Returns true if the move is valid. <P>
 	 * A move is valid if the goal position falls between min and max.
@@ -197,7 +197,7 @@ public class ActGalil implements ActInterface {
 	 * @param value
 	 */
 	private void encoderAbsolute(double value) {
-		protocol.send("PA" + axisName + "=" + value);
+		protocol.sendRead("PA" + axisName + "=" + value);
 		protocol.sendRead("BG" + axisName);
 	}
 	
@@ -206,7 +206,7 @@ public class ActGalil implements ActInterface {
 	 * @param value
 	 */
 	private void encoderRelative(double value) {
-		protocol.send("PR" + axisName + "=" + value);
+		protocol.sendRead("PR" + axisName + "=" + value);
 		protocol.sendRead("BG" + axisName);
 	}
 	
@@ -245,7 +245,15 @@ public class ActGalil implements ActInterface {
 	 */
 	public boolean motorState() {
 		String response = protocol.sendRead("MG _MO" + axisName);
-		double state = Double.parseDouble(response);
+		double state = 0;
+		try {
+			state = Double.parseDouble(response);
+		} catch (NumberFormatException e) {
+			System.out.println();
+			System.out.println(axis);
+			System.out.println(response);
+			System.out.println("ActGalil.motorState numberformatexception sigh");
+		}
 		if (state == 1) {
 			motorState = false;
 			return false;
@@ -297,6 +305,7 @@ public class ActGalil implements ActInterface {
 	
 	public boolean indexing() {return indexing;}
 	public void setIndexing(boolean indexing) {this.indexing = indexing;}
+	
 	public void calibrate(double degVal) {
 		offset = degVal - convEncToDeg(stage.encPos(axis));
 	}
@@ -312,9 +321,11 @@ public class ActGalil implements ActInterface {
 			case EL:
 				indexGalilEl(); break;
 		}
+		protocol.read(); //there's an erroneous : that pops up at the end of indexing. this gets rid of it
 	}
 	
 	private void indexGalilAz() {
+		boolean flag = true;
 		// Save acceleration and jog speed values
 		protocol.sendRead("T1 = _JG" + axisName);
 		protocol.sendRead("T2 = _AC" + axisName);
@@ -322,11 +333,9 @@ public class ActGalil implements ActInterface {
 		// then overwrite them
 		protocol.sendRead("MG \"Homing\", T1");
 		double jg = 150000d;
-		jg = jg * encPulsePerRev / azEncPerRev;
-		System.out.println(jg);
+		//System.out.println(jg);
 		protocol.sendRead("JG" + axisName + "=" + jg);
 		double ac = 50000d;
-		ac = ac * encPulsePerRev / azEncPerRev;
 		protocol.sendRead("AC" + axisName + "=" + ac);
 
 		// "FE" - find the opto-edge
@@ -337,7 +346,6 @@ public class ActGalil implements ActInterface {
 
 		// Turn the jog speed WAAAY down when searching for the index
 		jg = 500d;
-		jg = jg * encPulsePerRev / azEncPerRev;
 		protocol.sendRead("JG" + axisName + "=" + jg);
 
 		// Do the index search ("FI")
@@ -345,6 +353,13 @@ public class ActGalil implements ActInterface {
 		protocol.sendRead("BG" + axisName);
 		protocol.sendRead("AM" + axisName);
 		protocol.sendRead("MG \"Motion Done\";TP" + axisName);
+		while (flag) {
+			String temp = protocol.read();
+			if (temp.contains("one")) {
+				flag = false;
+			}
+			pause(100);
+		}
 
 		// Finally, restore accel and jog speeds from before routine was run
 		protocol.sendRead("JG" + axisName + "=T1");
@@ -352,20 +367,38 @@ public class ActGalil implements ActInterface {
 	}
 	
 	private void indexGalilEl() {
+		boolean flag = true;
 		// Save acceleration and jog speed values
-		//protocol.sendRead("T1 = _JG" + axisName);
-		//protocol.sendRead("T2 = _AC" + axisName);
+		protocol.sendRead("T1 = _JG" + axisName);
+		protocol.sendRead("T2 = _AC" + axisName);
 		
-		double jg = 500d;
+		double jg = 1000d;
 		protocol.sendRead("JG" + axisName + "=" + jg);
 		
 		// Do the index search ("FI")
 		protocol.sendRead("FI" + axisName);
 		protocol.sendRead("BG" + axisName);
+		protocol.sendRead("AM" + axisName);
+		encoderRelative(3900);
+		jg = 50d;
+		protocol.sendRead("AM" + axisName);
+		protocol.sendRead("JG" + axisName + "=" + jg);
+		protocol.sendRead("FI" + axisName);
+		protocol.sendRead("BG" + axisName);
+		protocol.sendRead("AM" + axisName);
+		protocol.sendRead("MG \"Motion Done\";");
+		while (flag) {
+			String temp = protocol.read();
+			if (temp.contains("one")) {
+				flag = false;
+			}
+			pause(100);
+		}
+		
 		
 		// Finally, restore accel and jog speeds from before routine was run
-		//protocol.sendRead("JG" + axisName + "=T1");
-		//protocol.sendRead("AC" + axisName + "=T2");
+		protocol.sendRead("JG" + axisName + "=T1");
+		protocol.sendRead("AC" + axisName + "=T2");
 	}
 	
 	public void setOffset(double indexOffset) {
