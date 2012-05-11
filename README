@@ -16,7 +16,7 @@ Getting the Code for contribution
 		7a)-Email jasface901@gmail.com to get your git account added to contributers list
 		7b)click projects from git
 		8)paste https url in prompt https://${account}@github.com/dontQQ/GroundCOFE.git
-		
+
 Setting eclipse to use java 1.7
 	1)click project->properties
 	2)click add library
@@ -24,12 +24,12 @@ Setting eclipse to use java 1.7
 	4)click installed jres
 	5)click add
 	6)browse for jre 7 
-	
+
 Running From within java
 	1)click on the edu.ucsb.deepsace package
 	2)select Main.java
 	3)Hit the f-11 key on your keyboard
-	test	
+
 			
 How to pull master
 1: 	reset master last pull(deletes code changes in master)
@@ -56,3 +56,4 @@ How to add code
 	git push origin master
 7b:if it says cant merge do to conflict
 	git mergetool
+

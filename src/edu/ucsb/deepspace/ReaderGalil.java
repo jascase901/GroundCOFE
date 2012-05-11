@@ -13,8 +13,10 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 	public ReaderGalil(Stage stage) {
 		this.setDaemon(true);
 		this.stage = stage;
+		this.setName("ReaderGalil");
 		azAxis = stage.axisName(axisType.AZ);
 		elAxis = stage.axisName(axisType.EL);
+		protocol = new CommGalil(13358);
 	}
 	
 	private String tellPos = "TP";
@@ -23,32 +25,26 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 	private boolean pauseFlag = false;
 	
 	public void togglePauseFlag() {
-		System.out.println("hi");
 		this.pauseFlag = !pauseFlag;
 	}
 	
 	public void run() {
-		protocol = new CommGalil(13358);
 		while (flag) {
 			if (!pauseFlag) {
 				String azPos = protocol.sendRead(tellPos + azAxis);
 				String azVel = protocol.sendRead(tellVel + azAxis);
+				String azJg = protocol.sendRead("JG?");
+				String azAc = protocol.sendRead("AC?");
+				
 				String elPos = protocol.sendRead(tellPos + elAxis);
 				String elVel = protocol.sendRead(tellVel + elAxis);
-
-				if (elPos == null || elPos == "") {elPos="0";}
+				String elJg = protocol.sendRead("JG,?");
+				String elAc = protocol.sendRead("AC,?");
 				
 				data = new DataGalil();
-				data.makeAz(azPos, azVel);
-				data.makeEl(elPos, elVel);
+				data.make(azPos, azVel, azJg, azAc, axisType.AZ);
+				data.make(elPos, elVel, elJg, elAc, axisType.EL);
 				stage.updatePosition(data);
-				
-				azVel = protocol.sendRead("JG?");
-				String azAcc = protocol.sendRead("AC?");
-				elVel = protocol.sendRead("JG,?");
-				String elAcc = protocol.sendRead("AC,?");
-				
-				stage.updateVelAcc(azVel, azAcc, elVel, elAcc);
 			}
 			pause(1000);
 		}

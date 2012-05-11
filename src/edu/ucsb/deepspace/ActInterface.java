@@ -48,6 +48,22 @@ public interface ActInterface {
 	 */
 	public double userPos();
 	
+	/**
+	 * 
+	 * @return true if motor is on, false if not
+	 */
+	public boolean motorState();
+	
+	/**
+	 * Stops the current motion.
+	 */
+	public void stop();
+	
+	/**
+	 * Toggles the motor state. <P>
+	 */
+	public void motorControl();
+	
 	//public void moveEncVal(double numSteps);
 	
 	//public double currentDegPos();
@@ -69,8 +85,6 @@ public interface ActInterface {
 	public void setIndexing(boolean indexing);
 	
 	//public boolean isMoving();
-	
-//	public double encValToDeg(double encVal);
 	
 	public void scan(ScanCommand sc);
 	

@@ -20,7 +20,7 @@ public class Stage {
 
 	private static final Stage INSTANCE = new Stage();
 	public static Stage getInstance() {return INSTANCE;}
-
+	
 	public static enum stageType {
 		Galil, FTDI;
 	}
@@ -30,6 +30,7 @@ public class Stage {
 	}
 
 	private double minAz, maxAz, minEl, maxEl;
+	private double velAz, accAz, velEl, accEl;
 	//TODO private double maxMoveRel = 360;
 	private int encTol = 10;
 
@@ -45,6 +46,7 @@ public class Stage {
 	private LatLongAlt baseLocation, balloonLocation;
 	private double azToBalloon = 0, elToBalloon = 0;
 	private CommGalil protocol, protocolTest;
+	private boolean azMotorState = false, elMotorState = false;
 
 	public Stage() {
 		try {
@@ -68,6 +70,9 @@ public class Stage {
 			loadGalil();
 			az.registerStage(this);
 			el.registerStage(this);
+			azMotorState = az.motorState();
+			elMotorState = el.motorState();
+			window.updateMotorState(azMotorState, elMotorState);
 			break;
 		case FTDI:
 			//These are commented out because I made the ActFTDI class abstract.
@@ -94,6 +99,18 @@ public class Stage {
 			return "A";
 		case EL:
 			return "B";
+		default:
+			System.out.println("this should never happen.  Stage.axisName()");
+		}
+		return "error Stage.axisName()";
+	}
+	
+	public String axisNameLong(axisType axis) {
+		switch (axis) {
+		case AZ:
+			return "Azimuth";
+		case EL:
+			return "Elevation";
 		default:
 			System.out.println("this should never happen.  Stage.axisName()");
 		}
@@ -144,10 +161,15 @@ public class Stage {
 		maxAz = Double.parseDouble(actSettings.getProperty("maxAz"));
 		minEl = Double.parseDouble(actSettings.getProperty("minEl"));
 		maxEl = Double.parseDouble(actSettings.getProperty("maxEl"));
+		velAz = Double.parseDouble(actSettings.getProperty("velAz"));
+		accAz = Double.parseDouble(actSettings.getProperty("accAz"));
+		velEl = Double.parseDouble(actSettings.getProperty("velEl"));
+		accEl = Double.parseDouble(actSettings.getProperty("accEl"));
 		encTol = Integer.parseInt(actSettings.getProperty("encTol"));
 		az.setOffset(azOffset);
 		el.setOffset(elOffset);
 		window.setMinMaxAzEl(minAz, maxAz, minEl, maxEl);
+		window.setVelAccAzEl(velAz, accAz, velEl, accEl);
 	}
 
 	private void closeGalil() {
@@ -157,6 +179,10 @@ public class Stage {
 		actSettings.setProperty("maxAz", String.valueOf(maxAz));
 		actSettings.setProperty("minEl", String.valueOf(minEl));
 		actSettings.setProperty("maxEl", String.valueOf(maxEl));
+		actSettings.setProperty("velAz", String.valueOf(velAz));
+		actSettings.setProperty("accAz", String.valueOf(accAz));
+		actSettings.setProperty("velEl", String.valueOf(velEl));
+		actSettings.setProperty("accEl", String.valueOf(accEl));
 		actSettings.setProperty("encTol", String.valueOf(encTol));
 		try {
 			actSettings.store(new FileOutputStream("Galil.ini"), "");
@@ -185,7 +211,14 @@ public class Stage {
 		return out;
 	}
 
+	//TODO test to make sure motor state stuff is working
 	public void startRaDecTracking(final double ra, final double dec) {
+		if (!motorCheck(axisType.AZ)) {
+			return;
+		}
+		if (!motorCheck(axisType.EL)) {
+			return;
+		}
 		long period = 10000;
 		raDecTracker = new Timer("RA/Dec Tracker", true);
 		raDecTracker.scheduleAtFixedRate(new TimerTask() {
@@ -280,24 +313,23 @@ public class Stage {
 		el.stopScanning();
 	}
 	
-	public void raster(ScanCommand azSc, ScanCommand elSc) {
-		moveAbsolute(azSc.getMin(), elSc.getMin());
-		double deltaAz = azSc.getMax() - azSc.getMin();
-		double deltaEl = elSc.getMax() - elSc.getMin();
-		double reps = azSc.getReps();
-		
-		
-//		moveAbsolute(minAz, minEl)
-//		int i = 1
-//		int mask = 0
-//		int parity = 1
-//		while (i<2*reps) {
-//		  moveRelative(parity*deltaAz, mask*deltaEl/reps)
-//		  parity = -1*parity
-//		  mask++
-//		  mask%2
-		
-	}
+//	public void raster(ScanCommand azSc, ScanCommand elSc) {
+//		moveAbsolute(azSc.getMin(), elSc.getMin());
+//		double deltaAz = azSc.getMax() - azSc.getMin();
+//		double deltaEl = elSc.getMax() - elSc.getMin();
+//		double reps = azSc.getReps();
+//		double lines = 3;
+//		
+//		
+//		moveAbsolute(minAz, minEl);
+//		int i = 1;
+//		int mask = 0;
+//		int parity = 1;
+//		while (i<reps) {
+//		  //moveRelative(deltaAz, 0);
+//		  //moveRelative(-deltaAz, -deltaEl/lines);
+//		}
+//	}
 	
 	public void move(MoveCommand mc) {
 		ActInterface act = null;
@@ -305,11 +337,15 @@ public class Stage {
 		
 		switch (mc.getAxis()) {
 			case AZ:
-				act = az; min = minAz; max = maxAz; break;
+				act = az; min = minAz; max = maxAz;break;
 			case EL:
 				act = el; min = minEl; max = maxEl; break;
 			default:
 				System.out.println("error Stage.move");
+		}
+		if (!motorCheck(mc.getAxis())) {
+			window.controlMoveButtons(true);
+			return;
 		}
 		
 		if (!act.validMove(mc, min, max)) {
@@ -348,21 +384,23 @@ public class Stage {
 			}
 		});
 	}
-	
-	public void index(final axisType type) {
+
+	public void index(final axisType axis) {
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
-				switch (type) {
-				case AZ:
-					az.index();
-					buttonEnabler("indexAz");
-					break;
-				case EL:
-					el.index();
-					buttonEnabler("indexEl");
-					break;
+				reader.togglePauseFlag();
+				switch (axis) {
+					case AZ:
+						az.index();
+						buttonEnabler("indexAz");
+						break;
+					case EL:
+						el.index();
+						buttonEnabler("indexEl");
+						break;
 				}
+				reader.togglePauseFlag();
 			}
 		});
 	}
@@ -406,6 +444,16 @@ public class Stage {
 		this.minEl = minEl;
 		this.maxEl = maxEl;
 	}
+	
+	public void setVelAccAz(double velAz, double accAz) {
+		this.velAz = velAz;
+		this.accAz = accAz;
+	}
+	
+	public void setVelAccEl(double velEl, double accEl) {
+		this.velEl = velEl;
+		this.accEl = accEl;
+	}
 
 	public int getEncTol() {return encTol;}
 	public void setEncTol(int encTol) {
@@ -413,18 +461,18 @@ public class Stage {
 	}
 
 	public void status() {
-		String tellPos = "TP";
-		String tellVel = "TV";
-		String azAxis = "A";
-		DataGalil data;
-
-		String azPos = protocol.sendRead(tellPos + azAxis);
-		String azVel = protocol.sendRead(tellVel + azAxis);
-
-		data = new DataGalil();
-		data.makeAz(azPos, azVel);
-		position = data;
-		window.updateTxtPosInfo(position.info());
+//		String tellPos = "TP";
+//		String tellVel = "TV";
+//		String azAxis = "A";
+//		DataGalil data;
+//
+//		String azPos = protocol.sendRead(tellPos + azAxis);
+//		String azVel = protocol.sendRead(tellVel + azAxis);
+//
+//		data = new DataGalil();
+		//data.makeAz(azPos, azVel);
+		//position = data;
+		//window.updateTxtPosInfo(position.info());
 	}
 
 	public void sendCommand(String command) {
@@ -438,26 +486,62 @@ public class Stage {
 	public void readQueue() {
 		protocol.test();
 	}
+	
+	/**
+	 * Stops the desired axis.
+	 * @param axis az or el
+	 */
+	public void stop(axisType axis) {
+		ActInterface act = axisPicker(axis);
+		act.stop();
+	}
+	
+	//TODO this is clunky, but it works
+	/**
+	 * Toggles the motor on or off.
+	 * @param axis az or el
+	 */
+	public void motorControl(axisType axis) {
+		ActInterface act = axisPicker(axis);
+		act.motorControl();
+		window.updateMotorState(az.motorState(), el.motorState());
+	}
+	
+	/**
+	 * Convenience method that selects the desired axis.
+	 * @param axis
+	 * @return
+	 */
+	private ActInterface axisPicker(axisType axis) {
+		ActInterface act = null;
+		switch (axis) {
+			case AZ:
+				act = az; break;
+			case EL:
+				act = el; break;
+		}
+		return act;
+	}
 
 	public double encPos(axisType axisType) {
 		if (position == null) return 0;
 		switch (axisType) {
-		case AZ:
-			return position.azPos();
-		case EL:
-			return position.elPos();
-		default:
-			return 0;
+			case AZ:
+				return position.azPos();
+			case EL:
+				return position.elPos();
+			default:
+				return 0;
 		}
 	}
-
+	
 	public void indexingDone(axisType type) {
 		System.out.println("indexing done");
 		switch (type) {
-		case AZ:
-			az.setIndexing(false); break;
-		case EL:
-			el.setIndexing(false); break;
+			case AZ:
+				az.setIndexing(false); break;
+			case EL:
+				el.setIndexing(false); break;
 		}
 	}
 
@@ -546,7 +630,6 @@ public class Stage {
 			info += "El AbsPos: " + Formatters.TWO_POINTS.format(el.absolutePos()) + "\n";
 		}
 		window.updateTxtPosInfo(info);
-		
 	}
 	
 	void updateVelAcc(String azVel, String azAcc, String elVel, String elAcc) {
@@ -556,14 +639,6 @@ public class Stage {
 	void toggleReader() {
 		reader.togglePauseFlag();
 	}
-
-//	void setGoalAz(double goalAz) {
-//		window.setGoalAz(goalAz);
-//	}
-//
-//	void setGoalEl(double goalEl) {
-//		window.setGoalEl(goalEl);
-//	}
 	
 	void setGoalPos(double deg, axisType axis) {
 		window.setGoalPos(Formatters.TWO_POINTS.format(deg), axis);
@@ -580,13 +655,38 @@ public class Stage {
 			e.printStackTrace();
 		}
 		switch (type) {
-		case Galil:
-			closeGalil();
-			protocol.close();
-			break;
-		case FTDI:
-			break;
+			case Galil:
+				closeGalil();
+				protocol.close();
+				break;
+			case FTDI:
+				break;
 		}
+	}
+	
+	public void statusArea(String message) {
+		window.updateStatusArea(message);
+	}
+	
+	/**
+	 * Returns true if the motor is on.
+	 * @param axis
+	 * @return
+	 */
+	private boolean motorCheck(axisType axis) {
+		String name = "";
+		ActInterface act = null;
+		switch (axis) {
+			case AZ:
+				act = az; name = "Azimuth"; break;
+			case EL:
+				act = el; name = "Elevation"; break;
+		}
+		if (!act.motorState()) {
+			statusArea(name + " motor is off.  Please turn motor on before proceeding.\n");
+			return false;
+		}
+		return true;
 	}
 
 }
