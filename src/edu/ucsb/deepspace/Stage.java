@@ -384,6 +384,7 @@ public class Stage {
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
+				reader.togglePauseFlag();
 				switch (axis) {
 					case AZ:
 						az.index();
@@ -394,6 +395,7 @@ public class Stage {
 						buttonEnabler("indexEl");
 						break;
 				}
+				reader.togglePauseFlag();
 			}
 		});
 	}
@@ -454,15 +456,15 @@ public class Stage {
 	}
 
 	public void status() {
-		String tellPos = "TP";
-		String tellVel = "TV";
-		String azAxis = "A";
-		DataGalil data;
-
-		String azPos = protocol.sendRead(tellPos + azAxis);
-		String azVel = protocol.sendRead(tellVel + azAxis);
-
-		data = new DataGalil();
+//		String tellPos = "TP";
+//		String tellVel = "TV";
+//		String azAxis = "A";
+//		DataGalil data;
+//
+//		String azPos = protocol.sendRead(tellPos + azAxis);
+//		String azVel = protocol.sendRead(tellVel + azAxis);
+//
+//		data = new DataGalil();
 		//data.makeAz(azPos, azVel);
 		//position = data;
 		//window.updateTxtPosInfo(position.info());

@@ -25,20 +25,19 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 	private boolean pauseFlag = false;
 	
 	public void togglePauseFlag() {
-		System.out.println("hi");
 		this.pauseFlag = !pauseFlag;
 	}
 	
 	public void run() {
-		//pause(1000);
 		while (flag) {
 			if (!pauseFlag) {
 				String azPos = protocol.sendRead(tellPos + azAxis);
 				String azVel = protocol.sendRead(tellVel + azAxis);
-				String elPos = protocol.sendRead(tellPos + elAxis);
-				String elVel = protocol.sendRead(tellVel + elAxis);
 				String azJg = protocol.sendRead("JG?");
 				String azAc = protocol.sendRead("AC?");
+				
+				String elPos = protocol.sendRead(tellPos + elAxis);
+				String elVel = protocol.sendRead(tellVel + elAxis);
 				String elJg = protocol.sendRead("JG,?");
 				String elAc = protocol.sendRead("AC,?");
 				

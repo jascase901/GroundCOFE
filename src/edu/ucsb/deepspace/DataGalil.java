@@ -42,10 +42,12 @@ public class DataGalil implements DataInterface {
 		out += "Az Velocity:  " + az.vel + "\n";
 		out += "Az Jog Speed: " + az.jg + "\n";
 		out += "Az Accel:     " + az.ac + "\n";
+		out += "\n";
 		out += "El Position:  " + el.pos + "\n";
 		out += "El Velocity:  " + el.vel + "\n";
 		out += "El Jog Speed: " + el.jg + "\n";
 		out += "El Accel:     " + el.ac + "\n";
+		out += "\n";
 		
 		return out;
 	}
