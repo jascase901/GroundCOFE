@@ -16,6 +16,7 @@ Getting the Code for contribution
 		7a)-Email jasface901@gmail.com to get your git account added to contributers list
 		7b)click projects from git
 		8)paste https url in prompt https://${account}@github.com/dontQQ/GroundCOFE.git
+		
 Setting eclipse to use java 1.7
 	1)click project->properties
 	2)click add library
@@ -23,17 +24,12 @@ Setting eclipse to use java 1.7
 	4)click installed jres
 	5)click add
 	6)browse for jre 7 
+	
 Running From within java
 	1)click on the edu.ucsb.deepsace package
 	2)select Main.java
 	3)Hit the f-11 key on your keyboard
-	test
-	
-Reed  5/8
-two ERRORS right now
-Weird "?" error
-velocity / position are sometimes flipped.  this error can be reproduced by indexing az, and then indexing el
-			
+	test	
 			
 How to pull master
 1: 	reset master last pull(deletes code changes in master)
@@ -48,50 +44,15 @@ How to add code
 	git branch <name_of_branch>
 3:switch to that branch
 	git checkout <name_of_branch>
-4: make your changes to that branch
+4:make your changes to that branch
 	type code into eclipse
-5: switch to master
+5:switch to master
 	git checkout master
-6:  pull master
+6:pull master
 	see how to pull master
-7: merge branches
+7:merge branches
 	git merge <name_of_branch>
 7a:if no conflicts  then push branch
 	git push origin master
 7b:if it says cant merge do to conflict
-	type in git mergetool
-	
-	
-
-
-	
-	
-
-Todo:	
-maximum velocity and acceleration display and control.  something similar to min/max az/el
-ra/dec calibration
-status area.  the user needs information about what's going on in the program
-raster scan
-data output.  during ra/dec tracking and scanning.  into some sort of text file
-ra/dec + raster scan
-fool proof.  try breaking the program
-seperate GUI for FTDI and GALIL
-
-
-
-
-
-
-customize user interface for galil or ftdi?
-slightly implemented 4/17 Reed.  made "encoder steps" radio button hidden if stageType is galil
-
-
-Jason 4/11
-	Renabled limits in stage-added printstatements to AllowedMove in ActGalil
-	Added a dialog box that pops up when user tries to move outside limits inside main window, had to import JOptionpane
-
-
-Jason 4/13
-	Changed ui interface of gotopos
-	removed superfulous code in AzElWindow 
-Why is the 10 important in the velocity code 
+	git mergetool
