@@ -981,10 +981,32 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	btnSetMaxVelAccAz = new Button(grpAxisControl, SWT.NONE);
     	btnSetMaxVelAccAz.setBounds(52, 171, 104, 23);
     	btnSetMaxVelAccAz.setText("Set Max Vel/Acc Az");
+    	btnSetMaxVelAccAz.addMouseListener(new MouseAdapter() {
+    		public void mouseDown(MouseEvent evt) {
+    			try {
+    				double velAz = Double.parseDouble(txtVelAz.getText());
+    				double accAz = Double.parseDouble(txtAccAz.getText());
+    				stage.setVelAccAz(velAz, accAz);
+    			} catch (NumberFormatException e1) {
+    				txtStatusArea.append("Must input a number.\n");
+    			}
+    		}
+    	});
     	
     	btnSetMaxVelAccEl = new Button(grpAxisControl, SWT.NONE);
     	btnSetMaxVelAccEl.setBounds(162, 171, 102, 23);
     	btnSetMaxVelAccEl.setText("Set Max Vel/Acc El");
+    	btnSetMaxVelAccEl.addMouseListener(new MouseAdapter() {
+    		public void mouseDown(MouseEvent evt) {
+    			try {
+    				double velEl = Double.parseDouble(txtVelEl.getText());
+    				double accEl = Double.parseDouble(txtAccEl.getText());
+    				stage.setVelAccEl(velEl, accEl);
+    			} catch (NumberFormatException e1) {
+    				txtStatusArea.append("Must input a number.\n");
+    			}
+    		}
+    	});
     	
     	
     	
@@ -1193,6 +1215,18 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 				txtMaxAz.setText(String.valueOf(maxAz));
 				txtMinEl.setText(String.valueOf(minEl));
 				txtMaxEl.setText(String.valueOf(maxEl));
+			}
+		});
+	}
+	
+	public void setVelAccAzEl(final double velAz, final double accAz, final double velEl, final double accEl) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				txtVelAz.setText(String.valueOf(velAz));
+				txtAccAz.setText(String.valueOf(accAz));
+				txtVelEl.setText(String.valueOf(velEl));
+				txtAccEl.setText(String.valueOf(accEl));
 			}
 		});
 	}

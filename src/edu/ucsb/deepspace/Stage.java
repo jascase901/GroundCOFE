@@ -30,6 +30,7 @@ public class Stage {
 	}
 
 	private double minAz, maxAz, minEl, maxEl;
+	private double velAz, accAz, velEl, accEl;
 	//TODO private double maxMoveRel = 360;
 	private int encTol = 10;
 
@@ -160,10 +161,15 @@ public class Stage {
 		maxAz = Double.parseDouble(actSettings.getProperty("maxAz"));
 		minEl = Double.parseDouble(actSettings.getProperty("minEl"));
 		maxEl = Double.parseDouble(actSettings.getProperty("maxEl"));
+		velAz = Double.parseDouble(actSettings.getProperty("velAz"));
+		accAz = Double.parseDouble(actSettings.getProperty("accAz"));
+		velEl = Double.parseDouble(actSettings.getProperty("velEl"));
+		accEl = Double.parseDouble(actSettings.getProperty("accEl"));
 		encTol = Integer.parseInt(actSettings.getProperty("encTol"));
 		az.setOffset(azOffset);
 		el.setOffset(elOffset);
 		window.setMinMaxAzEl(minAz, maxAz, minEl, maxEl);
+		window.setVelAccAzEl(velAz, accAz, velEl, accEl);
 	}
 
 	private void closeGalil() {
@@ -173,6 +179,10 @@ public class Stage {
 		actSettings.setProperty("maxAz", String.valueOf(maxAz));
 		actSettings.setProperty("minEl", String.valueOf(minEl));
 		actSettings.setProperty("maxEl", String.valueOf(maxEl));
+		actSettings.setProperty("velAz", String.valueOf(velAz));
+		actSettings.setProperty("accAz", String.valueOf(accAz));
+		actSettings.setProperty("velEl", String.valueOf(velEl));
+		actSettings.setProperty("accEl", String.valueOf(accEl));
 		actSettings.setProperty("encTol", String.valueOf(encTol));
 		try {
 			actSettings.store(new FileOutputStream("Galil.ini"), "");
@@ -303,23 +313,23 @@ public class Stage {
 		el.stopScanning();
 	}
 	
-	public void raster(ScanCommand azSc, ScanCommand elSc) {
-		moveAbsolute(azSc.getMin(), elSc.getMin());
-		double deltaAz = azSc.getMax() - azSc.getMin();
-		double deltaEl = elSc.getMax() - elSc.getMin();
-		double reps = azSc.getReps();
-		double lines = 3;
-		
-		
-		moveAbsolute(minAz, minEl);
-		int i = 1;
-		int mask = 0;
-		int parity = 1;
-		while (i<reps) {
-		  //moveRelative(deltaAz, 0);
-		  //moveRelative(-deltaAz, -deltaEl/lines);
-		}
-	}
+//	public void raster(ScanCommand azSc, ScanCommand elSc) {
+//		moveAbsolute(azSc.getMin(), elSc.getMin());
+//		double deltaAz = azSc.getMax() - azSc.getMin();
+//		double deltaEl = elSc.getMax() - elSc.getMin();
+//		double reps = azSc.getReps();
+//		double lines = 3;
+//		
+//		
+//		moveAbsolute(minAz, minEl);
+//		int i = 1;
+//		int mask = 0;
+//		int parity = 1;
+//		while (i<reps) {
+//		  //moveRelative(deltaAz, 0);
+//		  //moveRelative(-deltaAz, -deltaEl/lines);
+//		}
+//	}
 	
 	public void move(MoveCommand mc) {
 		ActInterface act = null;
@@ -426,6 +436,16 @@ public class Stage {
 	public void setMinMaxEl(double minEl, double maxEl) {
 		this.minEl = minEl;
 		this.maxEl = maxEl;
+	}
+	
+	public void setVelAccAz(double velAz, double accAz) {
+		this.velAz = velAz;
+		this.accAz = accAz;
+	}
+	
+	public void setVelAccEl(double velEl, double accEl) {
+		this.velEl = velEl;
+		this.accEl = accEl;
 	}
 
 	public int getEncTol() {return encTol;}

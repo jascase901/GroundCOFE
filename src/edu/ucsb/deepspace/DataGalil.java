@@ -10,30 +10,6 @@ public class DataGalil implements DataInterface {
 		
 	}
 	
-//	void makeAz(String pos, String vel) {
-//		if (pos.equals("")) {
-//			pos = "0";
-//		}
-//		if (vel.equals("")) {
-//			vel = "0";
-//		}
-//		double dPos = Double.parseDouble(pos);
-//		double dVel = Double.parseDouble(vel); 
-//		az = new GalilStatus(dPos, dVel);
-//	}
-//	
-//	void makeEl(String pos, String vel) {
-//		if (pos.equals("")) {
-//			pos = "0";
-//		}
-//		if (vel.equals("")) {
-//			vel = "0";
-//		}
-//		double dPos = Double.parseDouble(pos);
-//		double dVel = Double.parseDouble(vel); 
-//		el = new GalilStatus(dPos, dVel);
-//	}
-	
 	void make (String pos, String vel, String jg, String ac, axisType axis) {
 		if (pos.equals("")) {
 			pos = "0";
@@ -62,18 +38,18 @@ public class DataGalil implements DataInterface {
 	@Override
 	public String info() {
 		String out = "";
-		out += "Az Position: " + az.pos + "\n";
-		out += "Az Velocity: " + az.vel + "\n";
-		out +="Az Jog Speed: " + az.jg + "\n";
-		out +="Az Accel: " + az.ac + "\n";
-		out += "El Position: " + el.pos + "\n";
-		out += "El Velocity: " + el.vel + "\n";
-		out +="El Jog Speed:" + el.jg + "\n";
-		out +="El Accel:" + el.ac + "\n";
+		out += "Az Position:  " + az.pos + "\n";
+		out += "Az Velocity:  " + az.vel + "\n";
+		out += "Az Jog Speed: " + az.jg + "\n";
+		out += "Az Accel:     " + az.ac + "\n";
+		out += "El Position:  " + el.pos + "\n";
+		out += "El Velocity:  " + el.vel + "\n";
+		out += "El Jog Speed: " + el.jg + "\n";
+		out += "El Accel:     " + el.ac + "\n";
 		
 		return out;
 	}
-
+	
 	@Override
 	public boolean moving() {
 		boolean azMoving = (Math.abs(az.vel) >= 10);
