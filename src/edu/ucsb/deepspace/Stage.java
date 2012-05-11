@@ -20,7 +20,7 @@ public class Stage {
 
 	private static final Stage INSTANCE = new Stage();
 	public static Stage getInstance() {return INSTANCE;}
-
+	
 	public static enum stageType {
 		Galil, FTDI;
 	}
@@ -71,6 +71,7 @@ public class Stage {
 			el.registerStage(this);
 			azMotorState = az.motorState();
 			elMotorState = el.motorState();
+			window.updateMotorState(azMotorState, elMotorState);
 			break;
 		case FTDI:
 			//These are commented out because I made the ActFTDI class abstract.
@@ -302,24 +303,23 @@ public class Stage {
 		el.stopScanning();
 	}
 	
-//	public void raster(ScanCommand azSc, ScanCommand elSc) {
-//		moveAbsolute(azSc.getMin(), elSc.getMin());
-//		double deltaAz = azSc.getMax() - azSc.getMin();
-//		double deltaEl = elSc.getMax() - elSc.getMin();
-//		double reps = azSc.getReps();
-//		
-//		
-//		moveAbsolute(minAz, minEl);
-//		int i = 1;
-//		int mask = 0;
-//		int parity = 1;
-//		while (i<2*reps) {
-//		  //moveRelative(parity*deltaAz, mask*deltaEl/reps);
-//		  parity = -1*parity;
-//		  mask++;
-//		  mask %= 2;
-//		}
-//	}
+	public void raster(ScanCommand azSc, ScanCommand elSc) {
+		moveAbsolute(azSc.getMin(), elSc.getMin());
+		double deltaAz = azSc.getMax() - azSc.getMin();
+		double deltaEl = elSc.getMax() - elSc.getMin();
+		double reps = azSc.getReps();
+		double lines = 3;
+		
+		
+		moveAbsolute(minAz, minEl);
+		int i = 1;
+		int mask = 0;
+		int parity = 1;
+		while (i<reps) {
+		  //moveRelative(deltaAz, 0);
+		  //moveRelative(-deltaAz, -deltaEl/lines);
+		}
+	}
 	
 	public void move(MoveCommand mc) {
 		ActInterface act = null;
@@ -386,10 +386,6 @@ public class Stage {
 				}
 			}
 		});
-	}
-	
-	public void motorControl(boolean onOff, axisType axis) {
-		
 	}
 
 	//should return true if something is moving, false if not
@@ -473,10 +469,15 @@ public class Stage {
 		act.stop();
 	}
 	
-	
+	//TODO this is clunky, but it works
+	/**
+	 * Toggles the motor on or off.
+	 * @param axis az or el
+	 */
 	public void motorControl(axisType axis) {
 		ActInterface act = axisPicker(axis);
-		
+		act.motorControl();
+		window.updateMotorState(az.motorState(), el.motorState());
 	}
 	
 	/**
@@ -640,6 +641,11 @@ public class Stage {
 		window.updateStatusArea(message);
 	}
 	
+	/**
+	 * Returns true if the motor is on.
+	 * @param axis
+	 * @return
+	 */
 	private boolean motorCheck(axisType axis) {
 		String name = "";
 		ActInterface act = null;

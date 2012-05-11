@@ -947,7 +947,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	btnMotorAz.setText("MotorAzOnOff");
     	btnMotorAz.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
-    			stage.index(axisType.EL);
+    			stage.motorControl(axisType.AZ);
     		}
     	});
     	
@@ -956,7 +956,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	btnMotorEl.setText("MotorElOnOff");
     	btnMotorEl.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
-    			stage.index(axisType.EL);
+    			stage.motorControl(axisType.EL);
     		}
     	});
     	
@@ -1310,8 +1310,12 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				btnMotorAz.setText("");
-				btnMotorEl.setText("");
+				String textAz = "Motor On";
+				String textEl = "Motor on";
+				if (az) textAz = "Motor Off";
+				if (el) textEl = "Motor Off";
+				btnMotorAz.setText(textAz);
+				btnMotorEl.setText(textEl);
 			}
 		});
 	}

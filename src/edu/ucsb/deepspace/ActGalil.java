@@ -15,6 +15,7 @@ public class ActGalil implements ActInterface {
 	private double offset = 0;
 	private double azEncPerRev=1000*1024;
 	private boolean scanning = false;
+	private boolean motorState = false;
 
 	public ActGalil(axisType axis, CommGalil protocol) {
 		this.axis = axis;
@@ -84,17 +85,23 @@ public class ActGalil implements ActInterface {
 			}
 		}
 		
-		
-		
 //		switch (mc.getMode()) {
 //			case RELATIVE:
-//				double userPos = userPos();
-//				double amount = mc.getAmount();
-//				//goal = userPos() + mc.getAmount(); break;
-//				goal = userPos + amount; break;
+//				switch (mc.getType()) {
+//					case ENCODER:
+//						goal = userPos() + convEncToDeg(mc.getAmount()); break;
+//					case DEGREE:
+//						goal = userPos() + mc.getAmount(); break;
+//				}
 //			case ABSOLUTE:
-//				goal = mc.getAmount(); break;
+//				switch (mc.getType()) {
+//					case ENCODER:
+//						goal = convEncToDeg(mc.getAmount()); break;
+//					case DEGREE:
+//						goal = mc.getAmount(); break;
+//				}
 //		}
+		
 		return absDegToUserDeg(goal);
 	}
 
@@ -115,11 +122,7 @@ public class ActGalil implements ActInterface {
 	 * @return absolutePos() % 360
 	 */
 	public double userPos() {
-//		double absPos = absolutePos();
-//		double userPos = absPos % 360;
-//		return userPos;
 		return absDegToUserDeg(absolutePos());
-		//return absolutePos() % 360;
 	}
 	
 	/**
@@ -244,28 +247,47 @@ public class ActGalil implements ActInterface {
 		String response = protocol.sendRead("MG _MO" + axisName);
 		double state = Double.parseDouble(response);
 		if (state == 1) {
+			motorState = false;
 			return false;
 		}
 		else if (state == 0) {
+			motorState = true;
 			return true;
 		}
 		System.out.println("error ActGalil.motorState");
 		return false;
 	}
 	
-	void motorOn() {
-		protocol.send("SH" + axisName);
+	private void motorOn() {
+		protocol.sendRead("SH" + axisName);
+		motorState();
 	}
 	
-	void motorOff() {
-		protocol.send("MO" + axisName);
+	private void motorOff() {
+		protocol.sendRead("MO" + axisName);
+		motorState();
+	}
+	
+	/**
+	 * Toggles the motor state. <P>
+	 * By default, set to false.  When stage is initialized, motorState() is called.<BR>
+	 * This updates motorState to the current state.  True for on, false for off. <BR>
+	 * 
+	 */
+	public void motorControl() {
+		if (motorState) {
+			motorOff();
+		}
+		else {
+			motorOn();
+		}
 	}
 	
 	/**
 	 * Stops the current motion.
 	 */
 	public void stop() {
-		protocol.send("ST" + axisName);
+		protocol.sendRead("ST" + axisName);
 	}
 	
 	public void setVelocity(double vel) {

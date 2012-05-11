@@ -59,6 +59,11 @@ public interface ActInterface {
 	 */
 	public void stop();
 	
+	/**
+	 * Toggles the motor state. <P>
+	 */
+	public void motorControl();
+	
 	//public void moveEncVal(double numSteps);
 	
 	//public double currentDegPos();
