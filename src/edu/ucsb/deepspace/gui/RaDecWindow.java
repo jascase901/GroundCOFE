@@ -1,21 +1,13 @@
 package edu.ucsb.deepspace.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -23,9 +15,6 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ucsb.deepspace.Coordinate;
 import edu.ucsb.deepspace.LatLongAlt;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-
 import edu.ucsb.deepspace.Stage;
 
 public class RaDecWindow {
@@ -79,8 +68,8 @@ public class RaDecWindow {
 		raHour.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent evt1) {
 				checkHandler(evt1, raHour,minsec);
-			}});
-		
+			}
+		});
 		
 		raMin = new Text(shell, SWT.BORDER);
 		raMin.setBounds(96, 89, 37, 18);
@@ -88,9 +77,8 @@ public class RaDecWindow {
 		raMin.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent evt1) {
 				checkHandler(evt1, raMin,minsec);
-			}});
-		
-	
+			}
+		});
 		
 		raSec = new Text(shell, SWT.BORDER);
 		raSec.setBounds(139, 89, 37, 18);
@@ -99,7 +87,8 @@ public class RaDecWindow {
 		raSec.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent evt1) {
 				checkHandler(evt1, raSec,minsec);
-			}});
+			}
+		});
 		
 		decDeg = new Text(shell, SWT.BORDER);
 		decDeg.setBounds(53, 110, 37, 18);
@@ -107,7 +96,8 @@ public class RaDecWindow {
 		decDeg.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent evt1) {
 				checkHandler(evt1, decDeg,minsec);
-			}});
+			}
+		});
 		
 		decMin = new Text(shell, SWT.BORDER);
 		decMin.setBounds(96, 110, 37, 18);
@@ -115,8 +105,8 @@ public class RaDecWindow {
 		decMin.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent evt1) {
 				checkHandler(evt1, decMin,minsec);
-			}});
-		
+			}
+		});
 		
 		decSec = new Text(shell, SWT.BORDER);
 		decSec.setBounds(139, 110, 37, 18);
@@ -125,14 +115,10 @@ public class RaDecWindow {
 		decSec.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent evt1) {
 				checkHandler(evt1, decSec,minsec);
-			}});
-		
-		action = new Button(shell, SWT.PUSH | SWT.CENTER);
-		action.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
 			}
 		});
+		
+		action = new Button(shell, SWT.PUSH | SWT.CENTER);
 		action.setText("Convert to az/el");
 		action.setBounds(49, 134, 84, 30);
 		action.setEnabled(false);
@@ -165,7 +151,6 @@ public class RaDecWindow {
 			}
 		});
 		
-		
 		hourdeg = new Label(shell, SWT.NONE);
 		hourdeg.setText("hour / deg");
 		hourdeg.setBounds(40, 70, 50, 13);
@@ -186,8 +171,6 @@ public class RaDecWindow {
 		dec = new Label(shell, SWT.NONE);
 		dec.setText("dec:");
 		dec.setBounds(10, 110, 37, 13);
-		
-	
 		
 		lblDirections = new Label(shell, SWT.WRAP);
 		lblDirections.setBounds(27, 27, 149, 80);
@@ -223,45 +206,21 @@ public class RaDecWindow {
 		});
 	}
 	
-	
 	//Enables calibrate if all the fields are filled.
-			public void checkHandler(ModifyEvent evt, Text text, boolean minOrSecFlag){
-				
-			
-				
-				boolean min_sec_check = false;
-				if (minOrSecFlag){
-					if(raSec.getText().equals("")||decSec.getText().equals("")){
-						min_sec_check = true;
-					}
-			
-				}
-				if (decDeg.getText().equals("") || decMin.getText().equals("") || raHour.getText().equals("")
-						 || raMin.getText().equals("") || min_sec_check){
-					action.setEnabled(false);
-					
-				}
-				else{
-					action.setEnabled(true);
-				}
-				
-				
+	public void checkHandler(ModifyEvent evt, Text text, boolean minOrSecFlag){
+		boolean min_sec_check = false;
+		if (minOrSecFlag){
+			if(raSec.getText().equals("")||decSec.getText().equals("")){
+				min_sec_check = true;
 			}
-	@SuppressWarnings("unused")
-	public void handler(KeyEvent evt, Text text, boolean minOrSecFlag) {
-		double rangeMin = 0;
-		double rangeMax = 0;
-		if (minOrSecFlag) {
-			rangeMin = 0;
-			rangeMax = 60;
 		}
-		else {
-			rangeMin = -180;
-			rangeMax = 180;
+		if (decDeg.getText().equals("") || decMin.getText().equals("") || raHour.getText().equals("")
+				|| raMin.getText().equals("") || min_sec_check){
+			action.setEnabled(false);
 		}
-		
-		if (evt.keyCode == 16777296 || evt.keyCode == 13) {
-			
+		else{
+			action.setEnabled(true);
 		}
 	}
+	
 }
