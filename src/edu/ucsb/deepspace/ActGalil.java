@@ -305,6 +305,7 @@ public class ActGalil implements ActInterface {
 	
 	public boolean indexing() {return indexing;}
 	public void setIndexing(boolean indexing) {this.indexing = indexing;}
+	
 	public void calibrate(double degVal) {
 		offset = degVal - convEncToDeg(stage.encPos(axis));
 	}
@@ -320,7 +321,7 @@ public class ActGalil implements ActInterface {
 			case EL:
 				indexGalilEl(); break;
 		}
-		System.out.println("yeee:     " + axis + "    " + protocol.read());
+		protocol.read(); //there's an erroneous : that pops up at the end of indexing. this gets rid of it
 	}
 	
 	private void indexGalilAz() {
