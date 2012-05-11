@@ -1,7 +1,6 @@
 package edu.ucsb.deepspace.gui;
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -10,10 +9,12 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Control;
+
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -30,8 +31,7 @@ public class LatLongAltWindow {
 	private Text longDeg, longMin, longSec;
 	private Text altText;
 	private Label lat, lon, deg, min, sec, alt;
-	private Control current;
-	private List<Control> order = new ArrayList<Control>();
+
 	
 	private boolean minsec;
 	private LatLongAlt previous;
@@ -75,123 +75,77 @@ public class LatLongAltWindow {
 		latDeg = new Text(shell, SWT.BORDER);
 		latDeg.setBounds(53, 112, 50, 18);
 		latDeg.setText(String.valueOf(previous.getLatitude()));
-		latDeg.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, latDeg, false);
-			}
-		});
-		latDeg.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = latDeg;
-			}
-		});
+		latDeg.setMessage("String.valueOf(previous.getLatitude())");
+		latDeg.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, latDeg,minsec);
+			}});
+		
+	
 		
 		latMin = new Text(shell, SWT.BORDER);
 		latMin.setBounds(107, 112, 50, 18);
-		latMin.setEnabled(false);
-		latMin.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, latMin, true);
-			}
-		});
-		latMin.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = latMin;
-			}
-		});
+		latMin.setMessage("");
+		latMin.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, latMin,minsec);
+			}});
+		
 		
 		latSec = new Text(shell, SWT.BORDER);
 		latSec.setBounds(160, 112, 50, 18);
-		latSec.setEnabled(false);
-		latSec.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, latSec, true);
-			}
-		});
-		latSec.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = latSec;
-			}
-		});
+		latSec.setMessage("");
+		latSec.setVisible(minsec);
+		latSec.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, latSec,minsec);
+			}});
+		
 		
 		longDeg = new Text(shell, SWT.BORDER);
 		longDeg.setBounds(53, 133, 50, 18);
 		longDeg.setText(String.valueOf(previous.getLongitude()));
-		longDeg.setEnabled(false);
-		longDeg.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, longDeg, false);
-			}
-		});
-		longDeg.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = longDeg;
-			}
-		});
+		longDeg.setMessage(String.valueOf(previous.getLongitude()));
+		longDeg.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, longDeg,minsec);
+			}});
+
 		
 		longMin = new Text(shell, SWT.BORDER);
 		longMin.setBounds(107, 133, 50, 18);
-		longMin.setEnabled(false);
-		longMin.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, longMin, true);
-			}
-		});
-		longMin.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = longMin;
-			}
-		});
+		longMin.setMessage("");
+		
+		longMin.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, longMin,minsec);
+			}});
+		
+		
 		
 		longSec = new Text(shell, SWT.BORDER);
 		longSec.setBounds(160, 133, 50, 18);
-		longSec.setEnabled(false);
-		longSec.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				handler(evt, longSec, true);
-			}
-		});
-		longSec.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = longSec;
-			}
-		});
+		longSec.setMessage("");
+		longSec.setVisible(minsec);
+		longSec.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, latSec,minsec);
+			}});
+		
 		
 		alt = new Label(shell, SWT.NONE);
 		alt.setBounds(20, 174, 16, 13);
 		alt.setText("alt:");
 		
+		
 		altText = new Text(shell, SWT.BORDER);
 		altText.setBounds(53, 171, 75, 18);
-		altText.setText(String.valueOf(previous.getAltitude()));
-		altText.setEnabled(false);
-		altText.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent evt) {
-				if (evt.keyCode == 16777296 || evt.keyCode == 13) {
-					try {
-						double altVal = Double.parseDouble(altText.getText());
-						//System.out.println(altVal);
-						if (altVal >= 0) {
-							action.setEnabled(true);
-						}
-					} catch (NumberFormatException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		});
-		altText.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				current = altText;
-			}
-		});
+		altText.setText("0.0");
+		altText.setMessage("0.0");
+		altText.addModifyListener(new ModifyListener(){
+			public void modifyText(ModifyEvent evt1) {
+				checkHandler(evt1, altText,minsec);
+			}});
 		
 		action = new Button(shell, SWT.PUSH | SWT.CENTER);
 		action.setText("Set Balloon Position");
@@ -245,6 +199,7 @@ public class LatLongAltWindow {
 		sec = new Label(shell, SWT.NONE);
 		sec.setText("sec");
 		sec.setBounds(170, 93, 37, 13);
+		sec.setVisible(minsec);
 		
 		min = new Label(shell, SWT.NONE);
 		min.setText("min");
@@ -258,19 +213,7 @@ public class LatLongAltWindow {
 		lon.setText("long:");
 		lon.setBounds(20, 133, 37, 13);
 		
-		order.add(latDeg);
-		order.add(latMin);
-		if (minsec) {
-			order.add(latSec);
-		}
-		order.add(longDeg);
-		order.add(longMin);
-		if (minsec) {
-			order.add(longSec);
-		}
-		order.add(altText);
-		order.add(action);
-		current = latDeg;
+	
 		
 		Label lblNewLabel = new Label(shell, SWT.WRAP);
 		lblNewLabel.setBounds(10, 10, 188, 77);
@@ -281,7 +224,29 @@ public class LatLongAltWindow {
 		lblkm.setText("(km)");
 		
 	}
-	
+	//Enables calibrate if all the fields are filled.
+		public void checkHandler(ModifyEvent evt, Text text, boolean minOrSecFlag){
+			
+		
+			
+			boolean min_sec_check = false;
+			if (minOrSecFlag){
+				if(latSec.getText().equals("")||longSec.getText().equals("")){
+					min_sec_check = true;
+				}
+		
+			}
+			if (latDeg.getText().equals("") || latMin.getText().equals("") || longDeg.getText().equals("")
+					||altText.getText().equals("") || longMin.getText().equals("") || longDeg.getText().equals("") || min_sec_check){
+				action.setEnabled(false);
+				
+			}
+			else{
+				action.setEnabled(true);
+			}
+			
+			
+		}
 	@SuppressWarnings("unused")
 	public void handler(KeyEvent evt, Text text, boolean minOrSecFlag) {
 		double rangeMin = 0;
@@ -294,30 +259,7 @@ public class LatLongAltWindow {
 			rangeMin = -180;
 			rangeMax = 180;
 		}
-		int pos = order.indexOf(current);
-		final Control next = order.get(pos+1);
-		if (evt.keyCode == 16777296 || evt.keyCode == 13) {
-			try {
-				Double val = Double.parseDouble(text.getText());
-				//if ((val >= rangeMin) && (val <= rangeMax)) {
-					Display.getCurrent().asyncExec(new Runnable() {
-						public void run() {
-							next.setEnabled(true);
-							next.setFocus();
-						}
-					});
-					current = next;
-					return;
-				//}
-			} catch (NumberFormatException e) {
-				if (text.getText()== null) {
-					
-				}
-				else if (text.getText().equals("")) {
-					
-				}
-				System.out.println("enter an integer between -180 and 180");
-			} 
-		}
+	
+		
 	}
 }

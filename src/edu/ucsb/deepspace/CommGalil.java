@@ -19,9 +19,10 @@ public class CommGalil implements CommInterface {
 	BufferedReader in;
 	Socket socket = null;
 	boolean connection = false;
+	String previousCommand = "";
 	
 	public CommGalil(int port) {
-		System.out.println("hi from CommGalil constructor");
+		System.out.println("hi from CommGalil constructor" + port);
 		try {
 			socket = new Socket();
 			socket.connect(new InetSocketAddress("192.168.1.200", port), 3000);
@@ -42,6 +43,7 @@ public class CommGalil implements CommInterface {
 	
 	//Send message through output stream.
     public void send(String message) {
+    	previousCommand = message;
     	out.println(message);
     }
     
@@ -60,6 +62,7 @@ public class CommGalil implements CommInterface {
     	//Deal with error message, if necessary.
     	if (result.contains("?")) {
     		System.out.println("Syntax Error");
+    		System.out.println("Command Sent: " + previousCommand);
     		System.out.println("Returned value: " + result);
     		System.out.println("Error code: " + sendRead("TC1"));
     	}
