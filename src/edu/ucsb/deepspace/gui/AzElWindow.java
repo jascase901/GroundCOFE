@@ -25,7 +25,6 @@ public class AzElWindow {
 	private Text elDeg, elMin, elSec;
 	private Label el, min, az, sec, deg, lblDirections;
 
-	
 	private boolean minsec;
 	private final String type;
 	private final Stage stage;
@@ -64,16 +63,17 @@ public class AzElWindow {
 		azDeg.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent evt1) {
 				checkHandler(evt1, azDeg,minsec );
-			}});
+			}
+		});
 
 		azMin = new Text(shell, SWT.BORDER);
 		azMin.setBounds(96, 147, 37, 18);
-
 		azMin.setMessage("");
 		azMin.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent evt1) {
 				checkHandler(evt1, azDeg,minsec );
-			}});
+			}
+		});
 
 		azSec = new Text(shell, SWT.BORDER);
 		azSec.setBounds(139, 147, 37, 18);
@@ -81,20 +81,18 @@ public class AzElWindow {
 		azSec.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent evt1) {
 				checkHandler(evt1, azDeg,minsec );
-			}});
+			}
+		});
 
 
 		elDeg = new Text(shell, SWT.BORDER);
 		elDeg.setBounds(53, 168, 37, 18);
-		//elDeg.setEnabled(false);
 		elDeg.setMessage("");
 		elDeg.addModifyListener(new ModifyListener(){
-
 			public void modifyText(ModifyEvent evt1) {
-
 				checkHandler(evt1, azDeg,minsec );
-
-			}});
+			}
+		});
 
 
 		elMin = new Text(shell, SWT.BORDER);
@@ -103,14 +101,16 @@ public class AzElWindow {
 		elMin.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent evt1) {
 				checkHandler(evt1, azDeg,minsec );
-			}});
+			}
+		});
 		
 		elSec = new Text(shell, SWT.BORDER);
 		elSec.setBounds(139, 168, 37, 18);
 		elSec.addModifyListener(new ModifyListener(){
 			public void modifyText(ModifyEvent evt1) {
 				checkHandler(evt1, azDeg,minsec );
-			}});
+			}
+		});
 
 		action = new Button(shell, SWT.PUSH | SWT.CENTER);
 		if (type.equals("calibrate")) {
@@ -180,12 +180,11 @@ public class AzElWindow {
 		
 		lblDirections = new Label(shell, SWT.WRAP);
 		lblDirections.setBounds(27, 27, 149, 80);
-		//lblDirections.setText("azimuth is from 0 to 360.  positive is counter-clockwise.  el is currently 0 straight up.  positive is downwards.");
+		lblDirections.setText("azimuth is from 0 to 360.  positive is counter-clockwise.  el is currently 0 straight up.  positive is downwards.");
 	}
 	
 	//Enables calibrate if all the fields are filled.
 	public void checkHandler(ModifyEvent evt, Text text, boolean minOrSecFlag){
-		
 		boolean min_sec_check = false;
 		if(minOrSecFlag){
 			if(azSec.getText().equals("")||elSec.getText().equals("")){
@@ -199,7 +198,6 @@ public class AzElWindow {
 		else{
 			action.setEnabled(true);
 		}
-		
 	}
 		
 }
