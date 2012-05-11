@@ -62,8 +62,8 @@ public class Stage {
 		this.window = window;
 		switch (type) {
 		case Galil:
-			protocol = new CommGalil(1337);
-			protocolTest = new CommGalil(1338);
+			protocol = new CommGalil(2222);
+			protocolTest = new CommGalil(3333);
 			az = new ActGalil(axisType.AZ, protocol);
 			el = new ActGalil(axisType.EL, protocolTest);
 			reader = new ReaderGalil(this);
@@ -331,38 +331,44 @@ public class Stage {
 //		}
 //	}
 	
-	public void move(MoveCommand mc) {
-		ActInterface act = null;
-		double min = 0, max = 0;
+	public void move(final MoveCommand mc) {
+		exec.submit(new Runnable() {
+			public void run() {
+				ActInterface act = null;
+				double min = 0, max = 0;
+				
+				switch (mc.getAxis()) {
+					case AZ:
+						act = az; min = minAz; max = maxAz;break;
+					case EL:
+						act = el; min = minEl; max = maxEl; break;
+					default:
+						System.out.println("error Stage.move");
+				}
+				if (!motorCheck(mc.getAxis())) {
+					window.controlMoveButtons(true);
+					return;
+				}
+				
+				if (!act.validMove(mc, min, max)) {
+					System.out.println("this is an invalid move");
+					window.controlMoveButtons(true);
+					return;
+				}
+				
+				switch (mc.getMode()) {
+					case RELATIVE:
+						act.moveRelative(mc); break;
+					case ABSOLUTE:
+						act.moveAbsolute(mc); break;
+					default:
+						System.out.println("error Stage.move");
+				}
+				window.controlMoveButtons(true);
+			}
+		});
 		
-		switch (mc.getAxis()) {
-			case AZ:
-				act = az; min = minAz; max = maxAz;break;
-			case EL:
-				act = el; min = minEl; max = maxEl; break;
-			default:
-				System.out.println("error Stage.move");
-		}
-		if (!motorCheck(mc.getAxis())) {
-			window.controlMoveButtons(true);
-			return;
-		}
 		
-		if (!act.validMove(mc, min, max)) {
-			System.out.println("this is an invalid move");
-			window.controlMoveButtons(true);
-			return;
-		}
-		
-		switch (mc.getMode()) {
-			case RELATIVE:
-				act.moveRelative(mc); break;
-			case ABSOLUTE:
-				act.moveAbsolute(mc); break;
-			default:
-				System.out.println("error Stage.move");
-		}
-		window.controlMoveButtons(true);
 	}
 	
 	/**

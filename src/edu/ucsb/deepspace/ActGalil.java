@@ -199,6 +199,8 @@ public class ActGalil implements ActInterface {
 	private void encoderAbsolute(double value) {
 		protocol.sendRead("PA" + axisName + "=" + value);
 		protocol.sendRead("BG" + axisName);
+		//waitWhileMoving();
+		System.out.println("done encoderAbsolute");
 	}
 	
 	/**
@@ -206,8 +208,12 @@ public class ActGalil implements ActInterface {
 	 * @param value
 	 */
 	private void encoderRelative(double value) {
+		System.out.println("send pr");
 		protocol.sendRead("PR" + axisName + "=" + value);
+		//System.out.println("send bg");
 		protocol.sendRead("BG" + axisName);
+		waitWhileMoving();
+		System.out.println("done encoderRelative");
 	}
 	
 	/**
@@ -321,7 +327,7 @@ public class ActGalil implements ActInterface {
 			case EL:
 				indexGalilEl(); break;
 		}
-		protocol.read(); //there's an erroneous : that pops up at the end of indexing. this gets rid of it
+		//protocol.read(); //there's an erroneous : that pops up at the end of indexing. this gets rid of it
 	}
 	
 	private void indexGalilAz() {
@@ -351,15 +357,16 @@ public class ActGalil implements ActInterface {
 		// Do the index search ("FI")
 		protocol.sendRead("FI" + axisName);
 		protocol.sendRead("BG" + axisName);
-		protocol.sendRead("AM" + axisName);
-		protocol.sendRead("MG \"Motion Done\";TP" + axisName);
-		while (flag) {
-			String temp = protocol.read();
-			if (temp.contains("one")) {
-				flag = false;
-			}
-			pause(100);
-		}
+//		protocol.sendRead("AM" + axisName);
+//		protocol.sendRead("MG \"Motion Done\";");
+//		while (flag) {
+//			String temp = protocol.read();
+//			if (temp.contains("one")) {
+//				flag = false;
+//			}
+//			pause(100);
+//		}
+		waitWhileMoving();
 
 		// Finally, restore accel and jog speeds from before routine was run
 		protocol.sendRead("JG" + axisName + "=T1");
@@ -387,18 +394,33 @@ public class ActGalil implements ActInterface {
 		protocol.sendRead("BG" + axisName);
 		protocol.sendRead("AM" + axisName);
 		protocol.sendRead("MG \"Motion Done\";");
-		while (flag) {
-			String temp = protocol.read();
-			if (temp.contains("one")) {
-				flag = false;
-			}
-			pause(100);
-		}
+//		while (flag) {
+//			String temp = protocol.read();
+//			if (temp.contains("one")) {
+//				flag = false;
+//			}
+//			pause(100);
+//		}
+		waitWhileMoving();
 		
 		
 		// Finally, restore accel and jog speeds from before routine was run
 		protocol.sendRead("JG" + axisName + "=T1");
 		protocol.sendRead("AC" + axisName + "=T2");
+	}
+	
+	private void waitWhileMoving() {
+		boolean flag = true;
+		CommGalil hatlife = new CommGalil(55555);
+		while (flag) {
+			String temp = hatlife.sendRead("MG _BG" + axisName);
+			if (temp.contains("0.0000")) {
+				System.out.println("tedasfasdfadsfst");
+				flag = false;
+			}
+			pause(250);
+		}
+		System.out.println("done wait while moving");
 	}
 	
 	public void setOffset(double indexOffset) {
