@@ -13,8 +13,10 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 	public ReaderGalil(Stage stage) {
 		this.setDaemon(true);
 		this.stage = stage;
+		this.setName("ReaderGalil");
 		azAxis = stage.axisName(axisType.AZ);
 		elAxis = stage.axisName(axisType.EL);
+		protocol = new CommGalil(13358);
 	}
 	
 	private String tellPos = "TP";
@@ -28,15 +30,15 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 	}
 	
 	public void run() {
-		protocol = new CommGalil(13358);
+		pause(1000);
 		while (flag) {
 			if (!pauseFlag) {
 				String azPos = protocol.sendRead(tellPos + azAxis);
 				String azVel = protocol.sendRead(tellVel + azAxis);
 				String elPos = protocol.sendRead(tellPos + elAxis);
 				String elVel = protocol.sendRead(tellVel + elAxis);
-
-				if (elPos == null || elPos == "") {elPos="0";}
+				
+				//if (elPos == null || elPos == "") {elPos="0";}
 				
 				data = new DataGalil();
 				data.makeAz(azPos, azVel);

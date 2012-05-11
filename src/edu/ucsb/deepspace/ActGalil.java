@@ -40,76 +40,6 @@ public class ActGalil implements ActInterface {
 	public String info() {
 		return "info: blank";
 	}
-
-	
-//	public void moveAbsolute(double goalPosInDeg) {
-//	    if (axis == axisType.AZ) stage.setGoalAz(goalPosInDeg);
-//		else stage.setGoalEl(goalPosInDeg);
-//	    double goalEnc = degToEncVal(goalPosInDeg);
-//		moveEncVal(goalEnc);
-//	}
-//	
-//	public void moveRelative(double numDeg, String moveType) {
-//		double goalDeg = goalPos(moveType, numDeg);
-//		moveAbsolute(goalDeg);
-//	}
-//	
-//	public void moveEncoder(double numEncPulse) {
-//		double goalDeg = goalPos("encoder", numEncPulse);
-//		moveAbsolute(goalDeg);
-//	}
-//	
-//	//Lowest level move command
-//	//This is the method that makes use of the GalilComm instance, "protocol".
-//	public void moveEncVal(double numEncPulses) {
-//		String out = "PA" + axisName;
-//		out += "=" + numEncPulses;
-//		//System.out.println(out);
-//		protocol.sendRead(out);
-//		protocol.sendRead("BG"+axisName);
-//	}
-//	
-//	private double currentPosDeg() {
-//		return encValToDeg(stage.encPos(axis));
-//	}
-//	
-//	public double encValToDeg(double encVal) {
-//		return offset + encVal / encPulsePerDeg;
-//	}
-//	
-//	//Inverse of encValToDeg
-//	private double  degToEncVal(double degVal) {
-//		return (degVal - offset)*encPulsePerDeg;
-//	}
-	
-	//This method will be used to calculate the final position as a result of a move command.
-	//Used so that the user knows where it will end up pointing, AND to verify that the move is valid.
-//	private double goalPos(String moveType, double amount) {
-//		double goalPos = currentPosDeg();
-//		switch (moveType) {
-//			case "steps": //Galil: steps = enc pulses
-//				goalPos += amount / encPulsePerDeg; break;
-//			case "degrees": //If degrees, add the move amount to current position.
-//				goalPos += amount; break;
-//			case "encoder": //Galil: encoder pulses = steps
-//				goalPos += amount / encPulsePerDeg; break;
-//			case "absolute": //If absolute, final position is the absolute position; do nothing.
-//				goalPos = amount; break;
-//			default :
-//				System.out.println("Error in Galil.goalPos"); break;
-//		}
-//		return goalPos;
-//	}
-	
-	//Check to see if the move is allowed.
-//	public boolean allowedMove(String moveType, double min, double max, double amount) {
-//		double goalPos = goalPos(moveType, amount);
-//		if (goalPos >= min && goalPos <= max) {
-//			return true;
-//		}
-//		return false;
-//	}
-	
 	
 	/**
 	 * Returns true if the move is valid. <P>
@@ -306,6 +236,23 @@ public class ActGalil implements ActInterface {
 		}
 	}
 	
+	/**
+	 * 
+	 * @return true if motor is on, false if not
+	 */
+	public boolean motorState() {
+		String response = protocol.sendRead("MG _MO" + axisName);
+		double state = Double.parseDouble(response);
+		if (state == 1) {
+			return false;
+		}
+		else if (state == 0) {
+			return true;
+		}
+		System.out.println("error ActGalil.motorState");
+		return false;
+	}
+	
 	void motorOn() {
 		protocol.send("SH" + axisName);
 	}
@@ -314,6 +261,12 @@ public class ActGalil implements ActInterface {
 		protocol.send("MO" + axisName);
 	}
 	
+	/**
+	 * Stops the current motion.
+	 */
+	public void stop() {
+		protocol.send("ST" + axisName);
+	}
 	
 	public void setVelocity(double vel) {
 		String out = "JG" + axisName + "=" + vel;
@@ -327,6 +280,10 @@ public class ActGalil implements ActInterface {
 	}
 	
 	public void index() {
+		if (!motorState()) {
+			stage.statusArea(stage.axisNameLong(axis) + " motor is not on.  Please turn on motor before proceeding.\n");
+			return;
+		}
 		switch (axis) {
 			case AZ:
 				indexGalilAz(); break;

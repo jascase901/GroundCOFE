@@ -48,6 +48,17 @@ public interface ActInterface {
 	 */
 	public double userPos();
 	
+	/**
+	 * 
+	 * @return true if motor is on, false if not
+	 */
+	public boolean motorState();
+	
+	/**
+	 * Stops the current motion.
+	 */
+	public void stop();
+	
 	//public void moveEncVal(double numSteps);
 	
 	//public double currentDegPos();

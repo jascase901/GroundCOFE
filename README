@@ -77,8 +77,7 @@ data output.  during ra/dec tracking and scanning.  into some sort of text file
 ra/dec + raster scan
 fool proof.  try breaking the program
 seperate GUI for FTDI and GALIL
-
-
+watchdog to prevent velocity from being set to something that exceeds max value.  same for accel
 
 
 
