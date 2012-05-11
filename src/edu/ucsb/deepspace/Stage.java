@@ -443,9 +443,9 @@ public class Stage {
 		String azVel = protocol.sendRead(tellVel + azAxis);
 
 		data = new DataGalil();
-		data.makeAz(azPos, azVel);
-		position = data;
-		window.updateTxtPosInfo(position.info());
+		//data.makeAz(azPos, azVel);
+		//position = data;
+		//window.updateTxtPosInfo(position.info());
 	}
 
 	public void sendCommand(String command) {
