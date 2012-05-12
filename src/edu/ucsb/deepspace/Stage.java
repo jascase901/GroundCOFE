@@ -365,10 +365,9 @@ public class Stage {
 						System.out.println("error Stage.move");
 				}
 				window.controlMoveButtons(true);
+				System.out.println("stage done move");
 			}
 		});
-		
-		
 	}
 	
 	/**
@@ -392,21 +391,30 @@ public class Stage {
 	}
 
 	public void index(final axisType axis) {
+		if (isIndexing()) {
+			buttonEnabler("indexAz");
+			buttonEnabler("indexEl");
+			return;
+		}
+		
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
-				reader.togglePauseFlag();
+				reader.readerOnOff(false);
 				switch (axis) {
 					case AZ:
 						az.index();
-						buttonEnabler("indexAz");
+						//buttonEnabler("indexAz");
 						break;
 					case EL:
 						el.index();
-						buttonEnabler("indexEl");
+						//buttonEnabler("indexEl");
 						break;
 				}
-				reader.togglePauseFlag();
+				buttonEnabler("indexAz");
+				buttonEnabler("indexEl");
+				System.out.println("Stage done indexing");
+				reader.readerOnOff(true);
 			}
 		});
 	}
@@ -418,7 +426,7 @@ public class Stage {
 			return true; //don't care about FTDI right now (5/5/2012, reed)
 			//return Math.abs(velocity) <= 1;
 		case Galil:
-			return position.moving();
+			return az.moving() || el.moving();
 		default:
 			return true;
 		}
@@ -467,6 +475,7 @@ public class Stage {
 	}
 
 	public void status() {
+		System.out.println(isMoving());
 //		String tellPos = "TP";
 //		String tellVel = "TV";
 //		String azAxis = "A";
@@ -486,11 +495,14 @@ public class Stage {
 	}
 
 	public void queueSize() {
-		System.out.println(protocol.queueSize());
+		System.out.println("az protocol queue size: " + protocol.queueSize());
+		System.out.println("el protocol queue size: " + protocolTest.queueSize());
 	}
 
 	public void readQueue() {
 		protocol.test();
+		System.out.println("--------");
+		protocolTest.test();
 	}
 	
 	/**
@@ -549,6 +561,16 @@ public class Stage {
 			case EL:
 				el.setIndexing(false); break;
 		}
+	}
+	
+	private boolean isIndexing() {
+		boolean azIndexing = az.indexing();
+		boolean elIndexing = el.indexing();
+		boolean result = azIndexing || elIndexing;
+		if (result) {
+			statusArea("Indexing currently in progress.  Please wait before proceeding");
+		}
+		return result;
 	}
 
 	public void goToPos(Coordinate c) {

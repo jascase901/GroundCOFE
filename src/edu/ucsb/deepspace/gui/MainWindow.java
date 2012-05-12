@@ -39,8 +39,6 @@ import edu.ucsb.deepspace.MoveCommand.MoveMode;
 import edu.ucsb.deepspace.MoveCommand.MoveType;
 import edu.ucsb.deepspace.ScanCommand;
 import edu.ucsb.deepspace.Stage;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 
 public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	public static enum buttonGroups {
@@ -660,6 +658,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	indexAz.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
     			indexAz.setEnabled(false);
+    			//indexEl.setEnabled(false);
     			stage.index(axisType.AZ);
     		}
     	});
@@ -670,6 +669,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	popupWindowButtons.put("indexEl", indexEl);
     	indexEl.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
+    			//indexAz.setEnabled(false);
     			indexEl.setEnabled(false);
     			stage.index(axisType.EL);
     		}

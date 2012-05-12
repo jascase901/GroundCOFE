@@ -22,15 +22,19 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 	private String tellPos = "TP";
 	private String tellVel = "TV";
 	DataGalil data;
-	private boolean pauseFlag = false;
+	private boolean flag2 = true;
 	
 	public void togglePauseFlag() {
-		this.pauseFlag = !pauseFlag;
+		this.flag2 = !flag2;
+	}
+	
+	public void readerOnOff(boolean onOff) {
+		this.flag2 = onOff;
 	}
 	
 	public void run() {
 		while (flag) {
-			if (!pauseFlag) {
+			if (flag2) {
 				//System.out.println("\n\n");
 				String azPos = protocol.sendRead(tellPos + azAxis);
 				String azVel = protocol.sendRead(tellVel + azAxis);

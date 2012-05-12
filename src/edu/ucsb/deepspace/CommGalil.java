@@ -30,6 +30,7 @@ public class CommGalil implements CommInterface {
 	private static List<String> threads = new ArrayList<String>();
 	
 	public CommGalil(int port) {
+		System.out.println("comm galil constructor" + port);
 		this.port = port;
 		try {
 			socket = new Socket();
@@ -51,15 +52,15 @@ public class CommGalil implements CommInterface {
 	
 	//Send message through output stream.
     public void send(String message) {
-    	sendCount++;
+    	//sendCount++;
     	
     	previousCommand = message;
     	out.println(message);
     }
     
     public String read() {
-    	//readCount++;
-    	Thread tr = Thread.currentThread();
+    	readCount++;
+    	//Thread tr = Thread.currentThread();
     	//threads.add(tr.getName());
     	
     	//System.out.println(readCount + "thread name:  " + tr.getName());
@@ -93,7 +94,7 @@ public class CommGalil implements CommInterface {
     		System.out.println("This should never ever happen.");
     		result = "0";
     	}
-    	response.add(result);
+    	//response.add(result);
     	//System.out.println("length before trim:  " + result.length());
     	result = result.replace("\r\n:", "");
     	//System.out.println("length after trim:  " + result.length());
@@ -114,7 +115,7 @@ public class CommGalil implements CommInterface {
     	threads.add(port + tr.getName());
     	
     	String temp = read();
-    	//response.add(temp);
+    	response.add(temp);
     	return temp;
     }
     
@@ -143,7 +144,7 @@ public class CommGalil implements CommInterface {
     		temp.add(a);
     	}
     	for (String s : temp) {
-    		//System.out.println(s);
+    		System.out.println(s);
     	}
     	try {
 			socket.close();
