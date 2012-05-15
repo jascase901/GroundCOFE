@@ -1,10 +1,17 @@
 package edu.ucsb.deepspace;
 
-import static org.junit.Assert.*;
+import junit.framework.TestCase;
 
 import org.junit.Test;
 
-public class LatLongAltTest {
+public class LatLongAltTest extends TestCase {
+	
+	LatLongAlt asdf = new LatLongAlt(30, 50, 10);
+	
+	@Override
+	protected void setUp() {
+		
+	}
 
 	@Test
 	public void testGetLatitude() {
