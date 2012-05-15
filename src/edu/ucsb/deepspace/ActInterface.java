@@ -15,6 +15,11 @@ public interface ActInterface {
 	
 	public String info();
 	
+	/**
+	 * Returns true if moving.
+	 */
+	public boolean moving();
+	
 //	public void moveAbsolute(double goalPosInDeg);
 //	
 //	public void moveRelative(double numDeg, String moveType);
@@ -80,6 +85,9 @@ public interface ActInterface {
 	public void setOffset(double indexOffset);
 	public double getOffset();
 	
+	/**
+	 * Returns true if this axis is currently indexing.
+	 */
 	public boolean indexing();
 	
 	public void setIndexing(boolean indexing);

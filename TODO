@@ -7,3 +7,9 @@ data output.  during ra/dec tracking and scanning.  into some sort of text file
 ra/dec + raster scan
 fool proof.  try breaking the program
 seperate GUI for FTDI and GALIL
+
+
+Scanning
+
+Continuous Horizontal Scan
+Raster Scan
