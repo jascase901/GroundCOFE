@@ -1,6 +1,10 @@
 package edu.ucsb.deepspace;
 
-public class Coordinate {
+import org.apache.commons.lang.builder.CompareToBuilder;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
+public class Coordinate implements Comparable<Coordinate> {
 
 	private double r, theta, phi;
 	private double x, y, z;
@@ -61,13 +65,15 @@ public class Coordinate {
 		return new Coordinate(xCom, yCom, zCom, true);
 	}
 
+	//TODO breaks if x and y are 0
 	public Coordinate thetaHat() {
 		double xCom = x*z / (r*Math.sqrt(x*x+y*y));
 		double yCom = y*z / (r*Math.sqrt(x*x+y*y));
 		double zCom = -Math.sqrt(x*x+y*y) / r;
 		return new Coordinate(xCom, yCom, zCom, true);
 	}
-
+	
+	//TODO breaks if x and y are 0
 	public Coordinate phiHat() {
 		double xCom = -y / Math.sqrt(x*x+y*y);
 		double yCom = x / Math.sqrt(x*x+y*y);
@@ -93,23 +99,24 @@ public class Coordinate {
 	public String toString() {
 		return "phi:  " + phi + "  theta:  " + theta + "  r:  " + r;
 	}
-	/**
-	 * Checks if two positions are equal within some user defined tolerance
-	 *
-	 *
-	 * 
-	 * @param Coordinate pos, Double tol
-	 * @return True if this.x, and this.y equal x and y
-	 * @author Jason
-	 */
-	public boolean compareAzAndEl(Coordinate pos, double tol){
-		double x=Math.abs((getAz()- pos.getAz()));
-		double y=Math.abs((getEl()- pos.getEl()));
-		System.out.println(Double.toString(getAz())+ " " + Double.toString(pos.getAz()));
-		return ((-tol<x && x<tol)&&(-tol<y && y<tol) );
+	
+	@Override
+	public boolean equals (Object o) {
+		if (o == null) return false;
+		if (o == this) return true;
+		if (o.getClass() != this.getClass()) return false;
+		Coordinate rhs = (Coordinate) o;
+		return new EqualsBuilder().append(x, rhs.x).append(y, rhs.y).append(z, rhs.z).isEquals(); 
+	}
+	
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(11, 13).append(x).append(y).append(z).toHashCode();
 	}
 
-	
-	
+	@Override
+	public int compareTo(Coordinate o) {
+		return new CompareToBuilder().append(this.x, o.x).append(this.y, o.y).append(this.z, o.z).toComparison();
+	}
 }
 

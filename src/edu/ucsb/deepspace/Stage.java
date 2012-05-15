@@ -65,8 +65,8 @@ public class Stage {
 		this.window = window;
 		switch (type) {
 		case Galil:
-			protocol = new CommGalil(1337);
-			protocolTest = new CommGalil(1338);
+			protocol = new CommGalil(2222);
+			protocolTest = new CommGalil(3333);
 			az = new ActGalil(axisType.AZ, protocol);
 			el = new ActGalil(axisType.EL, protocolTest);
 			reader = new ReaderGalil(this);
@@ -338,38 +338,43 @@ public class Stage {
 //		}
 //	}
 	
-	public void move(MoveCommand mc) {
-		ActInterface act = null;
-		double min = 0, max = 0;
-		
-		switch (mc.getAxis()) {
-			case AZ:
-				act = az; min = minAz; max = maxAz;break;
-			case EL:
-				act = el; min = minEl; max = maxEl; break;
-			default:
-				System.out.println("error Stage.move");
-		}
-		if (!motorCheck(mc.getAxis())) {
-			window.controlMoveButtons(true);
-			return;
-		}
-		
-		if (!act.validMove(mc, min, max)) {
-			System.out.println("this is an invalid move");
-			window.controlMoveButtons(true);
-			return;
-		}
-		
-		switch (mc.getMode()) {
-			case RELATIVE:
-				act.moveRelative(mc); break;
-			case ABSOLUTE:
-				act.moveAbsolute(mc); break;
-			default:
-				System.out.println("error Stage.move");
-		}
-		window.controlMoveButtons(true);
+	public void move(final MoveCommand mc) {
+		exec.submit(new Runnable() {
+			public void run() {
+				ActInterface act = null;
+				double min = 0, max = 0;
+				
+				switch (mc.getAxis()) {
+					case AZ:
+						act = az; min = minAz; max = maxAz;break;
+					case EL:
+						act = el; min = minEl; max = maxEl; break;
+					default:
+						System.out.println("error Stage.move");
+				}
+				if (!motorCheck(mc.getAxis())) {
+					window.controlMoveButtons(true);
+					return;
+				}
+				
+				if (!act.validMove(mc, min, max)) {
+					System.out.println("this is an invalid move");
+					window.controlMoveButtons(true);
+					return;
+				}
+				
+				switch (mc.getMode()) {
+					case RELATIVE:
+						act.moveRelative(mc); break;
+					case ABSOLUTE:
+						act.moveAbsolute(mc); break;
+					default:
+						System.out.println("error Stage.move");
+				}
+				window.controlMoveButtons(true);
+				System.out.println("stage done move");
+			}
+		});
 	}
 	
 	/**
@@ -393,21 +398,30 @@ public class Stage {
 	}
 
 	public void index(final axisType axis) {
+		if (isIndexing()) {
+			buttonEnabler("indexAz");
+			buttonEnabler("indexEl");
+			return;
+		}
+		
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
-				reader.togglePauseFlag();
+				reader.readerOnOff(false);
 				switch (axis) {
 					case AZ:
 						az.index();
-						buttonEnabler("indexAz");
+						//buttonEnabler("indexAz");
 						break;
 					case EL:
 						el.index();
-						buttonEnabler("indexEl");
+						//buttonEnabler("indexEl");
 						break;
 				}
-				reader.togglePauseFlag();
+				buttonEnabler("indexAz");
+				buttonEnabler("indexEl");
+				System.out.println("Stage done indexing");
+				reader.readerOnOff(true);
 			}
 		});
 	}
@@ -419,7 +433,7 @@ public class Stage {
 			return true; //don't care about FTDI right now (5/5/2012, reed)
 			//return Math.abs(velocity) <= 1;
 		case Galil:
-			return position.moving();
+			return az.moving() || el.moving();
 		default:
 			return true;
 		}
@@ -468,6 +482,7 @@ public class Stage {
 	}
 
 	public void status() {
+		System.out.println(isMoving());
 //		String tellPos = "TP";
 //		String tellVel = "TV";
 //		String azAxis = "A";
@@ -487,11 +502,14 @@ public class Stage {
 	}
 
 	public void queueSize() {
-		System.out.println(protocol.queueSize());
+		System.out.println("az protocol queue size: " + protocol.queueSize());
+		System.out.println("el protocol queue size: " + protocolTest.queueSize());
 	}
 
 	public void readQueue() {
 		protocol.test();
+		System.out.println("--------");
+		protocolTest.test();
 	}
 	
 	/**
@@ -550,6 +568,16 @@ public class Stage {
 			case EL:
 				el.setIndexing(false); break;
 		}
+	}
+	
+	private boolean isIndexing() {
+		boolean azIndexing = az.indexing();
+		boolean elIndexing = el.indexing();
+		boolean result = azIndexing || elIndexing;
+		if (result) {
+			statusArea("Indexing currently in progress.  Please wait before proceeding");
+		}
+		return result;
 	}
 
 	public void goToPos(Coordinate c) {
