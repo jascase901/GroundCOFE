@@ -93,4 +93,23 @@ public class Coordinate {
 	public String toString() {
 		return "phi:  " + phi + "  theta:  " + theta + "  r:  " + r;
 	}
+	/**
+	 * Checks if two positions are equal within some user defined tolerance
+	 *
+	 *
+	 * 
+	 * @param Coordinate pos, Double tol
+	 * @return True if this.x, and this.y equal x and y
+	 * @author Jason
+	 */
+	public boolean compareAzAndEl(Coordinate pos, double tol){
+		double x=Math.abs((getAz()- pos.getAz()));
+		double y=Math.abs((getEl()- pos.getEl()));
+		System.out.println(Double.toString(getAz())+ " " + Double.toString(pos.getAz()));
+		return ((-tol<x && x<tol)&&(-tol<y && y<tol) );
+	}
+
+	
+	
 }
+

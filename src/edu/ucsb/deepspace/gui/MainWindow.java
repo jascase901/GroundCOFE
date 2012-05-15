@@ -73,6 +73,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Button indexAz;
 	private Button indexEl;
 	private Button btnCalibrate;
+	private Button btnRaCalibrate;
 	private Button btnGoToPosition;
 	private Button btnGoToRaDec;
 	private Button btnBaseLocation;
@@ -198,6 +199,18 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		public void mouseDown(MouseEvent evt) {
     			btnCalibrate.setEnabled(false);
     			new AzElWindow(minsec, "calibrate", stage);
+    		}
+    	});
+    	
+    	//TODO
+    	btnRaCalibrate = new Button(area, SWT.PUSH | SWT.CENTER);
+    	btnRaCalibrate.setText("Ra Calibrate");
+    	btnRaCalibrate.setBounds(296, 500, 87, 31);
+    	popupWindowButtons.put("ra calibrate", btnCalibrate);
+    	btnRaCalibrate.addMouseListener(new MouseAdapter() {
+    		public void mouseDown(MouseEvent evt) {
+    			btnRaCalibrate.setEnabled(false);
+    			new RaDecCalibrateWindow(minsec, "calibrate", stage);
     		}
     	});
     	
@@ -893,13 +906,21 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
-    	Button btnScnRaster = new Button(grpScanning, SWT.CHECK);
+    	Button btnScnRaster = new Button(grpScanning, SWT.None);
     	btnScnRaster.setBounds(203, 44, 85, 16);
     	btnScnRaster.setText("Raster Scan");
     	btnScnRaster.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
+    			double minAz = Double.parseDouble(txtMinAzScan.getText());
+				double maxAz = Double.parseDouble(txtMaxAzScan.getText());
+				double timeAz = Double.parseDouble(txtTimeAzScan.getText());
+				double minEl = Double.parseDouble(txtMinElScan.getText());
+    			double maxEl = Double.parseDouble(txtMaxElScan.getText());
+    			ScanCommand azSc = new ScanCommand(minAz, maxAz, continuousScanOn);
+				ScanCommand elSc = new ScanCommand(minEl, maxEl, continuousScanOn);
     			rasterScan = !rasterScan;
+    			stage.raster(azSc, elSc);
     		}
     	});
 	}
@@ -1080,6 +1101,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		btnGoToPosition.setEnabled(true);
     	btnBalloonLocation.setEnabled(true);
     	btnCalibrate.setEnabled(true);
+    	btnRaCalibrate.setEnabled(true);
     	btnBaseLocation.setEnabled(true);
     	azPlus.setEnabled(true);
     	azMinus.setEnabled(true);
@@ -1124,6 +1146,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	public void disableButtons() {
 		btnGoToPosition.setEnabled(false);
     	btnBalloonLocation.setEnabled(false);
+    	btnCalibrate.setEnabled(false);
     	btnCalibrate.setEnabled(false);
     	btnBaseLocation.setEnabled(false);
     	azPlus.setEnabled(false);
