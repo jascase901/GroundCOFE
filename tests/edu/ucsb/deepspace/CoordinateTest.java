@@ -3,35 +3,80 @@ package edu.ucsb.deepspace;
 import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
+import org.apache.commons.math.random.RandomData;
+import org.apache.commons.math.random.RandomDataImpl;
 import org.junit.Test;
 
 @SuppressWarnings("unused")
 public class CoordinateTest extends TestCase {
 	private Coordinate one;
+	private Coordinate aboveNorthPole = new Coordinate(1, 0, 0);
+	private Coordinate primeMeridianEquator = new Coordinate(1, 90, 0);
+	private RandomData rand;
 	
 	@Override
 	protected void setUp() {
 		one = new Coordinate(1, 0, 0);
+		rand = new RandomDataImpl();
 	}
 
-	@Test
-	public void testCoordinateDoubleDoubleDouble() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testCoordinateDoubleDoubleDoubleBoolean() {
-		fail("Not yet implemented");
-	}
+//	@Test
+//	public void testCoordinateDoubleDoubleDouble() {
+//		fail("Not yet implemented");
+//	}
+//
+//	@Test
+//	public void testCoordinateDoubleDoubleDoubleBoolean() {
+//		fail("Not yet implemented");
+//	}
 
 	@Test
 	public void testCoordinateDoubleDouble() {
-		fail("Not yet implemented");
+		double az = 0;
+		double el = 0;
+		Coordinate c = new Coordinate(el, az);
+		double expectedTheta = 90;
+		double expectedPhi = 90;
+		assertEquals(expectedTheta, c.getTheta());
+		assertEquals(expectedPhi, c.getPhi());
+		
+		az = 90;
+		el = 90;
+		c = new Coordinate(el, az);
+		expectedTheta = 0;
+		expectedPhi = 0;
+		assertEquals(expectedTheta, c.getTheta());
+		assertEquals(expectedPhi, c.getPhi());
+		
+		az = 180;
+		el = -45;
+		c = new Coordinate(el, az);
+		expectedTheta = 135;
+		expectedPhi = -90;
+		assertEquals(expectedTheta, c.getTheta());
+		assertEquals(expectedPhi, c.getPhi());
 	}
 
 	@Test
 	public void testCoordinateLatLongAlt() {
-		fail("Not yet implemented");
+		double latitude = 90;
+		double longitude = 30;
+		double altitude = rand.nextUniform(0, 1000000000);
+		LatLongAlt asdf = new LatLongAlt(latitude, longitude, altitude);
+		Coordinate c = new Coordinate(asdf);
+		double expectedTheta = 0;
+		double expectedPhi = 30;
+		assertEquals(expectedTheta, c.getTheta());
+		assertEquals(expectedPhi, c.getPhi());
+		
+		latitude = 30;
+		longitude = -30;
+		asdf = new LatLongAlt(latitude, longitude, altitude);
+		c = new Coordinate(asdf);
+		expectedTheta = 60;
+		expectedPhi = 330;
+		assertEquals(expectedTheta, c.getTheta());
+		assertEquals(expectedPhi, c.getPhi());
 	}
 
 	@Test
@@ -119,17 +164,33 @@ public class CoordinateTest extends TestCase {
 
 	@Test
 	public void testRHat() {
-		fail("Not yet implemented");
+		Coordinate c = new Coordinate(1, 0, 0, true);
+		Coordinate rHat = primeMeridianEquator.rHat();
+		assertEquals(c.getX(), rHat.getX(), .00000001);
+		assertEquals(c.getY(), rHat.getY(), .00000001);
+		assertEquals(c.getZ(), rHat.getZ(), .00000001);
 	}
 
 	@Test
 	public void testThetaHat() {
-		fail("Not yet implemented");
+		Coordinate c = new Coordinate(0, 0, -1, true);
+		Coordinate thetaHat = primeMeridianEquator.thetaHat();
+		assertEquals(c.getX(), thetaHat.getX(), .00000001);
+		assertEquals(c.getY(), thetaHat.getY(), .00000001);
+		assertEquals(c.getZ(), thetaHat.getZ(), .00000001);
 	}
 
 	@Test
 	public void testPhiHat() {
-		fail("Not yet implemented");
+		Coordinate c = new Coordinate(0, 1, 0, true);
+		Coordinate phiHat = primeMeridianEquator.phiHat();
+		assertEquals(c.getX(), phiHat.getX(), .00000001);
+		assertEquals(c.getY(), phiHat.getY(), .00000001);
+		assertEquals(c.getZ(), phiHat.getZ(), .00000001);
+		
+		//TODO gives incorrect output
+		//phiHat = aboveNorthPole.phiHat();
+		//System.out.println(phiHat.toString());
 	}
 
 	@Test
@@ -222,11 +283,6 @@ public class CoordinateTest extends TestCase {
 		one = new Coordinate(r, theta, phi);
 		expectedEl = -1*theta + 90;
 		assertEquals(expectedEl, one.getEl());
-	}
-
-	@Test
-	public void testToString() {
-		fail("Not yet implemented");
 	}
 
 }

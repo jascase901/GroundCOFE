@@ -65,13 +65,15 @@ public class Coordinate implements Comparable<Coordinate> {
 		return new Coordinate(xCom, yCom, zCom, true);
 	}
 
+	//TODO breaks if x and y are 0
 	public Coordinate thetaHat() {
 		double xCom = x*z / (r*Math.sqrt(x*x+y*y));
 		double yCom = y*z / (r*Math.sqrt(x*x+y*y));
 		double zCom = -Math.sqrt(x*x+y*y) / r;
 		return new Coordinate(xCom, yCom, zCom, true);
 	}
-
+	
+	//TODO breaks if x and y are 0
 	public Coordinate phiHat() {
 		double xCom = -y / Math.sqrt(x*x+y*y);
 		double yCom = x / Math.sqrt(x*x+y*y);
