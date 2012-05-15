@@ -1,6 +1,10 @@
 package edu.ucsb.deepspace;
 
-public class Coordinate {
+import org.apache.commons.lang.builder.CompareToBuilder;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
+public class Coordinate implements Comparable<Coordinate> {
 
 	private double r, theta, phi;
 	private double x, y, z;
@@ -92,5 +96,24 @@ public class Coordinate {
 	
 	public String toString() {
 		return "phi:  " + phi + "  theta:  " + theta + "  r:  " + r;
+	}
+	
+	@Override
+	public boolean equals (Object o) {
+		if (o == null) return false;
+		if (o == this) return true;
+		if (o.getClass() != this.getClass()) return false;
+		Coordinate rhs = (Coordinate) o;
+		return new EqualsBuilder().append(x, rhs.x).append(y, rhs.y).append(z, rhs.z).isEquals(); 
+	}
+	
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(11, 13).append(x).append(y).append(z).toHashCode();
+	}
+
+	@Override
+	public int compareTo(Coordinate o) {
+		return new CompareToBuilder().append(this.x, o.x).append(this.y, o.y).append(this.z, o.z).toComparison();
 	}
 }
