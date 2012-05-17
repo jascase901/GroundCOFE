@@ -154,5 +154,10 @@ public class ReaderFTDI extends Thread implements ReaderInterface {
 		// TODO Auto-generated method stub
 		
 	}
+	@Override
+	public void readerOnOff(boolean onOff) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

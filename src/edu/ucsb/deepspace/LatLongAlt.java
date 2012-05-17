@@ -17,6 +17,12 @@ public class LatLongAlt {
 	private final static double RTH = 12d / Math.PI;
 	private final static double HTR = Math.PI / 12d;
 	
+	/**
+	 * West hemisphere corresponds to negative longitude!
+	 * @param latitude
+	 * @param longitude
+	 * @param alt
+	 */
 	public LatLongAlt(double latitude, double longitude, double alt) {
 		this.latitude = latitude;
 		this.longitude = longitude;
