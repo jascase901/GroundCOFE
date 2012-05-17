@@ -10,10 +10,9 @@ public class ActGalil implements ActInterface {
 	private CommGalil protocol;
 	private double encPulsePerRev;
 	private double encPulsePerDeg;
-	private boolean indexing;
+	private boolean indexing = false;
 	private String axisName = "";
 	private double offset = 0;
-	private double azEncPerRev=1000*1024;
 	private boolean scanning = false;
 	private boolean motorState = false;
 
@@ -199,6 +198,7 @@ public class ActGalil implements ActInterface {
 	private void encoderAbsolute(double value) {
 		protocol.sendRead("PA" + axisName + "=" + value);
 		protocol.sendRead("BG" + axisName);
+		waitWhileMoving();
 	}
 	
 	/**
@@ -207,7 +207,9 @@ public class ActGalil implements ActInterface {
 	 */
 	private void encoderRelative(double value) {
 		protocol.sendRead("PR" + axisName + "=" + value);
+		//System.out.println("send bg");
 		protocol.sendRead("BG" + axisName);
+		waitWhileMoving();
 	}
 	
 	/**
@@ -303,6 +305,9 @@ public class ActGalil implements ActInterface {
 		protocol.sendRead(out);
 	}
 	
+	/**
+	 * Returns true if this axis is currently indexing.
+	 */
 	public boolean indexing() {return indexing;}
 	public void setIndexing(boolean indexing) {this.indexing = indexing;}
 	
@@ -315,17 +320,19 @@ public class ActGalil implements ActInterface {
 			stage.statusArea(stage.axisNameLong(axis) + " motor is not on.  Please turn on motor before proceeding.\n");
 			return;
 		}
+		indexing = true;
 		switch (axis) {
 			case AZ:
 				indexGalilAz(); break;
 			case EL:
 				indexGalilEl(); break;
 		}
-		protocol.read(); //there's an erroneous : that pops up at the end of indexing. this gets rid of it
+		indexing = false;
+		//protocol.read(); //there's an erroneous : that pops up at the end of indexing. this gets rid of it
+		//protocol.read();
 	}
 	
 	private void indexGalilAz() {
-		boolean flag = true;
 		// Save acceleration and jog speed values
 		protocol.sendRead("T1 = _JG" + axisName);
 		protocol.sendRead("T2 = _AC" + axisName);
@@ -341,6 +348,7 @@ public class ActGalil implements ActInterface {
 		// "FE" - find the opto-edge
 		protocol.sendRead("FE" + axisName);
 		protocol.sendRead("BG" + axisName);
+		//waitWhileMoving();
 		protocol.sendRead("AM" + axisName);
 		protocol.sendRead("MG \"Found Opto-Index\"; TP" + axisName);
 
@@ -351,15 +359,8 @@ public class ActGalil implements ActInterface {
 		// Do the index search ("FI")
 		protocol.sendRead("FI" + axisName);
 		protocol.sendRead("BG" + axisName);
-		protocol.sendRead("AM" + axisName);
-		protocol.sendRead("MG \"Motion Done\";TP" + axisName);
-		while (flag) {
-			String temp = protocol.read();
-			if (temp.contains("one")) {
-				flag = false;
-			}
-			pause(100);
-		}
+		
+		waitWhileMoving();
 
 		// Finally, restore accel and jog speeds from before routine was run
 		protocol.sendRead("JG" + axisName + "=T1");
@@ -367,7 +368,6 @@ public class ActGalil implements ActInterface {
 	}
 	
 	private void indexGalilEl() {
-		boolean flag = true;
 		// Save acceleration and jog speed values
 		protocol.sendRead("T1 = _JG" + axisName);
 		protocol.sendRead("T2 = _AC" + axisName);
@@ -385,20 +385,45 @@ public class ActGalil implements ActInterface {
 		protocol.sendRead("JG" + axisName + "=" + jg);
 		protocol.sendRead("FI" + axisName);
 		protocol.sendRead("BG" + axisName);
-		protocol.sendRead("AM" + axisName);
-		protocol.sendRead("MG \"Motion Done\";");
-		while (flag) {
-			String temp = protocol.read();
-			if (temp.contains("one")) {
-				flag = false;
-			}
-			pause(100);
-		}
+		//protocol.sendRead("AM" + axisName);
+		//protocol.sendRead("MG \"Motion Done\";");
 		
+		waitWhileMoving();
 		
 		// Finally, restore accel and jog speeds from before routine was run
 		protocol.sendRead("JG" + axisName + "=T1");
 		protocol.sendRead("AC" + axisName + "=T2");
+	}
+	
+	private void waitWhileMoving() {
+//		boolean flag = true;
+//		CommGalil hatlife = new CommGalil(55555);
+//		while (flag) {
+//			String temp = protocol.sendRead("MG _BG" + axisName);
+//			if (temp.contains("0.0000")) {
+//				flag = false;
+//			}
+//			pause(250);
+//		}
+//		hatlife.close();
+		//System.out.println("done wait while moving");
+		
+		while (moving()) {
+			pause(250);
+		}
+	}
+	
+	/**
+	 * Returns true if moving.
+	 */
+	public boolean moving() {
+		boolean flag = true;
+		String temp = protocol.sendRead("MG _BG" + axisName);
+		if (temp.contains("0.0000")) {
+			flag =  false;
+		}
+		protocol.read();
+		return flag;
 	}
 	
 	public void setOffset(double indexOffset) {

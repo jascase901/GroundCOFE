@@ -137,6 +137,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Button btnMotorAz;
 	private Button btnStopAz;
 	private Group area;
+	private Group grpLatitutdeLongitudeControl;
+	private Text text;
 
 	public MainWindow(Composite parent, int style, Stage stage, Stage.stageType stageType) {
 		super(parent, style);
@@ -173,7 +175,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
         area = new Group(this, SWT.NONE);
         area.setText("");
         area.setLayout(null);
-        area.setBounds(10, 10, 726, 872);
+        area.setBounds(10, 0, 728, 876);
         
         guiJoystick();
         guiRaDec();
@@ -192,7 +194,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	btnCalibrate = new Button(area, SWT.PUSH | SWT.CENTER);
     	btnCalibrate.setText("Calibrate");
-    	btnCalibrate.setBounds(296, 471, 87, 31);
+    	btnCalibrate.setBounds(387, 437, 87, 31);
     	popupWindowButtons.put("calibrate", btnCalibrate);
     	btnCalibrate.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
@@ -202,7 +204,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnGoToPosition = new Button(area, SWT.NONE);
-    	btnGoToPosition.setBounds(384, 471, 87, 31);
+    	btnGoToPosition.setBounds(290, 471, 87, 31);
     	btnGoToPosition.setText("Go to Position");
     	popupWindowButtons.put("gotopos", btnGoToPosition);
     	btnGoToPosition.addMouseListener(new MouseAdapter() {
@@ -214,7 +216,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnGoToRaDec = new Button(area, SWT.NONE);
-    	btnGoToRaDec.setBounds(627, 471, 87, 31);
+    	btnGoToRaDec.setBounds(290, 504, 87, 31);
     	btnGoToRaDec.setText("Go to RA / Dec");
     	popupWindowButtons.put("gotoradec", btnGoToRaDec);
     	btnGoToRaDec.addMouseListener(new MouseAdapter() {
@@ -225,32 +227,9 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
-    	btnBaseLocation = new Button(area, SWT.NONE);
-    	btnBaseLocation.setBounds(295, 416, 87, 31);
-    	btnBaseLocation.setText("Base Location");
-    	popupWindowButtons.put("baseloc", btnBaseLocation);
-    	btnBaseLocation.addMouseListener(new MouseAdapter() {
-    		public void mouseDown(MouseEvent evt) {
-    			btnBaseLocation.setEnabled(false);
-    			new LatLongAltWindow(minsec, "baseloc", stage);
-    		}
-    	});
-    	
-    	btnBalloonLocation = new Button(area, SWT.NONE);
-    	btnBalloonLocation.setBounds(384, 416, 87, 31);
-    	btnBalloonLocation.setText("Balloon Location");
-    	popupWindowButtons.put("balloonloc", btnBalloonLocation);
-    	btnBalloonLocation.addMouseListener(new MouseAdapter() {
-    		@Override
-    		public void mouseDown(MouseEvent e) {
-    			btnBalloonLocation.setEnabled(false);
-    			new LatLongAltWindow(minsec, "balloonloc", stage);
-    		}
-    	});
-    	
     	btnDecimalMinutes = new Button(area, SWT.RADIO);
     	btnDecimalMinutes.setSelection(true);
-    	btnDecimalMinutes.setBounds(293, 453, 96, 16);
+    	btnDecimalMinutes.setBounds(378, 541, 96, 16);
     	btnDecimalMinutes.setText("decimal minutes");
     	btnDecimalMinutes.addMouseListener(new MouseAdapter() {
     		@Override
@@ -260,7 +239,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	 	
     	btnMinutesSeconds = new Button(area, SWT.RADIO);
-    	btnMinutesSeconds.setBounds(395, 453, 96, 16);
+    	btnMinutesSeconds.setBounds(378, 563, 96, 16);
     	btnMinutesSeconds.setText("minutes seconds");
     	btnMinutesSeconds.addMouseListener(new MouseAdapter() {
     		@Override
@@ -268,19 +247,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     			minsec = true;
     		}
     	});
-//--------------------------------------------------------------------------------------------------------------------
-    	
-    	txtBaseLocation = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI);
-    	txtBaseLocation.setBounds(290, 249, 181, 60);
-    	txtBaseLocation.setText(stage.baseLocDisplay());
     	
     	txtPosInfo = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI);
-    	txtPosInfo.setBounds(290, 17, 181, 226);
+    	txtPosInfo.setBounds(290, 17, 181, 181);
     	txtPosInfo.setText("Actuator Information\r\n");
-    	
-    	txtBalloonLocation = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI);
-    	txtBalloonLocation.setBounds(290, 315, 181, 95);
-    	txtBalloonLocation.setText(stage.balloonLocDisplay());
     	
     	txtEncTol = new Text(area, SWT.BORDER);
     	txtEncTol.setBounds(11, 89, 49, 19);
@@ -335,7 +305,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	txtAzElRaDec = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.MULTI);
     	txtAzElRaDec.setText("Az:  \nEl:  \nRA:  \nDec:  \nUTC:  \nLST:  \nLocal:");
     	txtAzElRaDec.setFont(SWTResourceManager.getFont("Tahoma", 16, SWT.NORMAL));
-    	txtAzElRaDec.setBounds(477, 17, 237, 217);
+    	txtAzElRaDec.setBounds(477, 17, 237, 181);
     	
     	btnQuit = new Button(area, SWT.NONE);
     	btnQuit.setBounds(2, 171, 68, 23);
@@ -348,11 +318,11 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	Text txtStaticActInfo = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI);
-    	txtStaticActInfo.setBounds(477, 242, 137, 110);
+    	txtStaticActInfo.setBounds(10, 590, 137, 110);
     	txtStaticActInfo.setText(actInfo);
     		
     	btnGoToBalloon = new Button(area, SWT.NONE);
-    	btnGoToBalloon.setBounds(477, 471, 78, 31);
+    	btnGoToBalloon.setBounds(290, 437, 87, 31);
     	btnGoToBalloon.setText("Go to Balloon");
     	btnGoToBalloon.addMouseListener(new MouseAdapter() {
     		@Override
@@ -362,14 +332,58 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	txtGoalAz = new Text(area, SWT.BORDER | SWT.READ_ONLY);
-    	txtGoalAz.setBounds(620, 242, 94, 17);
+    	txtGoalAz.setBounds(620, 204, 94, 17);
     	
     	txtGoalEl = new Text(area, SWT.BORDER | SWT.READ_ONLY);
-    	txtGoalEl.setBounds(620, 269, 94, 17);
+    	txtGoalEl.setBounds(620, 231, 94, 17);
     	
     	txtStatusArea = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
-    	txtStatusArea.setBounds(10, 686, 704, 176);
+    	txtStatusArea.setBounds(10, 729, 704, 133);
     	txtStatusArea.setText("StatusArea\n\n");
+    	
+    	grpLatitutdeLongitudeControl = new Group(area, SWT.NONE);
+    	grpLatitutdeLongitudeControl.setText("Latitutde Longitude Control");
+    	grpLatitutdeLongitudeControl.setBounds(290, 204, 200, 227);
+    	//--------------------------------------------------------------------------------------------------------------------
+    	    	
+    	    	txtBaseLocation = new Text(grpLatitutdeLongitudeControl, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI);
+    	    	txtBaseLocation.setBounds(10, 20, 181, 60);
+    	    	txtBaseLocation.setText("Base Location");
+    	    	txtBaseLocation.setText(stage.baseLocDisplay());
+    	    	
+    	    	txtBalloonLocation = new Text(grpLatitutdeLongitudeControl, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI);
+    	    	txtBalloonLocation.setBounds(10, 86, 181, 95);
+    	    	txtBalloonLocation.setText("Balloon Location");
+    	    	txtBalloonLocation.setText(stage.balloonLocDisplay());
+    	    	
+    	    	btnBaseLocation = new Button(grpLatitutdeLongitudeControl, SWT.NONE);
+    	    	btnBaseLocation.setBounds(10, 187, 87, 31);
+    	    	btnBaseLocation.setText("Base Location");
+    	    	popupWindowButtons.put("baseloc", btnBaseLocation);
+    	    	
+    	    	btnBalloonLocation = new Button(grpLatitutdeLongitudeControl, SWT.NONE);
+    	    	btnBalloonLocation.setBounds(99, 187, 87, 31);
+    	    	btnBalloonLocation.setText("Balloon Location");
+    	    	popupWindowButtons.put("balloonloc", btnBalloonLocation);
+    	    	
+    	    	Button btnNewButton = new Button(area, SWT.NONE);
+    	    	btnNewButton.setBounds(387, 474, 87, 30);
+    	    	btnNewButton.setText("New Button");
+    	    	btnBalloonLocation.addMouseListener(new MouseAdapter() {
+    	    		@Override
+    	    		public void mouseDown(MouseEvent e) {
+    	    			btnBalloonLocation.setEnabled(false);
+    	    			new LatLongAltWindow(minsec, "balloonloc", stage);
+    	    		}
+    	    	});
+    	    	btnBaseLocation.addMouseListener(new MouseAdapter() {
+    	    		public void mouseDown(MouseEvent evt) {
+    	    			btnBaseLocation.setEnabled(false);
+    	    			new LatLongAltWindow(minsec, "baseloc", stage);
+    	    		}
+    	    	});
+    	
+    	
 
     	//TODO hide the debug stuff
     	if (debug) {
@@ -380,7 +394,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private void guiJoystick() {
     	Group grpJoystick = new Group(area, SWT.NONE);
     	grpJoystick.setText("Joystick");
-    	grpJoystick.setBounds(76, 17, 208, 178);
+    	grpJoystick.setBounds(76, 17, 208, 267);
     	
     	moveAmount = new Text(grpJoystick, SWT.BORDER);
     	moveAmount.setBounds(10, 28, 90, 16);
@@ -468,6 +482,9 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	btnEncoderSteps = new Button(grpJoystick, SWT.RADIO);
     	btnEncoderSteps.setBounds(106, 50, 83, 16);
     	btnEncoderSteps.setText("encoder steps");
+    	
+    	text = new Text(grpJoystick, SWT.BORDER);
+    	text.setBounds(10, 188, 76, 19);
     	btnEncoderSteps.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
@@ -479,7 +496,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private void guiRaDec() {
     	Group grpRaDec = new Group(area, SWT.NONE);
     	grpRaDec.setText("RA / Dec Tracking");
-    	grpRaDec.setBounds(497, 357, 217, 108);
+    	grpRaDec.setBounds(497, 394, 217, 108);
     	
     	txtRa = new Text(grpRaDec, SWT.BORDER);
     	txtRa.setEditable(false);
@@ -543,7 +560,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private void guiAxisControl() {
     	Group grpAxisControl = new Group(area, SWT.NONE);
     	grpAxisControl.setText("Axis Control");
-    	grpAxisControl.setBounds(10, 201, 274, 301);
+    	grpAxisControl.setBounds(10, 290, 274, 294);
     	
     	txtMinEl = new Text(grpAxisControl, SWT.BORDER);
     	txtMinEl.setBounds(215, 42, 49, 19);
@@ -641,6 +658,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	indexAz.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
     			indexAz.setEnabled(false);
+    			//indexEl.setEnabled(false);
     			stage.index(axisType.AZ);
     		}
     	});
@@ -651,6 +669,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	popupWindowButtons.put("indexEl", indexEl);
     	indexEl.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
+    			//indexAz.setEnabled(false);
     			indexEl.setEnabled(false);
     			stage.index(axisType.EL);
     		}
@@ -726,7 +745,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private void guiScanning() {
     	Group grpScanning = new Group(area, SWT.NONE);
     	grpScanning.setText("Scanning");
-    	grpScanning.setBounds(10, 508, 311, 172);
+    	grpScanning.setBounds(489, 508, 225, 215);
     	
     	Label lblMinAzScan = new Label(grpScanning, SWT.NONE);
     	lblMinAzScan.setBounds(13, 16, 40, 19);
@@ -884,7 +903,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnContinuousScan = new Button(grpScanning, SWT.CHECK);
-    	btnContinuousScan.setBounds(203, 13, 100, 24);
+    	btnContinuousScan.setBounds(13, 150, 100, 24);
     	btnContinuousScan.setText("Continuous Scan");
     	btnContinuousScan.addMouseListener(new MouseAdapter() {
     		@Override
@@ -894,7 +913,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	Button btnScnRaster = new Button(grpScanning, SWT.CHECK);
-    	btnScnRaster.setBounds(203, 44, 85, 16);
+    	btnScnRaster.setBounds(119, 154, 85, 16);
     	btnScnRaster.setText("Raster Scan");
     	btnScnRaster.addMouseListener(new MouseAdapter() {
     		@Override
@@ -907,10 +926,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private void guiDebug() {
     	Group grpDebug = new Group(area, SWT.NONE);
     	grpDebug.setText("Debug");
-    	grpDebug.setBounds(384, 524, 330, 156);
+    	grpDebug.setBounds(234, 590, 249, 133);
     	
     	Button btnQueueSize = new Button(grpDebug, SWT.NONE);
-    	btnQueueSize.setBounds(10, 24, 68, 23);
+    	btnQueueSize.setBounds(10, 78, 68, 23);
     	btnQueueSize.setText("queue size");
     	btnQueueSize.addMouseListener(new MouseAdapter() {
     		@Override
@@ -920,7 +939,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnStop = new Button(grpDebug, SWT.NONE);
-    	btnStop.setBounds(84, 24, 68, 23);
+    	btnStop.setBounds(10, 20, 68, 23);
     	btnStop.setText("Stop");
     	btnStop.addMouseListener(new MouseAdapter() {
     		@Override
@@ -930,7 +949,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnBegin = new Button(grpDebug, SWT.NONE);
-    	btnBegin.setBounds(158, 24, 68, 23);
+    	btnBegin.setBounds(84, 20, 68, 23);
     	btnBegin.setText("Begin");
     	btnBegin.addMouseListener(new MouseAdapter() {
     		@Override
@@ -940,7 +959,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnMotorOff = new Button(grpDebug, SWT.NONE);
-    	btnMotorOff.setBounds(158, 53, 68, 23);
+    	btnMotorOff.setBounds(84, 49, 68, 23);
     	btnMotorOff.setText("Motor Off");
     	btnMotorOff.addMouseListener(new MouseAdapter() {
     		@Override
@@ -951,7 +970,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	
     	btnMotorOn = new Button(grpDebug, SWT.NONE);
-    	btnMotorOn.setBounds(84, 53, 68, 23);
+    	btnMotorOn.setBounds(10, 49, 68, 23);
     	btnMotorOn.setText("Motor On");
     	btnMotorOn.addMouseListener(new MouseAdapter() {
     		@Override
@@ -961,7 +980,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	Button btnReadQueue = new Button(grpDebug, SWT.NONE);
-    	btnReadQueue.setBounds(10, 53, 68, 23);
+    	btnReadQueue.setBounds(10, 107, 68, 23);
     	btnReadQueue.setText("read queue");
     	btnReadQueue.addMouseListener(new MouseAdapter() {
     		@Override
@@ -972,7 +991,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	btnDebugAz = new Button(grpDebug, SWT.RADIO);
     	btnDebugAz.setSelection(true);
-    	btnDebugAz.setBounds(10, 82, 85, 16);
+    	btnDebugAz.setBounds(161, 22, 85, 16);
     	btnDebugAz.setText("Azimuth");
     	btnDebugAz.addSelectionListener(new SelectionAdapter() {
     		@Override
@@ -982,7 +1001,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnDebugEl = new Button(grpDebug, SWT.RADIO);
-    	btnDebugEl.setBounds(10, 103, 85, 16);
+    	btnDebugEl.setBounds(161, 43, 85, 16);
     	btnDebugEl.setText("Elevation");
     	btnDebugEl.addSelectionListener(new SelectionAdapter() {
     		@Override
@@ -993,10 +1012,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	txtDebugVel = new Text(grpDebug, SWT.BORDER);
     	txtDebugVel.setText("vel");
-    	txtDebugVel.setBounds(145, 100, 76, 19);
+    	txtDebugVel.setBounds(94, 82, 76, 19);
     	
     	Button btnSetVelocity = new Button(grpDebug, SWT.NONE);
-    	btnSetVelocity.setBounds(227, 96, 68, 23);
+    	btnSetVelocity.setBounds(176, 78, 68, 23);
     	btnSetVelocity.setText("Set Velocity");
     	btnSetVelocity.addMouseListener(new MouseAdapter() {
     		@Override
