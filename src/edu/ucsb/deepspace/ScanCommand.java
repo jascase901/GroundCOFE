@@ -1,5 +1,9 @@
 package edu.ucsb.deepspace;
-
+/**
+ * Lumps everything needed to run a scan into one object for convenience.
+ * 
+ *
+ */
 public class ScanCommand {
 	
 	private final double min, max, time, reps;

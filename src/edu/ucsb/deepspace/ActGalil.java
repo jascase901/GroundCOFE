@@ -2,7 +2,11 @@ package edu.ucsb.deepspace;
 
 import edu.ucsb.deepspace.MoveCommand.MoveMode;
 import edu.ucsb.deepspace.MoveCommand.MoveType;
-
+/**
+ * All methods that convert between encoder pulses and degrees and move Galil.
+ * 
+ *
+ */
 public class ActGalil implements ActInterface {
 	
 	private axisType axis;
@@ -15,7 +19,11 @@ public class ActGalil implements ActInterface {
 	private double offset = 0;
 	private double azEncPerRev=1000*1024;
 	private boolean scanning = false;
-
+	/**
+	 * Creates an ActGalil object to control each axis.
+	 * @param axis
+	 * @param protocol to talk to Galil
+	 */
 	public ActGalil(axisType axis, CommGalil protocol) {
 		this.axis = axis;
 		this.protocol = protocol;
@@ -27,7 +35,9 @@ public class ActGalil implements ActInterface {
 		}
 		encPulsePerDeg = ((double) encPulsePerRev) / 360d;
 	}
-	
+	/**
+	 * Creates a stage object with the correct instance variables.
+	 */
 	public void registerStage(Stage stage) {
 		this.stage = stage;
 		axisName = stage.axisName(axis);
@@ -235,16 +245,23 @@ public class ActGalil implements ActInterface {
 				encoderAbsolute(enc); break;
 		}
 	}
-	
+	/**
+	 * Turns an axis motor on.
+	 */
 	void motorOn() {
 		protocol.send("SH" + axisName);
 	}
-	
+	/**
+	 * Turns an axis motor off.
+	 */
 	void motorOff() {
 		protocol.send("MO" + axisName);
 	}
 	
-	
+	/**
+	 * Sets the velocity of az or el movement.
+	 * @param vel in encoder pulses per second
+	 */
 	public void setVelocity(double vel) {
 		String out = "JG" + axisName + "=" + vel;
 		protocol.sendRead(out);
@@ -252,10 +269,16 @@ public class ActGalil implements ActInterface {
 	
 	public boolean indexing() {return indexing;}
 	public void setIndexing(boolean indexing) {this.indexing = indexing;}
+	
+	/**
+	 * Sets a new coordinate as the relative (0,0).
+	 */
 	public void calibrate(double degVal) {
 		offset = degVal - convEncToDeg(stage.encPos(axis));
 	}
-	
+	/**
+	 * Moves everything to its default position.
+	 */
 	public void index() {
 		switch (axis) {
 			case AZ:
@@ -264,7 +287,9 @@ public class ActGalil implements ActInterface {
 				indexGalilEl(); break;
 		}
 	}
-	
+	/**
+	 * Indexes the AZ axis.
+	 */
 	private void indexGalilAz() {
 		// Save acceleration and jog speed values
 		protocol.sendRead("T1 = _JG" + axisName);
@@ -301,7 +326,9 @@ public class ActGalil implements ActInterface {
 		protocol.sendRead("JG" + axisName + "=T1");
 		protocol.sendRead("AC" + axisName + "=T2");
 	}
-	
+	/**
+	 * Indexes the EL axis.
+	 */
 	private void indexGalilEl() {
 		// Save acceleration and jog speed values
 		//protocol.sendRead("T1 = _JG" + axisName);
@@ -318,13 +345,22 @@ public class ActGalil implements ActInterface {
 		//protocol.sendRead("JG" + axisName + "=T1");
 		//protocol.sendRead("AC" + axisName + "=T2");
 	}
-	
+	/**
+	 * Sets the offset of an axis.
+	 */
 	public void setOffset(double indexOffset) {
 		offset = indexOffset;
 	}
-	
+	/**
+	 * @return offset
+	 */
 	public double getOffset() {return offset;}
-
+	/**
+	 * Moves an axis between a min and max multiple times.
+	 * @param time to move between min and max
+	 * @param repitions to be completed before stopping
+	 * @param continuous if true never stops until told to
+	 */
 	public void scan(ScanCommand sc) {
 		if (sc == null) return;
 		
@@ -357,11 +393,16 @@ public class ActGalil implements ActInterface {
 			if (i >= sc.getReps() && !sc.getContinuous()) scanning = false;
 		}
 	}
-	
+	/**
+	 * Stops the scanning loop.
+	 */
 	public void stopScanning() {
 		this.scanning = false;
 	}
-	
+	/**
+	 * Stops the thread from doing anything.
+	 * @param timeInMS
+	 */
 	private void pause(double timeInMS) {
 		try {
 			Thread.sleep((long) timeInMS);

@@ -9,7 +9,11 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-
+/**
+ * Lowest level methods that communicate with Galil.
+ *
+ *
+ */
 public class CommGalil implements CommInterface {
 	//Singleton
 	//private static final CommGalil INSTANCE = new CommGalil();
@@ -19,7 +23,10 @@ public class CommGalil implements CommInterface {
 	BufferedReader in;
 	Socket socket = null;
 	boolean connection = false;
-	
+	/**
+	 * Creates a connection with Galil and instantiates a CommGalil object.
+	 * @param port to connect to
+	 */
 	public CommGalil(int port) {
 		System.out.println("hi from CommGalil constructor");
 		try {
@@ -41,10 +48,16 @@ public class CommGalil implements CommInterface {
 	}
 	
 	//Send message through output stream.
+	/**
+	 * Sends a message to Galil which is how the program communicates with it.
+	 * @param message to send
+	 */
     public void send(String message) {
     	out.println(message);
     }
-    
+    /**
+     * Reads output from Galil.
+     */
     public String read() {
     	String result = "";
     	//As long as we haven't reached the EOL character (:), continue looping.
@@ -72,12 +85,20 @@ public class CommGalil implements CommInterface {
     }
     
     //Simply calls send and then receive for convenience.
+    /**
+     * Sends a message to Galil and receives a reply.
+     * @param message to send
+     * @return message from Galil
+     */
     public String sendRead(String message) {
     	send(message);
     	return read();
     }
     
     //How many bytes are waiting to be read.
+    /**
+     * Gets the amount of bytes waiting to be read from Galil.
+     */
     public int queueSize() {
     	int size = 0;
     	try {
@@ -87,7 +108,9 @@ public class CommGalil implements CommInterface {
 		}
     	return size;
     }
-    
+    /**
+     * Closes the connection with Galil.
+     */
     public void close() {
     	try {
 			socket.close();
@@ -95,7 +118,9 @@ public class CommGalil implements CommInterface {
 			e.printStackTrace();
 		}
     }
-    
+    /**
+     * Reads off what Galil is wanting to send.
+     */
     public void test() {
     	try {
 			InputStream asdf = socket.getInputStream();
