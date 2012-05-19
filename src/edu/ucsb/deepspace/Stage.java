@@ -66,6 +66,17 @@ public class Stage {
 			protocolTest = new CommGalil(3333);
 			az = new ActGalil(axisType.AZ, protocol);
 			el = new ActGalil(axisType.EL, protocolTest);
+			
+			ScriptLoader sl = new ScriptLoader();
+			sl.load();
+			//sl.close();
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			reader = new ReaderGalil(this);
 			loadGalil();
 			az.registerStage(this);
@@ -519,10 +530,14 @@ public class Stage {
 	 * Toggles the motor on or off.
 	 * @param axis az or el
 	 */
-	public void motorControl(axisType axis) {
-		ActInterface act = axisPicker(axis);
-		act.motorControl();
-		window.updateMotorState(az.motorState(), el.motorState());
+	public void motorControl(final axisType axis) {
+		exec.submit(new Runnable() {
+			public void run() {
+				ActInterface act = axisPicker(axis);
+				window.updateMotorButton(act.motorControl(), axis);
+			}
+		});
+		//window.updateMotorState(az.motorState(), el.motorState());
 	}
 	
 	/**

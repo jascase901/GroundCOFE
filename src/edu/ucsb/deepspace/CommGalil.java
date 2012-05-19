@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -19,6 +20,7 @@ public class CommGalil implements CommInterface {
 	
 	PrintWriter out;
 	BufferedReader in;
+	private OutputStream clean;
 	Socket socket = null;
 	boolean connection = false;
 	String previousCommand = "";
@@ -37,6 +39,7 @@ public class CommGalil implements CommInterface {
 			socket.connect(new InetSocketAddress("192.168.1.200", port), 3000);
 			socket.setSoTimeout(3000);
 			out = new PrintWriter(socket.getOutputStream(), true);
+			clean = socket.getOutputStream();
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			connection = true;
 			Stage.getInstance().confirmCommConnection();
@@ -53,10 +56,21 @@ public class CommGalil implements CommInterface {
 	//Send message through output stream.
     public void send(String message) {
     	//sendCount++;
-    	
     	previousCommand = message;
     	out.println(message);
+    	//System.out.print(message);
     }
+    
+//    public void sendClean(String message) {
+//    	try {
+//    		System.out.println(message);
+//			clean.write(message.getBytes());
+//			clean.flush();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//    }
     
     public String read() {
     	readCount++;
@@ -106,16 +120,17 @@ public class CommGalil implements CommInterface {
     
     //Simply calls send and then receive for convenience.
     public String sendRead(String message) {
+    	//read();
     	
-    	send.add(message);
+    	//send.add(message);
     	send(message);
     	
-    	readCount++;
-    	Thread tr = Thread.currentThread();
-    	threads.add(port + tr.getName());
+    	//readCount++;
+    	//Thread tr = Thread.currentThread();
+    	//threads.add(port + tr.getName());
     	
     	String temp = read();
-    	response.add(temp);
+    	//response.add(temp);
     	return temp;
     }
     
@@ -131,21 +146,21 @@ public class CommGalil implements CommInterface {
     }
     
     public void close() {
-    	System.out.println("readCount: " + readCount);
-    	System.out.println("sendCount: " + sendCount);
-    	List<String> temp = new ArrayList<String>();
-    	for (int i = 0; i < send.size(); i++) {
-    		String a = "qq";
-    		try {
-    			a = i + " " + threads.get(i) + "   " + send.get(i) + " " + response.get(i);
-    		} catch (IndexOutOfBoundsException e) {
-    			//don't care
-    		}
-    		temp.add(a);
-    	}
-    	for (String s : temp) {
-    		System.out.println(s);
-    	}
+//    	System.out.println("readCount: " + readCount);
+//    	System.out.println("sendCount: " + sendCount);
+//    	List<String> temp = new ArrayList<String>();
+//    	for (int i = 0; i < send.size(); i++) {
+//    		String a = "qq";
+//    		try {
+//    			a = i + " " + threads.get(i) + "   " + send.get(i) + " " + response.get(i);
+//    		} catch (IndexOutOfBoundsException e) {
+//    			//don't care
+//    		}
+//    		temp.add(a);
+//    	}
+//    	for (String s : temp) {
+//    		System.out.println(s);
+//    	}
     	try {
 			socket.close();
 		} catch (IOException e) {

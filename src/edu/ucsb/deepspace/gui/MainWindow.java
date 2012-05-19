@@ -1364,4 +1364,22 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 			}
 		});
 	}
+	
+	public void updateMotorButton(final boolean onOff, final axisType axis) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				String text = "Motor On";
+				if (onOff) {
+					text = "Motor Off";
+				}
+				switch (axis) {
+					case AZ:
+						btnMotorAz.setText(text); break;
+					case EL:
+						btnMotorEl.setText(text); break;
+				}
+			}
+		});
+	}
 }

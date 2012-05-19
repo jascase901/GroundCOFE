@@ -284,13 +284,14 @@ public class ActGalil implements ActInterface {
 	 * This updates motorState to the current state.  True for on, false for off. <BR>
 	 * 
 	 */
-	public void motorControl() {
+	public boolean motorControl() {
 		if (motorState) {
 			motorOff();
 		}
 		else {
 			motorOn();
 		}
+		return motorState;
 	}
 	
 	/**
@@ -333,66 +334,68 @@ public class ActGalil implements ActInterface {
 	}
 	
 	private void indexGalilAz() {
-		// Save acceleration and jog speed values
-		protocol.sendRead("T1 = _JG" + axisName);
-		protocol.sendRead("T2 = _AC" + axisName);
-
-		// then overwrite them
-		protocol.sendRead("MG \"Homing\", T1");
-		double jg = 150000d;
-		//System.out.println(jg);
-		protocol.sendRead("JG" + axisName + "=" + jg);
-		double ac = 50000d;
-		protocol.sendRead("AC" + axisName + "=" + ac);
-
-		// "FE" - find the opto-edge
-		protocol.sendRead("FE" + axisName);
-		protocol.sendRead("BG" + axisName);
-		//waitWhileMoving();
-		protocol.sendRead("AM" + axisName);
-		protocol.sendRead("MG \"Found Opto-Index\"; TP" + axisName);
-
-		// Turn the jog speed WAAAY down when searching for the index
-		jg = 500d;
-		protocol.sendRead("JG" + axisName + "=" + jg);
-
-		// Do the index search ("FI")
-		protocol.sendRead("FI" + axisName);
-		protocol.sendRead("BG" + axisName);
-		
-		waitWhileMoving();
-
-		// Finally, restore accel and jog speeds from before routine was run
-		protocol.sendRead("JG" + axisName + "=T1");
-		protocol.sendRead("AC" + axisName + "=T2");
+//		// Save acceleration and jog speed values
+//		protocol.sendRead("T1 = _JG" + axisName);
+//		protocol.sendRead("T2 = _AC" + axisName);
+//
+//		// then overwrite them
+//		protocol.sendRead("MG \"Homing\", T1");
+//		double jg = 150000d;
+//		//System.out.println(jg);
+//		protocol.sendRead("JG" + axisName + "=" + jg);
+//		double ac = 50000d;
+//		protocol.sendRead("AC" + axisName + "=" + ac);
+//
+//		// "FE" - find the opto-edge
+//		protocol.sendRead("FE" + axisName);
+//		protocol.sendRead("BG" + axisName);
+//		//waitWhileMoving();
+//		protocol.sendRead("AM" + axisName);
+//		protocol.sendRead("MG \"Found Opto-Index\"; TP" + axisName);
+//
+//		// Turn the jog speed WAAAY down when searching for the index
+//		jg = 500d;
+//		protocol.sendRead("JG" + axisName + "=" + jg);
+//
+//		// Do the index search ("FI")
+//		protocol.sendRead("FI" + axisName);
+//		protocol.sendRead("BG" + axisName);
+//		
+//		waitWhileMoving();
+//
+//		// Finally, restore accel and jog speeds from before routine was run
+//		protocol.sendRead("JG" + axisName + "=T1");
+//		protocol.sendRead("AC" + axisName + "=T2");
+		protocol.sendRead("XQ #HOMEA,0");
 	}
 	
 	private void indexGalilEl() {
-		// Save acceleration and jog speed values
-		protocol.sendRead("T1 = _JG" + axisName);
-		protocol.sendRead("T2 = _AC" + axisName);
-		
-		double jg = 1000d;
-		protocol.sendRead("JG" + axisName + "=" + jg);
-		
-		// Do the index search ("FI")
-		protocol.sendRead("FI" + axisName);
-		protocol.sendRead("BG" + axisName);
-		protocol.sendRead("AM" + axisName);
-		encoderRelative(3900);
-		jg = 50d;
-		protocol.sendRead("AM" + axisName);
-		protocol.sendRead("JG" + axisName + "=" + jg);
-		protocol.sendRead("FI" + axisName);
-		protocol.sendRead("BG" + axisName);
-		//protocol.sendRead("AM" + axisName);
-		//protocol.sendRead("MG \"Motion Done\";");
-		
-		waitWhileMoving();
-		
-		// Finally, restore accel and jog speeds from before routine was run
-		protocol.sendRead("JG" + axisName + "=T1");
-		protocol.sendRead("AC" + axisName + "=T2");
+//		// Save acceleration and jog speed values
+//		protocol.sendRead("T1 = _JG" + axisName);
+//		protocol.sendRead("T2 = _AC" + axisName);
+//		
+//		double jg = 1000d;
+//		protocol.sendRead("JG" + axisName + "=" + jg);
+//		
+//		// Do the index search ("FI")
+//		protocol.sendRead("FI" + axisName);
+//		protocol.sendRead("BG" + axisName);
+//		protocol.sendRead("AM" + axisName);
+//		encoderRelative(3900);
+//		jg = 50d;
+//		protocol.sendRead("AM" + axisName);
+//		protocol.sendRead("JG" + axisName + "=" + jg);
+//		protocol.sendRead("FI" + axisName);
+//		protocol.sendRead("BG" + axisName);
+//		//protocol.sendRead("AM" + axisName);
+//		//protocol.sendRead("MG \"Motion Done\";");
+//		
+//		waitWhileMoving();
+//		
+//		// Finally, restore accel and jog speeds from before routine was run
+//		protocol.sendRead("JG" + axisName + "=T1");
+//		protocol.sendRead("AC" + axisName + "=T2");
+		protocol.sendRead("XQ #HOMEB,0");
 	}
 	
 	private void waitWhileMoving() {
