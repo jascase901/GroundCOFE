@@ -1,5 +1,7 @@
 /*
  * I'm tired of FTDI stuff floating around.
+ * I have no clue as to the status of this.
+ * If you want to see working FTDI code, check out the "BalloonTracking" project.
  * (Reed, 5/19/2012)
  */
 
@@ -105,7 +107,7 @@
 //							int azEncoderPos = Integer.parseInt(splitStatus[10]);
 //							int azEncoderAtIndex = Integer.parseInt(splitStatus[14]);
 //							int azStepperAtIndex = Integer.parseInt(splitStatus[16]);
-//							//TODO ActStatus azStatus = new ActStatus(azStepperGoal, azStepperNow, azEncoderPos, azEncoderAtIndex, azStepperAtIndex);
+//							// ActStatus azStatus = new ActStatus(azStepperGoal, azStepperNow, azEncoderPos, azEncoderAtIndex, azStepperAtIndex);
 //							
 //							int elStepperGoal = Integer.parseInt(splitStatus[4]);
 //							int elStepperNow = Integer.parseInt(splitStatus[8]);
@@ -113,19 +115,19 @@
 //							//System.out.println(splitStatus[12]);
 //							int elEncoderAtIndex = Integer.parseInt(splitStatus[18]);
 //							int elStepperAtIndex = Integer.parseInt(splitStatus[20]);
-//							//TODO ActStatus elStatus = new ActStatus(elStepperGoal, elStepperNow, elEncoderPos, elEncoderAtIndex, elStepperAtIndex);
+//							// ActStatus elStatus = new ActStatus(elStepperGoal, elStepperNow, elEncoderPos, elEncoderAtIndex, elStepperAtIndex);
 //							
 //							int velocity = Integer.parseInt(splitStatus[22]);
 //							if (stage == null) System.out.println("stage is null");
-//							//TODO stage.setStatuses(azStatus, elStatus, velocity);
+//							// stage.setStatuses(azStatus, elStatus, velocity);
 //							
-//							//TODO BalloonTrackingWindow.updateTxtPosInfo(azStatus, elStatus, velocity); //so that the GUI will update
+//							// BalloonTrackingWindow.updateTxtPosInfo(azStatus, elStatus, velocity); //so that the GUI will update
 //							
 //						} catch (NumberFormatException e) {
 //							System.out.println(messageFromFTDI);
 //							System.out.println(message);
 //							
-//							//TODO BalloonTrackingWindow.updateTxtStatusArea("Error parsing status string from sate controller.");
+//							// BalloonTrackingWindow.updateTxtStatusArea("Error parsing status string from sate controller.");
 //							//BalloonTrackingWindow.updateTxtStatusArea("Specifically, expected a number but got something else instead.");
 //							//BalloonTrackingWindow.updateTxtStatusArea("Error from:  FTDIReader.java");
 //							e.printStackTrace();
@@ -137,7 +139,7 @@
 //			 * sleep for 100ms because we don't want to unnecessarily check the queue
 //			 * this wouldn't be bad, it'd just waste CPU
 //			 */
-//			//TODO BalloonTrackingWindow.updateTxtAzElRaDec(stage.currentAzDeg(), stage.currentElDeg());
+//			// BalloonTrackingWindow.updateTxtAzElRaDec(stage.currentAzDeg(), stage.currentElDeg());
 //			pause(100);
 //		}
 //	}
@@ -157,12 +159,12 @@
 //	}
 //	@Override
 //	public void togglePauseFlag() {
-//		// TODO Auto-generated method stub
+//		// Auto-generated method stub
 //		
 //	}
 //	@Override
 //	public void readerOnOff(boolean onOff) {
-//		// TODO Auto-generated method stub
+//		// Auto-generated method stub
 //		
 //	}
 //

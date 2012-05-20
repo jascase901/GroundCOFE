@@ -100,30 +100,6 @@ public class Stage {
 			reader.start();
 		}
 	}
-	
-//	public String axisName(axisType axis) {
-//		switch (axis) {
-//		case AZ:
-//			return "A";
-//		case EL:
-//			return "B";
-//		default:
-//			System.out.println("this should never happen.  Stage.axisName()");
-//		}
-//		return "error Stage.axisName()";
-//	}
-//	
-//	public String axisNameLong(axisType axis) {
-//		switch (axis) {
-//		case AZ:
-//			return "Azimuth";
-//		case EL:
-//			return "Elevation";
-//		default:
-//			System.out.println("this should never happen.  Stage.axisName()");
-//		}
-//		return "error Stage.axisName()";
-//	}
 
 	private void loadSettings() throws FileNotFoundException, IOException {
 		//read settings from file
@@ -221,10 +197,10 @@ public class Stage {
 
 	//TODO test to make sure motor state stuff is working
 	public void startRaDecTracking(final double ra, final double dec) {
-		if (!motorCheck(Axis.AZ)) {
+		if (!scope.motorState(Axis.AZ, false)) {
 			return;
 		}
-		if (!motorCheck(Axis.EL)) {
+		if (!scope.motorState(Axis.EL, false)) {
 			return;
 		}
 		long period = 10000;
@@ -337,9 +313,7 @@ public class Stage {
 	public void move(final MoveCommand mc) {
 		exec.submit(new Runnable() {
 			public void run() {
-				ActInterface act = null;
 				double min = 0, max = 0;
-				
 				Axis axis = mc.getAxis();
 				
 				switch (axis) {
@@ -351,7 +325,7 @@ public class Stage {
 						System.out.println("error Stage.move");
 				}
 				
-				if (!scope.motorState(axis)) {
+				if (!scope.motorState(axis, false)) {
 					window.controlMoveButtons(true);
 					return;
 				}
@@ -392,7 +366,7 @@ public class Stage {
 	}
 
 	public void index(final Axis axis) {
-		if (isIndexing()) {
+		if (scope.isIndexing(axis)) {
 			buttonEnabler("indexAz");
 			buttonEnabler("indexEl");
 			return;
@@ -502,8 +476,7 @@ public class Stage {
 	 * @param axis az or el
 	 */
 	public void stop(Axis axis) {
-		ActInterface act = axisPicker(axis);
-		act.stop();
+		scope.stop(axis);
 	}
 	
 	//TODO this is clunky, but it works
@@ -514,11 +487,9 @@ public class Stage {
 	public void motorControl(final Axis axis) {
 		exec.submit(new Runnable() {
 			public void run() {
-				ActInterface act = axisPicker(axis);
-				window.updateMotorButton(act.motorControl(), axis);
+				scope.motorToggle(axis);
 			}
 		});
-		//window.updateMotorState(az.motorState(), el.motorState());
 	}
 	
 	/**
@@ -526,18 +497,17 @@ public class Stage {
 	 * @param axis
 	 * @return
 	 */
-	private ActInterface axisPicker(Axis axis) {
-		ActInterface act = null;
-		switch (axis) {
-			case AZ:
-				act = az; break;
-			case EL:
-				act = el; break;
-		}
-		return act;
-	}
+//	private ActInterface axisPicker(Axis axis) {
+//		switch (axis) {
+//			case AZ:
+//				act = az; break;
+//			case EL:
+//				act = el; break;
+//		}
+//		return act;
+//	}
 
-	public double encPos(Axis axisType) {
+	double encPos(Axis axisType) {
 		if (position == null) return 0;
 		switch (axisType) {
 			case AZ:
@@ -549,25 +519,25 @@ public class Stage {
 		}
 	}
 	
-	public void indexingDone(Axis type) {
-		System.out.println("indexing done");
-		switch (type) {
-			case AZ:
-				az.setIndexing(false); break;
-			case EL:
-				el.setIndexing(false); break;
-		}
-	}
+//	public void indexingDone(Axis type) {
+//		System.out.println("indexing done");
+//		switch (type) {
+//			case AZ:
+//				az.setIndexing(false); break;
+//			case EL:
+//				el.setIndexing(false); break;
+//		}
+//	}
 	
-	private boolean isIndexing() {
-		boolean azIndexing = az.indexing();
-		boolean elIndexing = el.indexing();
-		boolean result = azIndexing || elIndexing;
-		if (result) {
-			statusArea("Indexing currently in progress.  Please wait before proceeding");
-		}
-		return result;
-	}
+//	private boolean isIndexing() {
+//		boolean azIndexing = az.indexing();
+//		boolean elIndexing = el.indexing();
+//		boolean result = azIndexing || elIndexing;
+//		if (result) {
+//			statusArea("Indexing currently in progress.  Please wait before proceeding");
+//		}
+//		return result;
+//	}
 
 	public void goToPos(Coordinate c) {
 		moveAbsolute(c.getAz(), c.getEl());
@@ -659,9 +629,9 @@ public class Stage {
 		window.updateVelAcc(azVel, azAcc, elVel, elAcc);
 	}
 
-	void toggleReader() {
-		reader.togglePauseFlag();
-	}
+//	void toggleReader() {
+//		reader.togglePauseFlag();
+//	}
 	
 	void setGoalPos(double deg, Axis axis) {
 		window.setGoalPos(Formatters.TWO_POINTS.format(deg), axis);
@@ -696,20 +666,20 @@ public class Stage {
 	 * @param axis
 	 * @return
 	 */
-	private boolean motorCheck(Axis axis) {
-		String name = "";
-		ActInterface act = null;
-		switch (axis) {
-			case AZ:
-				act = az; name = "Azimuth"; break;
-			case EL:
-				act = el; name = "Elevation"; break;
-		}
-		if (!act.motorState()) {
-			statusArea(name + " motor is off.  Please turn motor on before proceeding.\n");
-			return false;
-		}
-		return true;
-	}
+//	private boolean motorCheck(Axis axis) {
+//		String name = "";
+//		ActInterface act = null;
+//		switch (axis) {
+//			case AZ:
+//				act = az; name = "Azimuth"; break;
+//			case EL:
+//				act = el; name = "Elevation"; break;
+//		}
+//		if (!act.motorState()) {
+//			statusArea(name + " motor is off.  Please turn motor on before proceeding.\n");
+//			return false;
+//		}
+//		return true;
+//	}
 
 }

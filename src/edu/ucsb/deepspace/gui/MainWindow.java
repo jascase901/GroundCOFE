@@ -52,6 +52,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private final Properties windowSettings = new Properties();
 	private Stage stage;
 	
+	private String motorOff = "Motor Off", motorOn = "Motor On";
 	private String moveType = "degrees";
 	private long moveAmountVal = 0;
 	private boolean minsec = false;
@@ -677,18 +678,30 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	btnMotorAz = new Button(grpAxisControl, SWT.NONE);
     	btnMotorAz.setBounds(110, 204, 65, 25);
-    	btnMotorAz.setText("MotorAzOnOff");
+    	btnMotorAz.setText(motorOff);
     	btnMotorAz.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
+    			if (btnMotorAz.getText().equals(motorOff)) {
+    				btnMotorAz.setText(motorOn);
+    			}
+    			else {
+    				btnMotorAz.setText(motorOff);
+    			}
     			stage.motorControl(Axis.AZ);
     		}
     	});
     	
     	btnMotorEl = new Button(grpAxisControl, SWT.NONE);
     	btnMotorEl.setBounds(199, 204, 65, 25);
-    	btnMotorEl.setText("MotorElOnOff");
+    	btnMotorEl.setText(motorOff);
     	btnMotorEl.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
+    			if (btnMotorEl.getText().equals(motorOff)) {
+    				btnMotorEl.setText(motorOn);
+    			}
+    			else {
+    				btnMotorEl.setText(motorOff);
+    			}
     			stage.motorControl(Axis.EL);
     		}
     	});
@@ -1353,19 +1366,19 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	 * @param az state of az motor
 	 * @param el state of el motor
 	 */
-	public void updateMotorState(final boolean az, final boolean el) {
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				String textAz = "Motor On";
-				String textEl = "Motor on";
-				if (az) textAz = "Motor Off";
-				if (el) textEl = "Motor Off";
-				btnMotorAz.setText(textAz);
-				btnMotorEl.setText(textEl);
-			}
-		});
-	}
+//	public void updateMotorState(final boolean az, final boolean el) {
+//		Display.getDefault().asyncExec(new Runnable() {
+//			@Override
+//			public void run() {
+//				String textAz = "Motor On";
+//				String textEl = "Motor on";
+//				if (az) textAz = "Motor Off";
+//				if (el) textEl = "Motor Off";
+//				btnMotorAz.setText(textAz);
+//				btnMotorEl.setText(textEl);
+//			}
+//		});
+//	}
 	
 	public void updateMotorButton(final boolean onOff, final Axis axis) {
 		Display.getDefault().asyncExec(new Runnable() {

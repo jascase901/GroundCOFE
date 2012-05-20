@@ -65,7 +65,6 @@ public class CommGalil implements CommInterface {
 //			clean.write(message.getBytes());
 //			clean.flush();
 //		} catch (IOException e) {
-//			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
 //    }
