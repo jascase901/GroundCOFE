@@ -39,7 +39,14 @@ public class MoveCommand {
 		this.amount = amount;
 	}
 	
+	/**
+	 * Represents relative or absolute motion.
+	 */
 	public MoveMode getMode(){ return mode;}
+	
+	/**
+	 * Represents the units of amount.  Either encoder pulses or degrees.
+	 */
 	public MoveType getType() { return type;}
 	public Axis getAxis() {return axis;}
 	public double getAmount() {return amount;}

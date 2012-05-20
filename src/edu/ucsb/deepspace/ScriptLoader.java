@@ -1,27 +1,46 @@
 package edu.ucsb.deepspace;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 public class ScriptLoader {
 	
 	private CommGalil protocol;
 	
 	private Script homeA;
 	private Script homeB;
+	private Set<String> loadedScriptNames;
+	private Map<String, Script> scripts;
 	
 	public ScriptLoader() {
 		protocol = new CommGalil(23);
+		loadedScriptNames = new HashSet<String>();
+		scripts = new HashMap<String, Script>();
+		scripts.put("#HOMEAZ", homeA);
+		scripts.put("#HOMEB", homeB);
+	}
+	
+	public void check() {
+		String labels = protocol.sendRead("LL");
+		String[] split = labels.split("\r\n");
+		for (String s : split) {
+			String name = s.split("=")[0];
+			loadedScriptNames.add(name);
+		}
 	}
 	
 	public void load() {
-		System.out.println(protocol.sendRead("LL"));
+		Set<String> scriptsToLoad = scripts.keySet();
 		
-		homeA = new Script("#HOMEAZ", 0);
+		if (loadedScriptNames.containsAll(scriptsToLoad)) {
+			System.out.println("hi");
+			return;
+		}
+		
 		indexAz();
-		
-		homeB = new Script("#HOMEB", homeA.size()+20);
 		indexEl();
-		
-		System.out.println(homeA.getScript());
-		System.out.println(homeB.getScript());
 		
 		protocol.send(homeA.getScript());
 		pause();
@@ -43,7 +62,8 @@ public class ScriptLoader {
 		  //NO This is easy enough to do myself.
 
 		//NO Apparently any line cannot be more then 80 characters long, though
-
+		
+		homeA = new Script("#HOMEAZ", 0);
 		homeA.add("IF (_MOA)");
 		//"BG" commands fail if the motor is off. Therefore, check motor state
 		homeA.add("MG \"Motor is off. Cannot execute home operation\"");
@@ -83,6 +103,7 @@ public class ScriptLoader {
 	}
 	
 	private void indexEl() {
+		homeB = new Script("#HOMEB", homeA.size()+20);
 		String axisAbbrev = Axis.EL.getAbbrev();
 		
 		homeB.add("T1 = _JG" + axisAbbrev);

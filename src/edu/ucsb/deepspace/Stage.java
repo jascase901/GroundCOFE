@@ -62,34 +62,12 @@ public class Stage {
 		switch (stageType) {
 		case GALIL:
 			protocol = new CommGalil(2222);
-//			protocolTest = new CommGalil(3333);
-//			az = new ActGalil(axisType.AZ, protocol);
-//			el = new ActGalil(axisType.EL, protocolTest);
-//			
-//			ScriptLoader sl = new ScriptLoader();
-//			sl.load();
-//			//sl.close();
-//			try {
-//				Thread.sleep(5000);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//			
-//			reader = new ReaderGalil(this);
-//			loadGalil();
-//			az.registerStage(this);
-//			el.registerStage(this);
-//			azMotorState = az.motorState();
-//			elMotorState = el.motorState();
-//			window.updateMotorState(azMotorState, elMotorState);
 			
-			
-			
-//			ScriptLoader sl = new ScriptLoader();
-//			sl.load();
-//			pause(1000);
-//			sl.close();
-			
+			ScriptLoader sl = new ScriptLoader();
+			sl.check();
+			sl.load();
+			pause(1000);
+			sl.close();
 			
 			scope = new TelescopeGalil(this);
 			scope.queryMotorState();
@@ -97,7 +75,6 @@ public class Stage {
 			window.updateMotorButton(scope.motorState(Axis.EL), Axis.EL);
 			reader = new ReaderGalil(this);
 			loadGalil();
-			
 			break;
 		case FTDI:
 			//Really tired of FTDI stuff.
@@ -226,9 +203,6 @@ public class Stage {
 				//for FTDI only: velocity of 0 means no motion has occurred
 				//vel=1 currently at rest, but was moving forward
 				//vel=-1 currently at rest, but was moving backwards
-//				if (Math.abs(velocity) == 1 || velocity == 0) {
-//					moveAbsolute(az, el);
-//				}
 				moveAbsolute(az, el);
 			}
 		}, 0, period);
@@ -352,6 +326,10 @@ public class Stage {
 				System.out.println("stage done move");
 			}
 		});
+	}
+	
+	public void moveRelativeAz(MoveCommand azMc) {
+		
 	}
 	
 	/**
@@ -494,7 +472,6 @@ public class Stage {
 		scope.stop(axis);
 	}
 	
-	//TODO this is clunky, but it works
 	/**
 	 * Toggles the motor on or off.
 	 * @param axis az or el
@@ -522,9 +499,9 @@ public class Stage {
 //		return act;
 //	}
 
-	double encPos(Axis axisType) {
+	double encPos(Axis axis) {
 		if (position == null) return 0;
-		switch (axisType) {
+		switch (axis) {
 			case AZ:
 				return position.azPos();
 			case EL:
@@ -643,10 +620,6 @@ public class Stage {
 	void updateVelAcc(String azVel, String azAcc, String elVel, String elAcc) {
 		window.updateVelAcc(azVel, azAcc, elVel, elAcc);
 	}
-
-//	void toggleReader() {
-//		reader.togglePauseFlag();
-//	}
 	
 	void setGoalPos(double deg, Axis axis) {
 		window.setGoalPos(Formatters.TWO_POINTS.format(deg), axis);

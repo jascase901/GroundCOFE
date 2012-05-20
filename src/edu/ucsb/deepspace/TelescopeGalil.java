@@ -2,7 +2,6 @@ package edu.ucsb.deepspace;
 
 public class TelescopeGalil implements TelescopeInterface {
 	
-	@SuppressWarnings("unused")
 	private Stage stage;
 	private CommGalil protocol;
 	
@@ -11,20 +10,34 @@ public class TelescopeGalil implements TelescopeInterface {
 	public TelescopeGalil(Stage stage) {
 		this.stage = stage;
 		protocol = new CommGalil(55555);
-		az = new GalilAxis(Axis.AZ);
-		el = new GalilAxis(Axis.EL);
+		az = new GalilAxis(Axis.AZ, 1000*1024);
+		el = new GalilAxis(Axis.EL, 4000);
 	}
 
 	@Override
-	public void moveAbsolute(MoveCommand az, MoveCommand el) {
-		// TODO Auto-generated method stub
-		
+	public void moveAbsolute(MoveCommand azMc, MoveCommand elMc) {
+		int azEncGoal = 0;
+		int elEncGoal = 0;
+		azEncGoal = (int) az.encGoal(azMc);
+		elEncGoal = (int) el.encGoal(elMc);
+		String out = "PA " + azEncGoal + "," + elEncGoal;
+		System.out.println("azEncGoal: " + azEncGoal);
+		System.out.println("elEncGoal: " + elEncGoal);
+		System.out.println(out);
+		//protocol.sendRead(out);
 	}
 
 	@Override
-	public void moveRelative(MoveCommand az, MoveCommand el) {
-		// TODO Auto-generated method stub
-		
+	public void moveRelative(MoveCommand azMc, MoveCommand elMc) {
+		int azEncRel = 0;
+		int elEncRel = 0;
+		azEncRel = (int) az.encGoal(azMc);
+		elEncRel = (int) el.encGoal(elMc);
+		String out = "PR " + azEncRel + "," + elEncRel;
+		System.out.println("azEncRel: " + azEncRel);
+		System.out.println("elEncRel: " + elEncRel);
+		System.out.println(out);
+		//protocol.sendRead(out);
 	}
 
 	@Override
@@ -66,32 +79,32 @@ public class TelescopeGalil implements TelescopeInterface {
 
 	@Override
 	public void setOffsets(double azOffset, double elOffset) {
-		// TODO Auto-generated method stub
-		
+		az.offset = azOffset;
+		el.offset = elOffset;
 	}
 
 	@Override
 	public double getOffset(Axis axis) {
-		// TODO Auto-generated method stub
-		return 0;
+		GalilAxis temp = picker(axis);
+		return temp.offset;
 	}
 
 	@Override
 	public void calibrate(Coordinate c) {
-		// TODO Auto-generated method stub
-		
+		az.calibrate(c.getAz(), stage.encPos(Axis.AZ));
+		el.calibrate(c.getEl(), stage.encPos(Axis.EL));
 	}
 
 	@Override
 	public double getUserPos(Axis axis) {
-		// TODO Auto-generated method stub
-		return 0;
+		return getAbsolutePos(axis) % 360;
 	}
 
 	@Override
 	public double getAbsolutePos(Axis axis) {
-		// TODO Auto-generated method stub
-		return 0;
+		GalilAxis temp = picker(axis);
+		double currentEncPos = stage.encPos(axis);
+		return temp.encToAbsDeg(currentEncPos);
 	}
 
 	@Override
@@ -207,10 +220,13 @@ public class TelescopeGalil implements TelescopeInterface {
 		private boolean indexing = false;
 		private boolean motorState = true;
 		private String abbrev;
+		private double encPerDeg;
+		private double offset;
 		
-		private GalilAxis(Axis axis) {
+		private GalilAxis(Axis axis, double encPerRev) {
 			this.axis = axis;
 			abbrev = axis.getAbbrev();
+			encPerDeg = encPerRev / 360d;
 		}
 		
 		void motorOn() {
@@ -236,6 +252,119 @@ public class TelescopeGalil implements TelescopeInterface {
 			protocol.read();
 			return flag;
 		}
+		
+		/**
+		 * Converts a number of encoder pulses into degrees.
+		 * @param enc
+		 * @return
+		 */
+		private double convEncToDeg(double enc) {
+			return enc / encPerDeg;
+		}
+		
+		/**
+		 * Converts degrees into encoder pulses.
+		 * @param deg
+		 * @return
+		 */
+		private double convDegToEnc(double deg) {
+			return deg * encPerDeg;
+		}
+		
+		/**
+		 * Converts an encoder value into the absolute position. <P>
+		 * Inverse of absDegToEnc()
+		 * @param enc value of encoder
+		 * @return absolute degree position
+		 */
+		double encToAbsDeg(double enc) {
+			return offset + convEncToDeg(enc);
+		}
+		
+		/**
+		 * Converts an absolute degree position into an encoder value. <P>
+		 * Inverse of encToAbsDeg
+		 * @param deg position in degrees
+		 * @return encoder value
+		 */
+		double absDegToEnc(double deg) {
+			return convDegToEnc(deg - offset);
+		}
+		
+		/**
+		 * Converts user degrees into encoder value. <P>
+		 * First converts user degrees into absolute degrees.
+		 * @param deg
+		 * @return
+		 */
+		private double userDegToEnc(double deg) {
+			double absDeg = userDegToAbsDeg(deg);
+			return absDegToEnc(absDeg);
+		}
+		
+		/**
+		 * Converts user degrees into absolute degrees.
+		 * @param deg
+		 * @return 
+		 */
+		private double userDegToAbsDeg(double deg) {
+			return absolutePos() - userPos() + deg;
+		}
+		
+		/**
+		 * 
+		 * @return the absolute position in degrees
+		 */
+		public double absolutePos() {
+			double encPos = stage.encPos(axis);
+			double absDeg = encToAbsDeg(encPos);
+			return absDeg;
+			//return encToAbsDeg(stage.encPos(axis));
+		}
+		
+		/**
+		 * The position of the actuator in degrees. <P>
+		 * Prevents the user from ever seeing a position like 540 degrees.
+		 * @return absolutePos() % 360
+		 */
+		public double userPos() {
+			return absDegToUserDeg(absolutePos());
+		}
+		
+		/**
+		 * Converts absolute degrees into user degrees.
+		 * @param deg
+		 * @return
+		 */
+		private double absDegToUserDeg(double deg) {
+			return deg % 360;
+		}
+		
+		void calibrate(double degVal, double encPos) {
+			offset = degVal - convEncToDeg(encPos);
+		}
+		
+		double encGoal(MoveCommand mc) {
+			switch (mc.getMode()) {
+				case RELATIVE:
+					switch (mc.getType()) {
+						case ENCODER:
+							return mc.getAmount();
+						case DEGREE:
+							return convDegToEnc(mc.getAmount());
+					}
+				case ABSOLUTE:
+					switch (mc.getType()) {
+						case ENCODER:
+							return mc.getAmount();
+						case DEGREE:
+							return absDegToEnc(mc.getAmount());
+					}
+			}
+			System.out.println("TelescopeGaill.GalilAxis.encGoal reached end");
+			throw new Error("TelescopeGaill.GalilAxis.encGoal reached end");
+		}
+		
 	}
 
 
