@@ -687,7 +687,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     			else {
     				btnMotorAz.setText(motorOff);
     			}
-    			stage.motorControl(Axis.AZ);
+    			stage.motorToggle(Axis.AZ);
     		}
     	});
     	
@@ -702,7 +702,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     			else {
     				btnMotorEl.setText(motorOff);
     			}
-    			stage.motorControl(Axis.EL);
+    			stage.motorToggle(Axis.EL);
     		}
     	});
     	
@@ -1384,9 +1384,9 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				String text = "Motor On";
+				String text = motorOn;
 				if (onOff) {
-					text = "Motor Off";
+					text = motorOff;
 				}
 				switch (axis) {
 					case AZ:

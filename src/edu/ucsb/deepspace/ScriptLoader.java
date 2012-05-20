@@ -27,7 +27,6 @@ public class ScriptLoader {
 		pause();
 		protocol.send(homeB.getScript());
 		pause();
-		protocol.close();
 	}
 	
 	public void close() {

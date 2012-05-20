@@ -46,7 +46,6 @@ public class Stage {
 	private LatLongAlt baseLocation, balloonLocation;
 	private double azToBalloon = 0, elToBalloon = 0;
 	private CommGalil protocol, protocolTest;
-	private boolean azMotorState = false, elMotorState = false;
 
 	public Stage() {
 		try {
@@ -62,7 +61,7 @@ public class Stage {
 		this.window = window;
 		switch (stageType) {
 		case GALIL:
-//			protocol = new CommGalil(2222);
+			protocol = new CommGalil(2222);
 //			protocolTest = new CommGalil(3333);
 //			az = new ActGalil(axisType.AZ, protocol);
 //			el = new ActGalil(axisType.EL, protocolTest);
@@ -84,7 +83,18 @@ public class Stage {
 //			elMotorState = el.motorState();
 //			window.updateMotorState(azMotorState, elMotorState);
 			
+			
+			
+//			ScriptLoader sl = new ScriptLoader();
+//			sl.load();
+//			pause(1000);
+//			sl.close();
+			
+			
 			scope = new TelescopeGalil(this);
+			scope.queryMotorState();
+			window.updateMotorButton(scope.motorState(Axis.AZ), Axis.AZ);
+			window.updateMotorButton(scope.motorState(Axis.EL), Axis.EL);
 			reader = new ReaderGalil(this);
 			loadGalil();
 			
@@ -197,10 +207,10 @@ public class Stage {
 
 	//TODO test to make sure motor state stuff is working
 	public void startRaDecTracking(final double ra, final double dec) {
-		if (!scope.motorState(Axis.AZ, false)) {
+		if (!scope.motorState(Axis.AZ)) {
 			return;
 		}
-		if (!scope.motorState(Axis.EL, false)) {
+		if (!scope.motorState(Axis.EL)) {
 			return;
 		}
 		long period = 10000;
@@ -325,7 +335,7 @@ public class Stage {
 						System.out.println("error Stage.move");
 				}
 				
-				if (!scope.motorState(axis, false)) {
+				if (!scope.motorState(axis)) {
 					window.controlMoveButtons(true);
 					return;
 				}
@@ -372,6 +382,12 @@ public class Stage {
 			return;
 		}
 		
+		if (!motorCheck(axis)) {
+			buttonEnabler("indexAz");
+			buttonEnabler("indexEl");
+			return;
+		}
+		
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
@@ -379,7 +395,6 @@ public class Stage {
 				scope.index(axis);
 				buttonEnabler("indexAz");
 				buttonEnabler("indexEl");
-				System.out.println("Stage done indexing");
 				reader.readerOnOff(true);
 			}
 		});
@@ -484,7 +499,7 @@ public class Stage {
 	 * Toggles the motor on or off.
 	 * @param axis az or el
 	 */
-	public void motorControl(final Axis axis) {
+	public void motorToggle(final Axis axis) {
 		exec.submit(new Runnable() {
 			public void run() {
 				scope.motorToggle(axis);
@@ -666,20 +681,12 @@ public class Stage {
 	 * @param axis
 	 * @return
 	 */
-//	private boolean motorCheck(Axis axis) {
-//		String name = "";
-//		ActInterface act = null;
-//		switch (axis) {
-//			case AZ:
-//				act = az; name = "Azimuth"; break;
-//			case EL:
-//				act = el; name = "Elevation"; break;
-//		}
-//		if (!act.motorState()) {
-//			statusArea(name + " motor is off.  Please turn motor on before proceeding.\n");
-//			return false;
-//		}
-//		return true;
-//	}
+	private boolean motorCheck(Axis axis) {
+		if (!scope.motorState(axis)) {
+			statusArea(axis.getFullName() + " motor is off.  Please turn motor on before proceeding.\n");
+			return false;
+		}
+		return true;
+	}
 
 }

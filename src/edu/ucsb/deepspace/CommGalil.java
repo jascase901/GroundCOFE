@@ -22,7 +22,7 @@ public class CommGalil implements CommInterface {
 	boolean connection = false;
 	String previousCommand = "";
 	
-//	private int port = 0;
+	private int port = 0;
 //	private static int readCount = 0;
 //	private static int sendCount = 0;
 //	private static List<String> send = new ArrayList<String>();
@@ -31,11 +31,11 @@ public class CommGalil implements CommInterface {
 	
 	public CommGalil(int port) {
 		System.out.println("comm galil constructor" + port);
-		//this.port = port;
+		this.port = port;
 		try {
 			socket = new Socket();
 			socket.connect(new InetSocketAddress("192.168.1.200", port), 3000);
-			socket.setSoTimeout(3000);
+			socket.setSoTimeout(1000);
 			out = new PrintWriter(socket.getOutputStream(), true);
 			//clean = socket.getOutputStream();
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -117,6 +117,7 @@ public class CommGalil implements CommInterface {
     
     //Simply calls send and then receive for convenience.
     public String sendRead(String message) {
+    	//System.out.println(port + "   " + message);
     	//read();
     	
     	//send.add(message);
@@ -127,6 +128,7 @@ public class CommGalil implements CommInterface {
     	//threads.add(port + tr.getName());
     	
     	String temp = read();
+    	//System.out.println(temp);
     	//response.add(temp);
     	return temp;
     }

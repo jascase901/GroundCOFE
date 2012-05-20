@@ -56,10 +56,13 @@ public interface TelescopeInterface {
 	
 	/**
 	 * Returns true if motor is on, false if not.
-	 * @param query if true, asks the galil for the state, otherwise assumes that the internal<BR>
-	 * representation is correct
 	 */
-	public boolean motorState(Axis axis, boolean query);
+	public boolean motorState(Axis axis);
+	
+	/**
+	 * Updates the motor state.
+	 */
+	public void queryMotorState();
 	
 	/**
 	 * Toggles the motor on or off.

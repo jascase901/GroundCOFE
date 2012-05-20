@@ -60,8 +60,8 @@ public class TelescopeGalil implements TelescopeInterface {
 
 	@Override
 	public void stop(Axis axis) {
-		// TODO Auto-generated method stub
-		
+		GalilAxis temp = picker(axis);
+		temp.stop();
 	}
 
 	@Override
@@ -123,14 +123,17 @@ public class TelescopeGalil implements TelescopeInterface {
 	}
 
 	@Override
-	public boolean motorState(Axis axis, boolean query) {
+	public boolean motorState(Axis axis) {
 		GalilAxis temp = picker(axis);
-		if (query) {
-			return temp.queryMotorState();
-		}
-		else {
-			return temp.motorState;
-		}
+		return temp.motorState;
+	}
+	
+	@Override
+	public void queryMotorState() {
+		String response = protocol.sendRead("MG _MOA, _MOB");
+		String[] temp = response.split(" ");
+		az.motorState = (0 == Double.parseDouble(temp[1]));
+		el.motorState = (0 == Double.parseDouble(temp[2]));
 	}
 
 	@Override
@@ -165,8 +168,9 @@ public class TelescopeGalil implements TelescopeInterface {
 				waitWhileMoving(axis);
 				az.indexing = false;
 				break;
+			default:
+				System.out.println("TelescopeGalil.index error. reached end of switch statement");
 		}
-		throw new Error("This should never happen.  TelescopeGalil.index reached the end.");
 	}
 	
 	private GalilAxis picker(Axis axis) {
@@ -201,7 +205,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		
 		private Axis axis;
 		private boolean indexing = false;
-		private boolean motorState = false;
+		private boolean motorState = true;
 		private String abbrev;
 		
 		private GalilAxis(Axis axis) {
@@ -219,27 +223,8 @@ public class TelescopeGalil implements TelescopeInterface {
 			motorState = false;
 		}
 		
-		boolean queryMotorState() {
-			String response = protocol.sendRead("MG _MO" + abbrev);
-			double state = 0;
-			try {
-				state = Double.parseDouble(response);
-			} catch (NumberFormatException e) {
-				System.out.println();
-				System.out.println(axis);
-				System.out.println(response);
-				System.out.println("ActGalil.motorState numberformatexception sigh");
-			}
-			if (state == 1) {
-				motorState = false;
-				return false;
-			}
-			else if (state == 0) {
-				motorState = true;
-				return true;
-			}
-			System.out.println("error TelescopeGalil.GalilAxis.queryMotorState");
-			return false;
+		void stop() {
+			protocol.sendRead("ST" + abbrev);
 		}
 		
 		boolean isMoving() {
