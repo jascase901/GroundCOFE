@@ -11,7 +11,6 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import edu.ucsb.deepspace.ActInterface.axisType;
 import edu.ucsb.deepspace.MoveCommand.MoveMode;
 import edu.ucsb.deepspace.MoveCommand.MoveType;
 import edu.ucsb.deepspace.gui.MainWindow;
@@ -21,22 +20,23 @@ public class Stage {
 	private static final Stage INSTANCE = new Stage();
 	public static Stage getInstance() {return INSTANCE;}
 	
-	public static enum stageType {
-		Galil, FTDI;
+	public static enum StageTypes {
+		GALIL, FTDI;
 	}
-	private stageType type = stageType.Galil;
-	public stageType getType() {
-		return this.type;
+	private StageTypes stageType = StageTypes.GALIL;
+	public StageTypes getType() {
+		return this.stageType;
 	}
 
 	private double minAz, maxAz, minEl, maxEl;
 	private double velAz, accAz, velEl, accEl;
 	//TODO private double maxMoveRel = 360;
 	private int encTol = 10;
+	
+	private TelescopeInterface scope;
 
 	private Timer raDecTracker, lstUpdater;
 	private final ExecutorService exec = Executors.newFixedThreadPool(2);
-	private ActInterface az, el;
 	private MainWindow window;
 	private boolean commStatus = false;
 	private ReaderInterface reader;
@@ -60,41 +60,38 @@ public class Stage {
 
 	public void initialize(MainWindow window) throws FileNotFoundException, IOException {
 		this.window = window;
-		switch (type) {
-		case Galil:
-			protocol = new CommGalil(2222);
-			protocolTest = new CommGalil(3333);
-			az = new ActGalil(axisType.AZ, protocol);
-			el = new ActGalil(axisType.EL, protocolTest);
+		switch (stageType) {
+		case GALIL:
+//			protocol = new CommGalil(2222);
+//			protocolTest = new CommGalil(3333);
+//			az = new ActGalil(axisType.AZ, protocol);
+//			el = new ActGalil(axisType.EL, protocolTest);
+//			
+//			ScriptLoader sl = new ScriptLoader();
+//			sl.load();
+//			//sl.close();
+//			try {
+//				Thread.sleep(5000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//			
+//			reader = new ReaderGalil(this);
+//			loadGalil();
+//			az.registerStage(this);
+//			el.registerStage(this);
+//			azMotorState = az.motorState();
+//			elMotorState = el.motorState();
+//			window.updateMotorState(azMotorState, elMotorState);
 			
-			ScriptLoader sl = new ScriptLoader();
-			sl.load();
-			//sl.close();
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+			scope = new TelescopeGalil(this);
 			reader = new ReaderGalil(this);
 			loadGalil();
-			az.registerStage(this);
-			el.registerStage(this);
-			azMotorState = az.motorState();
-			elMotorState = el.motorState();
-			window.updateMotorState(azMotorState, elMotorState);
+			
 			break;
 		case FTDI:
-			//These are commented out because I made the ActFTDI class abstract.
-			//I got tired of adding new functionality to the ActInterface and having to "implement" the method
-			//in ActFTDI.  Once abstract, I could no longer instantiate them.  Hence they are now commented out.
-			//Reed, 5/5/2012
-			
-			//az = new ActFTDI();
-			//el = new ActFTDI();
-			reader = new ReaderFTDI(this);
-			loadFTDI();
+			//Really tired of FTDI stuff.
+			//Reed, 5/19/2012
 			break;
 		}
 		updateLst();
@@ -104,29 +101,29 @@ public class Stage {
 		}
 	}
 	
-	public String axisName(axisType axis) {
-		switch (axis) {
-		case AZ:
-			return "A";
-		case EL:
-			return "B";
-		default:
-			System.out.println("this should never happen.  Stage.axisName()");
-		}
-		return "error Stage.axisName()";
-	}
-	
-	public String axisNameLong(axisType axis) {
-		switch (axis) {
-		case AZ:
-			return "Azimuth";
-		case EL:
-			return "Elevation";
-		default:
-			System.out.println("this should never happen.  Stage.axisName()");
-		}
-		return "error Stage.axisName()";
-	}
+//	public String axisName(axisType axis) {
+//		switch (axis) {
+//		case AZ:
+//			return "A";
+//		case EL:
+//			return "B";
+//		default:
+//			System.out.println("this should never happen.  Stage.axisName()");
+//		}
+//		return "error Stage.axisName()";
+//	}
+//	
+//	public String axisNameLong(axisType axis) {
+//		switch (axis) {
+//		case AZ:
+//			return "Azimuth";
+//		case EL:
+//			return "Elevation";
+//		default:
+//			System.out.println("this should never happen.  Stage.axisName()");
+//		}
+//		return "error Stage.axisName()";
+//	}
 
 	private void loadSettings() throws FileNotFoundException, IOException {
 		//read settings from file
@@ -177,15 +174,14 @@ public class Stage {
 		velEl = Double.parseDouble(actSettings.getProperty("velEl"));
 		accEl = Double.parseDouble(actSettings.getProperty("accEl"));
 		encTol = Integer.parseInt(actSettings.getProperty("encTol"));
-		az.setOffset(azOffset);
-		el.setOffset(elOffset);
+		scope.setOffsets(azOffset, elOffset);
 		window.setMinMaxAzEl(minAz, maxAz, minEl, maxEl);
 		window.setVelAccAzEl(velAz, accAz, velEl, accEl);
 	}
 
 	private void closeGalil() {
-		actSettings.setProperty("azOffset", String.valueOf(az.getOffset()));
-		actSettings.setProperty("elOffset", String.valueOf(el.getOffset()));
+		actSettings.setProperty("azOffset", String.valueOf(scope.getOffset(Axis.AZ)));
+		actSettings.setProperty("elOffset", String.valueOf(scope.getOffset(Axis.EL)));
 		actSettings.setProperty("minAz", String.valueOf(minAz));
 		actSettings.setProperty("maxAz", String.valueOf(maxAz));
 		actSettings.setProperty("minEl", String.valueOf(minEl));
@@ -204,6 +200,7 @@ public class Stage {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void loadFTDI() throws FileNotFoundException, IOException {
 		actSettings.load(new FileInputStream("FTDI.ini"));
 	}
@@ -224,10 +221,10 @@ public class Stage {
 
 	//TODO test to make sure motor state stuff is working
 	public void startRaDecTracking(final double ra, final double dec) {
-		if (!motorCheck(axisType.AZ)) {
+		if (!motorCheck(Axis.AZ)) {
 			return;
 		}
-		if (!motorCheck(axisType.EL)) {
+		if (!motorCheck(Axis.EL)) {
 			return;
 		}
 		long period = 10000;
@@ -264,8 +261,8 @@ public class Stage {
 
 				double azPos = 0, elPos = 0;
 				if (position != null ) {
-					azPos = az.userPos();
-					elPos = el.userPos();
+					azPos = scope.getUserPos(Axis.AZ);
+					elPos = scope.getUserPos(Axis.EL);
 				}
 				
 				double ra = baseLocation.azelToRa(azPos, elPos);
@@ -300,28 +297,23 @@ public class Stage {
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
-				az.scan(azSc);
+				scope.scan(azSc, elSc);
 			}
 		});
-		exec.submit(new Runnable() {
-			@Override
-			public void run() {
-				el.scan(elSc);
-			}
-		});
+		
 		//TODO is this correct?
 		if (elSc == null) {
-			window.setScanEnabled(axisType.AZ);
+			window.setScanEnabled(Axis.AZ);
 		}
 		else if (azSc == null) {
-			window.setScanEnabled(axisType.EL);
+			window.setScanEnabled(Axis.EL);
 		}
-		window.setScanEnabled(axisType.BOTH);
+		//TODO fix!
+		//window.setScanEnabled(axisType.BOTH);
 	}
 	
 	public void stopScanning() {
-		az.stopScanning();
-		el.stopScanning();
+		scope.stopScanning();
 	}
 	
 //	public void raster(ScanCommand azSc, ScanCommand elSc) {
@@ -348,33 +340,30 @@ public class Stage {
 				ActInterface act = null;
 				double min = 0, max = 0;
 				
-				switch (mc.getAxis()) {
+				Axis axis = mc.getAxis();
+				
+				switch (axis) {
 					case AZ:
-						act = az; min = minAz; max = maxAz;break;
+						min = minAz; max = maxAz; break;
 					case EL:
-						act = el; min = minEl; max = maxEl; break;
+						min = minEl; max = maxEl; break;
 					default:
 						System.out.println("error Stage.move");
 				}
-				if (!motorCheck(mc.getAxis())) {
+				
+				if (!scope.motorState(axis)) {
 					window.controlMoveButtons(true);
 					return;
 				}
 				
-				if (!act.validMove(mc, min, max)) {
+				if (!scope.validMove(mc, min, max)) {
 					System.out.println("this is an invalid move");
 					window.controlMoveButtons(true);
 					return;
 				}
 				
-				switch (mc.getMode()) {
-					case RELATIVE:
-						act.moveRelative(mc); break;
-					case ABSOLUTE:
-						act.moveAbsolute(mc); break;
-					default:
-						System.out.println("error Stage.move");
-				}
+				scope.move(mc);
+				
 				window.controlMoveButtons(true);
 				System.out.println("stage done move");
 			}
@@ -386,9 +375,10 @@ public class Stage {
 	 * @param azDeg
 	 * @param elDeg
 	 */
+	//TODO this sucks  need to aggregate movecommands into a single class somehow
 	private void moveAbsolute(double azDeg, double elDeg) {
-		final MoveCommand mcAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, axisType.AZ, azDeg);
-		final MoveCommand mcEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, axisType.EL, elDeg);
+		final MoveCommand mcAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, Axis.AZ, azDeg);
+		final MoveCommand mcEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, Axis.EL, elDeg);
 		exec.submit(new Runnable() {
 			public void run() {
 				move(mcAz);
@@ -401,7 +391,7 @@ public class Stage {
 		});
 	}
 
-	public void index(final axisType axis) {
+	public void index(final Axis axis) {
 		if (isIndexing()) {
 			buttonEnabler("indexAz");
 			buttonEnabler("indexEl");
@@ -412,16 +402,7 @@ public class Stage {
 			@Override
 			public void run() {
 				reader.readerOnOff(false);
-				switch (axis) {
-					case AZ:
-						az.index();
-						//buttonEnabler("indexAz");
-						break;
-					case EL:
-						el.index();
-						//buttonEnabler("indexEl");
-						break;
-				}
+				scope.index(axis);
 				buttonEnabler("indexAz");
 				buttonEnabler("indexEl");
 				System.out.println("Stage done indexing");
@@ -432,14 +413,14 @@ public class Stage {
 
 	//should return true if something is moving, false if not
 	public boolean isMoving() {
-		switch (type) {
-		case FTDI:
-			return true; //don't care about FTDI right now (5/5/2012, reed)
-			//return Math.abs(velocity) <= 1;
-		case Galil:
-			return az.moving() || el.moving();
-		default:
-			return true;
+		switch (stageType) {
+			case FTDI:
+				return true; //don't care about FTDI right now (5/5/2012, reed)
+				//return Math.abs(velocity) <= 1;
+			case GALIL:
+				return scope.isMoving();
+			default:
+				return true;
 		}
 	}
 
@@ -520,7 +501,7 @@ public class Stage {
 	 * Stops the desired axis.
 	 * @param axis az or el
 	 */
-	public void stop(axisType axis) {
+	public void stop(Axis axis) {
 		ActInterface act = axisPicker(axis);
 		act.stop();
 	}
@@ -530,7 +511,7 @@ public class Stage {
 	 * Toggles the motor on or off.
 	 * @param axis az or el
 	 */
-	public void motorControl(final axisType axis) {
+	public void motorControl(final Axis axis) {
 		exec.submit(new Runnable() {
 			public void run() {
 				ActInterface act = axisPicker(axis);
@@ -545,7 +526,7 @@ public class Stage {
 	 * @param axis
 	 * @return
 	 */
-	private ActInterface axisPicker(axisType axis) {
+	private ActInterface axisPicker(Axis axis) {
 		ActInterface act = null;
 		switch (axis) {
 			case AZ:
@@ -556,7 +537,7 @@ public class Stage {
 		return act;
 	}
 
-	public double encPos(axisType axisType) {
+	public double encPos(Axis axisType) {
 		if (position == null) return 0;
 		switch (axisType) {
 			case AZ:
@@ -568,7 +549,7 @@ public class Stage {
 		}
 	}
 	
-	public void indexingDone(axisType type) {
+	public void indexingDone(Axis type) {
 		System.out.println("indexing done");
 		switch (type) {
 			case AZ:
@@ -657,8 +638,7 @@ public class Stage {
 	}
 
 	public void calibrate(Coordinate c) {
-		az.calibrate(c.getAz());
-		el.calibrate(c.getEl());
+		scope.calibrate(c);
 	}
 
 	public void buttonEnabler(String name) {
@@ -669,8 +649,8 @@ public class Stage {
 		position = data;
 		String info = position.info();
 		if (window.debug) {
-			info += "Az AbsPos: " + Formatters.TWO_POINTS.format(az.absolutePos()) + "\n";
-			info += "El AbsPos: " + Formatters.TWO_POINTS.format(el.absolutePos()) + "\n";
+			info += "Az AbsPos: " + Formatters.TWO_POINTS.format(scope.getAbsolutePos(Axis.AZ)) + "\n";
+			info += "El AbsPos: " + Formatters.TWO_POINTS.format(scope.getAbsolutePos(Axis.EL)) + "\n";
 		}
 		window.updateTxtPosInfo(info);
 	}
@@ -683,7 +663,7 @@ public class Stage {
 		reader.togglePauseFlag();
 	}
 	
-	void setGoalPos(double deg, axisType axis) {
+	void setGoalPos(double deg, Axis axis) {
 		window.setGoalPos(Formatters.TWO_POINTS.format(deg), axis);
 	}
 
@@ -697,8 +677,8 @@ public class Stage {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		switch (type) {
-			case Galil:
+		switch (stageType) {
+			case GALIL:
 				closeGalil();
 				protocol.close();
 				break;
@@ -716,7 +696,7 @@ public class Stage {
 	 * @param axis
 	 * @return
 	 */
-	private boolean motorCheck(axisType axis) {
+	private boolean motorCheck(Axis axis) {
 		String name = "";
 		ActInterface act = null;
 		switch (axis) {

@@ -14,8 +14,8 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 		this.setDaemon(true);
 		this.stage = stage;
 		this.setName("ReaderGalil");
-		azAxis = stage.axisName(axisType.AZ);
-		elAxis = stage.axisName(axisType.EL);
+		azAxis = Axis.AZ.getFullName();
+		elAxis = Axis.EL.getFullName();
 		protocol = new CommGalil(4444);
 	}
 	

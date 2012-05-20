@@ -5,21 +5,21 @@ import edu.ucsb.deepspace.MoveCommand.MoveType;
 
 public class ActGalil implements ActInterface {
 	
-	private axisType axis;
+	private Axis axis;
 	private Stage stage;
 	private CommGalil protocol;
 	private double encPulsePerRev;
 	private double encPulsePerDeg;
 	private boolean indexing = false;
-	private String axisName = "";
+	private String axisAbbrev = "";
 	private double offset = 0;
 	private boolean scanning = false;
 	private boolean motorState = false;
 
-	public ActGalil(axisType axis, CommGalil protocol) {
+	public ActGalil(Axis axis, CommGalil protocol) {
 		this.axis = axis;
 		this.protocol = protocol;
-		if (axis == axisType.AZ) {
+		if (axis == Axis.AZ) {
 			encPulsePerRev = 1000*1024;
 		}
 		else {
@@ -30,7 +30,7 @@ public class ActGalil implements ActInterface {
 	
 	public void registerStage(Stage stage) {
 		this.stage = stage;
-		axisName = stage.axisName(axis);
+		axisAbbrev = axis.getAbbrev();
 	}
 	
 	public void configure() {
@@ -196,8 +196,8 @@ public class ActGalil implements ActInterface {
 	 * @param value
 	 */
 	private void encoderAbsolute(double value) {
-		protocol.sendRead("PA" + axisName + "=" + value);
-		protocol.sendRead("BG" + axisName);
+		protocol.sendRead("PA" + axisAbbrev + "=" + value);
+		protocol.sendRead("BG" + axisAbbrev);
 		waitWhileMoving();
 	}
 	
@@ -206,9 +206,9 @@ public class ActGalil implements ActInterface {
 	 * @param value
 	 */
 	private void encoderRelative(double value) {
-		protocol.sendRead("PR" + axisName + "=" + value);
+		protocol.sendRead("PR" + axisAbbrev + "=" + value);
 		//System.out.println("send bg");
-		protocol.sendRead("BG" + axisName);
+		protocol.sendRead("BG" + axisAbbrev);
 		waitWhileMoving();
 	}
 	
@@ -246,7 +246,7 @@ public class ActGalil implements ActInterface {
 	 * @return true if motor is on, false if not
 	 */
 	public boolean motorState() {
-		String response = protocol.sendRead("MG _MO" + axisName);
+		String response = protocol.sendRead("MG _MO" + axisAbbrev);
 		double state = 0;
 		try {
 			state = Double.parseDouble(response);
@@ -269,12 +269,12 @@ public class ActGalil implements ActInterface {
 	}
 	
 	private void motorOn() {
-		protocol.sendRead("SH" + axisName);
+		protocol.sendRead("SH" + axisAbbrev);
 		motorState();
 	}
 	
 	private void motorOff() {
-		protocol.sendRead("MO" + axisName);
+		protocol.sendRead("MO" + axisAbbrev);
 		motorState();
 	}
 	
@@ -298,11 +298,11 @@ public class ActGalil implements ActInterface {
 	 * Stops the current motion.
 	 */
 	public void stop() {
-		protocol.sendRead("ST" + axisName);
+		protocol.sendRead("ST" + axisAbbrev);
 	}
 	
 	public void setVelocity(double vel) {
-		String out = "JG" + axisName + "=" + vel;
+		String out = "JG" + axisAbbrev + "=" + vel;
 		protocol.sendRead(out);
 	}
 	
@@ -318,7 +318,7 @@ public class ActGalil implements ActInterface {
 	
 	public void index() {
 		if (!motorState()) {
-			stage.statusArea(stage.axisNameLong(axis) + " motor is not on.  Please turn on motor before proceeding.\n");
+			stage.statusArea(axis.getFullName() + " motor is not on.  Please turn on motor before proceeding.\n");
 			return;
 		}
 		indexing = true;
@@ -421,7 +421,7 @@ public class ActGalil implements ActInterface {
 	 */
 	public boolean moving() {
 		boolean flag = true;
-		String temp = protocol.sendRead("MG _BG" + axisName);
+		String temp = protocol.sendRead("MG _BG" + axisAbbrev);
 		if (temp.contains("0.0000")) {
 			flag =  false;
 		}

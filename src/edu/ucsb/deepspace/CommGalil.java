@@ -4,14 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CommGalil implements CommInterface {
 	//Singleton
@@ -20,26 +17,27 @@ public class CommGalil implements CommInterface {
 	
 	PrintWriter out;
 	BufferedReader in;
-	private OutputStream clean;
+	//private OutputStream clean;
 	Socket socket = null;
 	boolean connection = false;
 	String previousCommand = "";
-	private int port = 0;
-	private static int readCount = 0;
-	private static int sendCount = 0;
-	private static List<String> send = new ArrayList<String>();
-	private static List<String> response = new ArrayList<String>();
-	private static List<String> threads = new ArrayList<String>();
+	
+//	private int port = 0;
+//	private static int readCount = 0;
+//	private static int sendCount = 0;
+//	private static List<String> send = new ArrayList<String>();
+//	private static List<String> response = new ArrayList<String>();
+//	private static List<String> threads = new ArrayList<String>();
 	
 	public CommGalil(int port) {
 		System.out.println("comm galil constructor" + port);
-		this.port = port;
+		//this.port = port;
 		try {
 			socket = new Socket();
 			socket.connect(new InetSocketAddress("192.168.1.200", port), 3000);
 			socket.setSoTimeout(3000);
 			out = new PrintWriter(socket.getOutputStream(), true);
-			clean = socket.getOutputStream();
+			//clean = socket.getOutputStream();
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			connection = true;
 			Stage.getInstance().confirmCommConnection();
@@ -73,7 +71,7 @@ public class CommGalil implements CommInterface {
 //    }
     
     public String read() {
-    	readCount++;
+    	//readCount++;
     	//Thread tr = Thread.currentThread();
     	//threads.add(tr.getName());
     	
