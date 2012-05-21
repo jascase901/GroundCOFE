@@ -57,16 +57,6 @@ public class ScriptLoader {
 	}
 	
 	private void indexAz() {
-		  //NO The galil manual is incorrect in some of the code specifications.
-		  //NO for one, it states that you must strip leading spaces from programs
-		  //NO this is incorrect.
-
-		  //NO Empty lines are a problem, though. The galil software automtically sticks
-		  //NO a comment symbol in them (" ' ")
-		  //NO This is easy enough to do myself.
-
-		//NO Apparently any line cannot be more then 80 characters long, though
-		
 		homeA = new Script("#HOMEAZ", 0);
 		homeA.add("IF (_MOA)");
 		//"BG" commands fail if the motor is off. Therefore, check motor state
@@ -128,8 +118,6 @@ public class ScriptLoader {
 		homeB.add("FI" + axisAbbrev);
 		homeB.add("BG" + axisAbbrev);
 		homeB.add("EN");
-		//pause();
-		//homeB.add("\\.");
 	}
 	
 	private void readerInfo() {
