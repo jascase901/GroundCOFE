@@ -34,8 +34,6 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import edu.ucsb.deepspace.Axis;
 import edu.ucsb.deepspace.Formatters;
-import edu.ucsb.deepspace.MoveCommand;
-import edu.ucsb.deepspace.MoveCommand.MoveMode;
 import edu.ucsb.deepspace.MoveCommand.MoveType;
 import edu.ucsb.deepspace.ScanCommand;
 import edu.ucsb.deepspace.Stage;
@@ -53,7 +51,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Stage stage;
 	
 	private String motorOff = "Motor Off", motorOn = "Motor On";
-	private String moveType = "degrees";
+	private MoveType moveType = MoveType.DEGREE;
 	private long moveAmountVal = 0;
 	private boolean minsec = false;
 	private boolean continuousScanOn = false;
@@ -418,7 +416,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		public void mouseDown(MouseEvent evt) {
     			controlMoveButtons(false);
     			//stage.relative(axisType.AZ, moveType, -moveAmountVal);
-    			stage.move(makeRelativeMC(Axis.AZ, -moveAmountVal));
+    			stage.moveRelative((double) -moveAmountVal, Axis.AZ, moveType);
     		}
     	});
     	
@@ -429,7 +427,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		public void mouseDown(MouseEvent evt) {
     			controlMoveButtons(false);
     			//stage.relative(axisType.AZ, moveType, moveAmountVal);
-    			stage.move(makeRelativeMC(Axis.AZ, moveAmountVal));
+    			stage.moveRelative((double) moveAmountVal, Axis.AZ, moveType);
     		}
     	});
     	
@@ -440,7 +438,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		public void mouseDown(MouseEvent evt) {
     			controlMoveButtons(false);
     			//stage.relative(axisType.EL, moveType, -moveAmountVal);
-    			stage.move(makeRelativeMC(Axis.EL, -moveAmountVal));
+    			stage.moveRelative((double) -moveAmountVal, Axis.EL, moveType);
     		}
     	});
     	
@@ -451,23 +449,23 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		public void mouseDown(MouseEvent evt) {
     			controlMoveButtons(false);
     			//stage.relative(axisType.EL, moveType, moveAmountVal);
-    			stage.move(makeRelativeMC(Axis.EL, moveAmountVal));
+    			stage.moveRelative((double) moveAmountVal, Axis.EL, moveType);
     		}
     	});
     	
-    	btnRadioSteps = new Button(grpJoystick, SWT.RADIO);
-    	btnRadioSteps.setBounds(106, 10, 47, 16);
-    	btnRadioSteps.setText("steps");
-    	btnRadioSteps.addMouseListener(new MouseAdapter() {
-    		@Override
-    		public void mouseDown(MouseEvent e) {
-    			moveType = "steps";
-    		}
-    	});
-    	
-    	if (StageTypes.equals(Stage.StageTypes.GALIL)) {
-	    	btnRadioSteps.setVisible(false);
-    	}
+//    	btnRadioSteps = new Button(grpJoystick, SWT.RADIO);
+//    	btnRadioSteps.setBounds(106, 10, 47, 16);
+//    	btnRadioSteps.setText("steps");
+//    	btnRadioSteps.addMouseListener(new MouseAdapter() {
+//    		@Override
+//    		public void mouseDown(MouseEvent e) {
+//    			moveType = "steps";
+//    		}
+//    	});
+//    	
+//    	if (StageTypes.equals(Stage.StageTypes.GALIL)) {
+//	    	btnRadioSteps.setVisible(false);
+//    	}
     	
     	btnRadioDegrees = new Button(grpJoystick, SWT.RADIO);
     	btnRadioDegrees.setSelection(true);
@@ -476,22 +474,23 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	btnRadioDegrees.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
-    			moveType = "degrees";
+    			moveType = MoveType.DEGREE;
     		}
     	});
     	
     	btnEncoderSteps = new Button(grpJoystick, SWT.RADIO);
     	btnEncoderSteps.setBounds(106, 50, 83, 16);
     	btnEncoderSteps.setText("encoder steps");
-    	
-    	text = new Text(grpJoystick, SWT.BORDER);
-    	text.setBounds(10, 188, 76, 19);
     	btnEncoderSteps.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
-    			moveType = "encoder";
+    			moveType = MoveType.ENCODER;
     		}
     	});
+    	
+    	text = new Text(grpJoystick, SWT.BORDER);
+    	text.setBounds(10, 188, 76, 19);
+    	
 	}
 	
 	private void guiRaDec() {
@@ -1342,24 +1341,24 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		});
 	}
 	
-	/**
-	 * Utility method to generate a MoveCommand for relative motion. <P>
-	 * Used by the joystick buttons.
-	 * @param axis az or el
-	 * @param amount to move in degrees
-	 * @return
-	 */
-	private MoveCommand makeRelativeMC(Axis axis, double amount) {
-		MoveType type = null;
-		switch (moveType) {
-			case "degrees":
-				type = MoveType.DEGREE; break;
-			case "encoder":
-				type = MoveType.ENCODER; break;
-		}
-		MoveCommand mc = new MoveCommand(MoveMode.RELATIVE, type, axis, amount);
-		return mc;
-	}
+//	/**
+//	 * Utility method to generate a MoveCommand for relative motion. <P>
+//	 * Used by the joystick buttons.
+//	 * @param axis az or el
+//	 * @param amount to move in degrees
+//	 * @return
+//	 */
+//	private MoveType makeRelativeMC(Axis axis, double amount) {
+//		MoveType type = null;
+//		switch (moveType) {
+//			case "degrees":
+//				type = MoveType.DEGREE; break;
+//			case "encoder":
+//				type = MoveType.ENCODER; break;
+//		}
+//		MoveCommand mc = new MoveCommand(MoveMode.RELATIVE, type, axis, amount);
+//		return mc;
+//	}
 	
 	/**
 	 * Used to initialize the text on btnMotorAz and btnMotorEl

@@ -1,7 +1,5 @@
 package edu.ucsb.deepspace;
 
-import edu.ucsb.deepspace.MoveCommand.MoveMode;
-import edu.ucsb.deepspace.MoveCommand.MoveType;
 
 public class ActGalil implements ActInterface {
 	
@@ -67,22 +65,22 @@ public class ActGalil implements ActInterface {
 	private double goalUserDeg(MoveCommand mc) {
 		double goal = 0;
 		
-		if (mc.getMode() == MoveMode.RELATIVE) {
-			if (mc.getType() == MoveType.ENCODER) {
-				goal = userPos() + convEncToDeg(mc.getAmount());
-			}
-			else if (mc.getType() == MoveType.DEGREE) {
-				goal = userPos() + mc.getAmount();
-			}
-		}
-		else if (mc.getMode() == MoveMode.ABSOLUTE) {
-			if (mc.getType() == MoveType.ENCODER) {
-				goal = convEncToDeg(mc.getAmount());
-			}
-			else if (mc.getType() == MoveType.DEGREE) {
-				goal = mc.getAmount();
-			}
-		}
+//		if (mc.getMode() == MoveMode.RELATIVE) {
+//			if (mc.getType() == MoveType.ENCODER) {
+//				goal = userPos() + convEncToDeg(mc.getAmount());
+//			}
+//			else if (mc.getType() == MoveType.DEGREE) {
+//				goal = userPos() + mc.getAmount();
+//			}
+//		}
+//		else if (mc.getMode() == MoveMode.ABSOLUTE) {
+//			if (mc.getType() == MoveType.ENCODER) {
+//				goal = convEncToDeg(mc.getAmount());
+//			}
+//			else if (mc.getType() == MoveType.DEGREE) {
+//				goal = mc.getAmount();
+//			}
+		//}
 		
 //		switch (mc.getMode()) {
 //			case RELATIVE:
@@ -150,6 +148,7 @@ public class ActGalil implements ActInterface {
 	 * @param deg
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private double userDegToEnc(double deg) {
 		double absDeg = userDegToAbsDeg(deg);
 		return absDegToEnc(absDeg);
@@ -195,6 +194,7 @@ public class ActGalil implements ActInterface {
 	 * Moves the actuator to the specified absolute position.
 	 * @param value
 	 */
+	@SuppressWarnings("unused")
 	private void encoderAbsolute(double value) {
 		protocol.sendRead("PA" + axisAbbrev + "=" + value);
 		protocol.sendRead("BG" + axisAbbrev);
@@ -205,6 +205,7 @@ public class ActGalil implements ActInterface {
 	 * Moves the actuator relative to the current position by the specified amount.
 	 * @param value
 	 */
+	@SuppressWarnings("unused")
 	private void encoderRelative(double value) {
 		protocol.sendRead("PR" + axisAbbrev + "=" + value);
 		//System.out.println("send bg");
@@ -219,12 +220,12 @@ public class ActGalil implements ActInterface {
 	 */
 	public void moveRelative(MoveCommand mc) {
 		stage.setGoalPos(goalUserDeg(mc), axis);
-		switch (mc.getType()) {
-			case ENCODER:
-				encoderRelative(mc.getAmount()); break;
-			case DEGREE:
-				encoderRelative(convDegToEnc(mc.getAmount())); break;
-		}
+//		switch (mc.getType()) {
+//			case ENCODER:
+//				encoderRelative(mc.getAmount()); break;
+//			case DEGREE:
+//				encoderRelative(convDegToEnc(mc.getAmount())); break;
+//		}
 	}
 	
 	/**
@@ -232,13 +233,13 @@ public class ActGalil implements ActInterface {
 	 */
 	public void moveAbsolute(MoveCommand mc) {
 		stage.setGoalPos(goalUserDeg(mc), axis);
-		switch (mc.getType()) {
-			case ENCODER:
-				encoderAbsolute(mc.getAmount()); break;
-			case DEGREE:
-				double enc = userDegToEnc(mc.getAmount());
-				encoderAbsolute(enc); break;
-		}
+//		switch (mc.getType()) {
+//			case ENCODER:
+//				encoderAbsolute(mc.getAmount()); break;
+//			case DEGREE:
+//				double enc = userDegToEnc(mc.getAmount());
+//				encoderAbsolute(enc); break;
+//		}
 	}
 	
 	/**

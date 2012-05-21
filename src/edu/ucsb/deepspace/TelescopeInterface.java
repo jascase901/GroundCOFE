@@ -2,15 +2,9 @@ package edu.ucsb.deepspace;
 
 public interface TelescopeInterface {
 	
-	public void moveAbsolute(MoveCommand az, MoveCommand el);
-	
-	public void moveRelative(MoveCommand az, MoveCommand el);
-	
-	public void moveSingle(double amount, Axis axis);
-	
 	public void move(MoveCommand mc);
 	
-	public boolean validMove(MoveCommand mc, double min, double max);
+	public boolean validMove(MoveCommand mc, double minAz, double maxAz, double minEl, double maxEl);
 	
 	
 	

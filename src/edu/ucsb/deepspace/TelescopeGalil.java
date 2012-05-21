@@ -1,5 +1,9 @@
 package edu.ucsb.deepspace;
 
+import edu.ucsb.deepspace.MoveCommand.MoveMode;
+import edu.ucsb.deepspace.MoveCommand.MoveType;
+
+
 public class TelescopeGalil implements TelescopeInterface {
 	
 	private Stage stage;
@@ -7,56 +11,142 @@ public class TelescopeGalil implements TelescopeInterface {
 	
 	private GalilAxis az, el;
 	
-	public TelescopeGalil(Stage stage) {
+	private String relative = "PR", absolute = "PA";
+	
+	public TelescopeGalil(Stage stage, CommGalil protocol) {
 		this.stage = stage;
-		protocol = new CommGalil(55555);
+		this.protocol = protocol;
 		az = new GalilAxis(Axis.AZ, 1000*1024);
 		el = new GalilAxis(Axis.EL, 4000);
 	}
 
 	@Override
-	public void moveAbsolute(MoveCommand azMc, MoveCommand elMc) {
-		int azEncGoal = 0;
-		int elEncGoal = 0;
-		azEncGoal = (int) az.encGoal(azMc);
-		elEncGoal = (int) el.encGoal(elMc);
-		String out = "PA " + azEncGoal + "," + elEncGoal;
-		System.out.println("azEncGoal: " + azEncGoal);
-		System.out.println("elEncGoal: " + elEncGoal);
-		System.out.println(out);
-		//protocol.sendRead(out);
-	}
-
-	@Override
-	public void moveRelative(MoveCommand azMc, MoveCommand elMc) {
-		int azEncRel = 0;
-		int elEncRel = 0;
-		azEncRel = (int) az.encGoal(azMc);
-		elEncRel = (int) el.encGoal(elMc);
-		String out = "PR " + azEncRel + "," + elEncRel;
-		System.out.println("azEncRel: " + azEncRel);
-		System.out.println("elEncRel: " + elEncRel);
-		System.out.println(out);
-		//protocol.sendRead(out);
-	}
-
-	@Override
-	public void moveSingle(double amount, Axis axis) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void move(MoveCommand mc) {
-		// TODO Auto-generated method stub
-		
+		int azEnc = (int) calcEncVal(mc.getMode(), mc.getType(), mc.getAzAmount(), Axis.AZ);
+		int elEnc = (int) calcEncVal(mc.getMode(), mc.getType(), mc.getElAmount(), Axis.EL);
+		String out = "";
+		switch (mc.getMode()) {
+			case RELATIVE:
+				out = relative;
+				break;
+			case ABSOLUTE:
+				out = absolute;
+				break;
+			default:
+				assert false; //This can only be reached if another move mode is added.
+		}
+		out += " " + azEnc + "," + elEnc;
+		System.out.println(out);
+		stage.setGoalPos(goalUserDeg(mc.getMode(), mc.getType(), mc.getAzAmount(), Axis.AZ), Axis.AZ);
+		stage.setGoalPos(goalUserDeg(mc.getMode(), mc.getType(), mc.getElAmount(), Axis.EL), Axis.EL);
+		protocol.sendRead(out);
+		protocol.sendRead("BG");
 	}
 
 	@Override
-	public boolean validMove(MoveCommand mc, double min, double max) {
-		// TODO Auto-generated method stub
+	public boolean validMove(MoveCommand mc, double minAz, double maxAz, double minEl, double maxEl) {
+//		GalilAxis temp = picker(mc.getAxis());
+//		double goal = temp.absDegToUserDeg(temp.convEncToDeg(temp.encGoal(mc, mc.getMode())));
+//		if (min <= goal && goal <= max) {
+//			return true;
+//		}
+		double goalAz = goalUserDeg(mc.getMode(), mc.getType(), mc.getAzAmount(), Axis.AZ);
+		System.out.println("goalAz: " + goalAz);
+		double goalEl = goalUserDeg(mc.getMode(), mc.getType(), mc.getElAmount(), Axis.EL);
+		System.out.println("goalEl: " + goalEl);
+		boolean validAz = (minAz <= goalAz && goalAz <= maxAz);
+		boolean validEl = (minEl <= goalEl && goalEl <= maxEl);
+		if (validAz && validEl) {
+			return true;
+		}
 		return false;
 	}
+	
+	private double calcEncVal(MoveMode mode, MoveType type, Double amount, Axis axis) {
+		GalilAxis temp = picker(axis);
+		double goal = 0;
+		
+		if (amount == null) {
+			switch (mode) {
+				case RELATIVE:
+					goal = 0; break;
+				case ABSOLUTE:
+					goal = temp.currentEncPos(); break;
+				default:
+					assert false; //This is never reached unless a new move mode is added.
+			}
+			return goal;
+		}
+		
+		switch (mode) {
+			case RELATIVE:
+				switch (type) {
+					case ENCODER:
+						goal = amount; break;
+					case DEGREE:
+						goal = temp.convDegToEnc(amount); break;
+				}
+				break;
+			case ABSOLUTE:
+				switch (type) {
+					case ENCODER:
+						goal = amount; break;
+					case DEGREE:
+						goal = temp.userDegToEnc(amount); break;
+				}
+				break;
+		}
+		
+		
+//		switch (type) {
+//			case ENCODER:
+//				goal = amount; break;
+//			case DEGREE:
+//				goal = temp.absDegToEnc(amount); break;
+//			default:
+//				assert false; //This is never reached unless a new move type is added.
+//		}
+		return goal;
+	}
+	
+	private double goalUserDeg(MoveMode mode, MoveType type, Double amount, Axis axis) {
+		double goal = 0;
+		GalilAxis temp = picker(axis);
+		if (amount == null) {
+			goal = temp.userPos();
+			return goal;
+		}
+		switch (mode) {
+			case RELATIVE:
+				switch (type) {
+					case ENCODER:
+						goal = temp.userPos() + temp.convEncToDeg(amount); break;
+					case DEGREE:
+						goal = temp.userPos() + amount; break;
+				}
+				break;
+			case ABSOLUTE:
+				switch (type) {
+					case ENCODER:
+						goal = temp.convEncToDeg(amount); break;
+					case DEGREE:
+						goal = amount; break;
+				}
+				break;
+		}
+		return goal;
+	}
+	
+//	private double goalUserDegNull(MoveMode mode, MoveType type, Axis axis) {
+//		GalilAxis temp = picker(axis);
+//		switch (mode) {
+//		case RELATIVE:
+//			return temp.userPos();
+//		case ABSOLUTE:
+//			
+//		}
+//		return 0;
+//	}
 
 	@Override
 	public void setVelocity(double azVel, double elVel) {
@@ -344,26 +434,62 @@ public class TelescopeGalil implements TelescopeInterface {
 			offset = degVal - convEncToDeg(encPos);
 		}
 		
-		double encGoal(MoveCommand mc) {
-			switch (mc.getMode()) {
-				case RELATIVE:
-					switch (mc.getType()) {
-						case ENCODER:
-							return mc.getAmount();
-						case DEGREE:
-							return convDegToEnc(mc.getAmount());
-					}
-				case ABSOLUTE:
-					switch (mc.getType()) {
-						case ENCODER:
-							return mc.getAmount();
-						case DEGREE:
-							return absDegToEnc(mc.getAmount());
-					}
-			}
-			System.out.println("TelescopeGaill.GalilAxis.encGoal reached end");
-			throw new Error("TelescopeGaill.GalilAxis.encGoal reached end");
+		private double currentEncPos() {
+			return stage.encPos(axis);
 		}
+		
+//		double encGoalRelative(MoveCommand mc) {
+//			if (mc == null) {
+//				return 0;
+//			}
+//			switch (mc.getType()) {
+//				case ENCODER:
+//					return mc.getAmount();
+//				case DEGREE:
+//					return convDegToEnc(mc.getAmount());
+//			}
+//			System.out.println("TelescopeGaill.GalilAxis.encGoalRelative reached end");
+//			throw new Error("TelescopeGaill.GalilAxis.encGoalRelative reached end");
+//		}
+//		
+//		double encGoalAbsolute(MoveCommand mc) {
+//			if (mc == null) {
+//				return currentEncPos();
+//			}
+//			switch (mc.getType()) {
+//				case ENCODER:
+//					return mc.getAmount();
+//				case DEGREE:
+//					return absDegToEnc(mc.getAmount());
+//			}
+//			System.out.println("TelescopeGaill.GalilAxis.encGoalAbsolute reached end");
+//			throw new Error("TelescopeGaill.GalilAxis.encGoalAbsolute reached end");
+//		}
+//		
+//		double encGoalNullMC(MoveMode mode) {
+//			switch (mode) {
+//				case RELATIVE:
+//					return 0;
+//				case ABSOLUTE:
+//					return currentEncPos();
+//			}
+//			System.out.println("TelescopeGaill.GalilAxis.encGoalNullMC reached end");
+//			throw new Error("TelescopeGaill.GalilAxis.encGoalNullMC reached end");
+//		}
+//		
+//		double encGoal(MoveCommand mc, MoveMode mode) {
+//			if (mc == null) {
+//				return encGoalNullMC(mode);
+//			}
+//			switch (mc.getMode()) {
+//				case RELATIVE:
+//					return encGoalRelative(mc);
+//				case ABSOLUTE:
+//					return encGoalAbsolute(mc);
+//			}
+//			System.out.println("TelescopeGaill.GalilAxis.encGoal reached end");
+//			throw new Error("TelescopeGaill.GalilAxis.encGoal reached end");
+//		}
 		
 	}
 

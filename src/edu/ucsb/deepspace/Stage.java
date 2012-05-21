@@ -45,7 +45,7 @@ public class Stage {
 	private final Properties settings = new Properties();
 	private LatLongAlt baseLocation, balloonLocation;
 	private double azToBalloon = 0, elToBalloon = 0;
-	private CommGalil protocol, protocolTest;
+	private CommGalil stageProtocol, scopeProtocol;
 
 	public Stage() {
 		try {
@@ -61,7 +61,8 @@ public class Stage {
 		this.window = window;
 		switch (stageType) {
 		case GALIL:
-			protocol = new CommGalil(2222);
+			stageProtocol = new CommGalil(2222);
+			scopeProtocol = new CommGalil(55555);
 			
 			ScriptLoader sl = new ScriptLoader();
 			sl.check();
@@ -69,7 +70,7 @@ public class Stage {
 			pause(1000);
 			sl.close();
 			
-			scope = new TelescopeGalil(this);
+			scope = new TelescopeGalil(this, scopeProtocol);
 			scope.queryMotorState();
 			window.updateMotorButton(scope.motorState(Axis.AZ), Axis.AZ);
 			window.updateMotorButton(scope.motorState(Axis.EL), Axis.EL);
@@ -297,60 +298,46 @@ public class Stage {
 	public void move(final MoveCommand mc) {
 		exec.submit(new Runnable() {
 			public void run() {
-				double min = 0, max = 0;
-				Axis axis = mc.getAxis();
+//				if (mc.getAzAmount() != null) {
+//					if (!scope.motorState(Axis.AZ)) {
+//						window.controlMoveButtons(true);
+//						return;
+//					}
+//				}
+//				if (mc.getElAmount() != null) {
+//					if (!scope.motorState(Axis.EL)) {
+//						window.controlMoveButtons(true);
+//						return;
+//					}
+//				}
 				
-				switch (axis) {
-					case AZ:
-						min = minAz; max = maxAz; break;
-					case EL:
-						min = minEl; max = maxEl; break;
-					default:
-						System.out.println("error Stage.move");
-				}
-				
-				if (!scope.motorState(axis)) {
-					window.controlMoveButtons(true);
-					return;
-				}
-				
-				if (!scope.validMove(mc, min, max)) {
+				if (!scope.validMove(mc, minAz, maxAz, minEl, maxEl)) {
 					System.out.println("this is an invalid move");
 					window.controlMoveButtons(true);
 					return;
 				}
-				
 				scope.move(mc);
 				
+				System.out.println("done stage.move\n");
 				window.controlMoveButtons(true);
-				System.out.println("stage done move");
 			}
 		});
 	}
 	
-	public void moveRelativeAz(MoveCommand azMc) {
-		
+	public void moveRelative(Double amount, Axis axis, MoveType type) {
+		MoveCommand mc = new MoveCommand(MoveMode.RELATIVE, type, null, null);
+		switch (axis) {
+			case AZ:
+				mc = new MoveCommand(MoveMode.RELATIVE, type, amount, null); break;
+			case EL:
+				mc = new MoveCommand(MoveMode.RELATIVE, type, null, amount); break;
+		}
+		move(mc);
 	}
 	
-	/**
-	 * Convenience method that 
-	 * @param azDeg
-	 * @param elDeg
-	 */
-	//TODO this sucks  need to aggregate movecommands into a single class somehow
 	private void moveAbsolute(double azDeg, double elDeg) {
-		final MoveCommand mcAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, Axis.AZ, azDeg);
-		final MoveCommand mcEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, Axis.EL, elDeg);
-		exec.submit(new Runnable() {
-			public void run() {
-				move(mcAz);
-			}
-		});
-		exec.submit(new Runnable() {
-			public void run() {
-				move(mcEl);
-			}
-		});
+		MoveCommand mc = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, azDeg, elDeg);
+		move(mc);
 	}
 
 	public void index(final Axis axis) {
@@ -450,18 +437,18 @@ public class Stage {
 	}
 
 	public void sendCommand(String command) {
-		System.out.println(protocol.sendRead(command));
+		System.out.println(stageProtocol.sendRead(command));
 	}
 
 	public void queueSize() {
-		System.out.println("az protocol queue size: " + protocol.queueSize());
-		System.out.println("el protocol queue size: " + protocolTest.queueSize());
+		System.out.println("stage protocol queue size: " + stageProtocol.queueSize());
+		System.out.println("scope protocol queue size: " + scopeProtocol.queueSize());
 	}
 
 	public void readQueue() {
-		protocol.test();
+		stageProtocol.test();
 		System.out.println("--------");
-		protocolTest.test();
+		scopeProtocol.test();
 	}
 	
 	/**
@@ -483,21 +470,6 @@ public class Stage {
 			}
 		});
 	}
-	
-	/**
-	 * Convenience method that selects the desired axis.
-	 * @param axis
-	 * @return
-	 */
-//	private ActInterface axisPicker(Axis axis) {
-//		switch (axis) {
-//			case AZ:
-//				act = az; break;
-//			case EL:
-//				act = el; break;
-//		}
-//		return act;
-//	}
 
 	double encPos(Axis axis) {
 		if (position == null) return 0;
@@ -510,26 +482,6 @@ public class Stage {
 				return 0;
 		}
 	}
-	
-//	public void indexingDone(Axis type) {
-//		System.out.println("indexing done");
-//		switch (type) {
-//			case AZ:
-//				az.setIndexing(false); break;
-//			case EL:
-//				el.setIndexing(false); break;
-//		}
-//	}
-	
-//	private boolean isIndexing() {
-//		boolean azIndexing = az.indexing();
-//		boolean elIndexing = el.indexing();
-//		boolean result = azIndexing || elIndexing;
-//		if (result) {
-//			statusArea("Indexing currently in progress.  Please wait before proceeding");
-//		}
-//		return result;
-//	}
 
 	public void goToPos(Coordinate c) {
 		moveAbsolute(c.getAz(), c.getEl());
@@ -638,7 +590,7 @@ public class Stage {
 		switch (stageType) {
 			case GALIL:
 				closeGalil();
-				protocol.close();
+				stageProtocol.close();
 				break;
 			case FTDI:
 				break;

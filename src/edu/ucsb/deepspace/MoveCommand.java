@@ -22,21 +22,21 @@ public class MoveCommand {
 	
 	private MoveMode mode;
 	private MoveType type;
-	private Axis axis;
-	private double amount;
+	private Double azAmount;
+	private Double elAmount;
 	
 	/**
 	 * 
 	 * @param mode relative or absolute
 	 * @param type encoder or degree
 	 * @param axis az or el
-	 * @param amount of motion to move
+	 * @param azAmount of motion to move
 	 */
-	public MoveCommand(MoveMode mode, MoveType type, Axis axis, double amount) {
+	public MoveCommand(MoveMode mode, MoveType type, Double azAmount, Double elAmount) {
 		this.mode = mode;
 		this.type = type;
-		this.axis = axis;
-		this.amount = amount;
+		this.azAmount = azAmount;
+		this.elAmount = elAmount;
 	}
 	
 	/**
@@ -48,6 +48,6 @@ public class MoveCommand {
 	 * Represents the units of amount.  Either encoder pulses or degrees.
 	 */
 	public MoveType getType() { return type;}
-	public Axis getAxis() {return axis;}
-	public double getAmount() {return amount;}
+	public Double getAzAmount() {return azAmount;}
+	public Double getElAmount() {return elAmount;}
 }
