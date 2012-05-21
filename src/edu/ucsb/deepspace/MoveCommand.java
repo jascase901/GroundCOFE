@@ -50,4 +50,15 @@ public class MoveCommand {
 	public MoveType getType() { return type;}
 	public Double getAzAmount() {return azAmount;}
 	public Double getElAmount() {return elAmount;}
+	public Double getAmount(Axis axis) {
+		switch (axis) {
+			case AZ:
+				return azAmount;
+			case EL:
+				return elAmount;
+			default:
+				assert false; //This can only be reached if another axis is added.
+		}
+		return null;
+	}
 }

@@ -7,26 +7,20 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 	private boolean flag = true;
 	private CommGalil protocol;
 	private final Stage stage;
-	private String azAxis = "";
-	private String elAxis = "";
 	
 	public ReaderGalil(Stage stage) {
 		this.setDaemon(true);
 		this.stage = stage;
 		this.setName("ReaderGalil");
-		azAxis = Axis.AZ.getAbbrev();
-		elAxis = Axis.EL.getAbbrev();
 		protocol = new CommGalil(4444);
 	}
 	
-	private String tellPos = "TP";
-	private String tellVel = "TV";
 	DataGalil data;
 	private boolean flag2 = true;
 	
-	public void togglePauseFlag() {
-		this.flag2 = !flag2;
-	}
+//	public void togglePauseFlag() {
+//		this.flag2 = !flag2;
+//	}
 	
 	public void readerOnOff(boolean onOff) {
 		this.flag2 = onOff;
@@ -34,40 +28,24 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 	
 	public void run() {
 		while (flag) {
-			if (flag2) {
-				//System.out.println("\n\n");
-				String azPos;// = protocol.sendRead(tellPos + azAxis);
-				String azVel;// = protocol.sendRead(tellVel + azAxis);
-				String azJg;// = protocol.sendRead("JG?");
-				String azAc;// = protocol.sendRead("AC?");
+			if (flag2) {		
+				protocol.initialize();
+				protocol.sendRead("XQ #READERI,3");
+				String info = protocol.read();
+				System.out.println(info);
+				String[] temp = info.split(" ");
 				
-				String elPos;// = protocol.sendRead(tellPos + elAxis);
-				String elVel;// = protocol.sendRead(tellVel + elAxis);
-				String elJg;// = protocol.sendRead("JG,?");
-				String elAc;// = protocol.sendRead("AC,?");
+				String azPos = temp[1];
+				String azVel = temp[2];
+				String azJg = temp[3];
+				String azAc = temp[4];
 				
-				String asdf = protocol.sendRead(tellPos);
-				String[] temp = asdf.split(", ");
-				azPos = temp[0];
-				elPos = temp[1];
-				
-				asdf = protocol.sendRead(tellVel);
-				temp = asdf.split(", ");
-				azVel = temp[0];
-				elVel = temp[1];
-				
-				asdf = protocol.sendRead("JG?,?");
-				temp = asdf.split(", ");
-				azJg = temp[0];
-				elJg = temp[1];
-				
-				asdf = protocol.sendRead("AC?,?");
-				temp = asdf.split(", ");
-				azAc = temp[0];
-				elAc = temp[1];
+				String elPos = temp[5];
+				String elVel = temp[6];
+				String elJg = temp[7];
+				String elAc = temp[8];
 				
 				
-				//System.out.println("\n\n");
 				
 				data = new DataGalil();
 				data.make(azPos, azVel, azJg, azAc, axisType.AZ);

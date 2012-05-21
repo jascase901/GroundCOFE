@@ -167,6 +167,11 @@ public class CommGalil implements CommInterface {
 		}
     }
     
+    public void initialize() {
+    	sendRead("CF I");
+    	sendRead("CW 2");
+    }
+    
     public void test() {
     	try {
 			InputStream asdf = socket.getInputStream();

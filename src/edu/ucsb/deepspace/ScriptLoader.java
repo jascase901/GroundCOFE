@@ -11,6 +11,7 @@ public class ScriptLoader {
 	
 	private Script homeA;
 	private Script homeB;
+	private Script readerInfo;
 	private Set<String> loadedScriptNames;
 	private Map<String, Script> scripts;
 	
@@ -20,6 +21,7 @@ public class ScriptLoader {
 		scripts = new HashMap<String, Script>();
 		scripts.put("#HOMEAZ", homeA);
 		scripts.put("#HOMEB", homeB);
+		scripts.put("#READERI", readerInfo);
 	}
 	
 	public void check() {
@@ -35,16 +37,18 @@ public class ScriptLoader {
 		Set<String> scriptsToLoad = scripts.keySet();
 		
 		if (loadedScriptNames.containsAll(scriptsToLoad)) {
-			System.out.println("hi");
 			return;
 		}
 		
 		indexAz();
 		indexEl();
+		readerInfo();
 		
 		protocol.send(homeA.getScript());
 		pause();
 		protocol.send(homeB.getScript());
+		pause();
+		protocol.send(readerInfo.getScript());
 		pause();
 	}
 	
@@ -123,10 +127,16 @@ public class ScriptLoader {
 		homeB.add("JG" + axisAbbrev + "=" + jg);
 		homeB.add("FI" + axisAbbrev);
 		homeB.add("BG" + axisAbbrev);
-		homeB.add("TPB");
 		homeB.add("EN");
 		//pause();
 		//homeB.add("\\.");
+	}
+	
+	private void readerInfo() {
+		readerInfo = new Script("#READERI", homeB.size()+20);
+		String temp = "MG _TPA, _TVA, _JGA, _ACA, _TPB, _TVB, _JGB, _ACB, _MOA, _MOB, _BGA, _BGB";
+		readerInfo.add(temp);
+		readerInfo.add("EN");
 	}
 	
 	private void pause() {

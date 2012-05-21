@@ -62,13 +62,14 @@ public class Stage {
 		switch (stageType) {
 		case GALIL:
 			stageProtocol = new CommGalil(2222);
-			scopeProtocol = new CommGalil(55555);
+			scopeProtocol = new CommGalil(23);
 			
 			ScriptLoader sl = new ScriptLoader();
 			sl.check();
 			sl.load();
 			pause(1000);
 			sl.close();
+			
 			
 			scope = new TelescopeGalil(this, scopeProtocol);
 			scope.queryMotorState();
@@ -86,6 +87,7 @@ public class Stage {
 		if (commStatus) {
 			System.out.println("reader started");
 			reader.start();
+			stageProtocol.initialize();
 		}
 	}
 
@@ -421,19 +423,9 @@ public class Stage {
 	}
 
 	public void status() {
-		System.out.println(isMoving());
-//		String tellPos = "TP";
-//		String tellVel = "TV";
-//		String azAxis = "A";
-//		DataGalil data;
-//
-//		String azPos = protocol.sendRead(tellPos + azAxis);
-//		String azVel = protocol.sendRead(tellVel + azAxis);
-//
-//		data = new DataGalil();
-		//data.makeAz(azPos, azVel);
-		//position = data;
-		//window.updateTxtPosInfo(position.info());
+		stageProtocol.initialize();
+		System.out.println(stageProtocol.sendRead("XQ #READERI"));
+		System.out.println(stageProtocol.read());
 	}
 
 	public void sendCommand(String command) {
