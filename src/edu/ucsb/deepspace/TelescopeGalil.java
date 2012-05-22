@@ -121,9 +121,25 @@ public class TelescopeGalil implements TelescopeInterface {
 	}
 
 	@Override
-	public void setVelocity(double azVel, double elVel) {
-		// TODO Auto-generated method stub
-		
+	public void setVelocity(double vel, Axis axis) {
+		GalilAxis temp = picker(axis);
+		if (stage.validateSpeed(vel, axis)) {
+			temp.setVelocity(vel);
+		}
+		else {
+			stage.statusArea("This velocity fall outside the maximum values specified.\n");
+		}
+	}
+	
+	@Override
+	public void setAccel(double acc, Axis axis) {
+		GalilAxis temp = picker(axis);
+		if (stage.validateAccel(acc, axis)) {
+			temp.setAccel(acc);
+		}
+		else {
+			stage.statusArea("This acceleration fall outside the maximum values specified.\n");
+		}
 	}
 
 	@Override
@@ -399,12 +415,27 @@ public class TelescopeGalil implements TelescopeInterface {
 			return deg % 360;
 		}
 		
+		/**
+		 * Calibrates the galil.<P>
+		 * Once indexed, this method basically says "encoder count X corresponds to degree Y".
+		 * Then, when power is lost, once the galil has been indexed, it will know where it is.
+		 * @param degVal
+		 * @param encPos
+		 */
 		private void calibrate(double degVal, double encPos) {
 			offset = degVal - convEncToDeg(encPos);
 		}
 		
 		private double currentEncPos() {
 			return stage.encPos(axis);
+		}
+		
+		private void setVelocity(double vel) {
+			protocol.sendRead("SP" + abbrev + "=" + (int) vel);
+		}
+		
+		private void setAccel(double acc) {
+			protocol.sendRead("SP" + abbrev + "=" + (int) acc);
 		}
 		
 	}

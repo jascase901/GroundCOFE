@@ -4,9 +4,10 @@ import edu.ucsb.deepspace.ActInterface.axisType;
 
 public class ReaderGalil extends Thread implements ReaderInterface {
 	
-	private boolean flag = true;
+	private boolean flag = true, flag2 = true;
 	private CommGalil protocol;
 	private final Stage stage;
+	private DataGalil data;
 	
 	public ReaderGalil(Stage stage) {
 		this.setDaemon(true);
@@ -15,24 +16,18 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 		protocol = new CommGalil(4444);
 	}
 	
-	DataGalil data;
-	private boolean flag2 = true;
-	
-//	public void togglePauseFlag() {
-//		this.flag2 = !flag2;
-//	}
-	
 	public void readerOnOff(boolean onOff) {
 		this.flag2 = onOff;
 	}
 	
+	//TODO make use of motor data and motion data
 	public void run() {
 		while (flag) {
 			if (flag2) {		
 				protocol.initialize();
 				protocol.sendRead("XQ #READERI,3");
 				String info = protocol.read();
-				System.out.println(info);
+				//System.out.println(info);
 				String[] temp = info.split(" ");
 				
 				String azPos = temp[1];
@@ -45,7 +40,11 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 				String elJg = temp[7];
 				String elAc = temp[8];
 				
-				
+//				String azMotor = temp[9];
+//				String elMotor = temp[10];
+//				
+//				String azMoving = temp[11];
+//				String elMoving = temp[12];
 				
 				data = new DataGalil();
 				data.make(azPos, azVel, azJg, azAc, axisType.AZ);

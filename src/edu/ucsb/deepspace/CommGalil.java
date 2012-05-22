@@ -11,17 +11,13 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 public class CommGalil implements CommInterface {
-	//Singleton
-	//private static final CommGalil INSTANCE = new CommGalil();
-	//public static CommGalil getInstance() {return INSTANCE;}
-	
-	PrintWriter out;
-	BufferedReader in;
-	//private OutputStream clean;
-	Socket socket = null;
+	private PrintWriter out;
+	private BufferedReader in;
+	private Socket socket = null;
 	boolean connection = false;
-	String previousCommand = "";
+	private String previousCommand = "";
 	
+	@SuppressWarnings("unused")
 	private int port = 0;
 //	private static int readCount = 0;
 //	private static int sendCount = 0;
@@ -35,9 +31,8 @@ public class CommGalil implements CommInterface {
 		try {
 			socket = new Socket();
 			socket.connect(new InetSocketAddress("192.168.1.200", port), 3000);
-			socket.setSoTimeout(1000);
+			socket.setSoTimeout(500);
 			out = new PrintWriter(socket.getOutputStream(), true);
-			//clean = socket.getOutputStream();
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			connection = true;
 			Stage.getInstance().confirmCommConnection();
@@ -58,16 +53,6 @@ public class CommGalil implements CommInterface {
     	out.println(message);
     	//System.out.print(message);
     }
-    
-//    public void sendClean(String message) {
-//    	try {
-//    		System.out.println(message);
-//			clean.write(message.getBytes());
-//			clean.flush();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//    }
     
     public String read() {
     	//readCount++;

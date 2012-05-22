@@ -8,7 +8,9 @@ public interface TelescopeInterface {
 	
 	
 	
-	public void setVelocity(double azVel, double elVel);
+	public void setVelocity(double vel, Axis axis);
+	
+	public void setAccel(double acc, Axis axis);
 	
 	public boolean isMoving();
 	

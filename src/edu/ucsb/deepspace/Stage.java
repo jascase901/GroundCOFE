@@ -29,7 +29,7 @@ public class Stage {
 	}
 
 	private double minAz, maxAz, minEl, maxEl;
-	private double velAz, accAz, velEl, accEl;
+	private double maxVelAz, maxAccAz, maxVelEl, maxAccEl;
 	//TODO private double maxMoveRel = 360;
 	private int encTol = 10;
 	
@@ -135,14 +135,14 @@ public class Stage {
 		maxAz = Double.parseDouble(actSettings.getProperty("maxAz"));
 		minEl = Double.parseDouble(actSettings.getProperty("minEl"));
 		maxEl = Double.parseDouble(actSettings.getProperty("maxEl"));
-		velAz = Double.parseDouble(actSettings.getProperty("velAz"));
-		accAz = Double.parseDouble(actSettings.getProperty("accAz"));
-		velEl = Double.parseDouble(actSettings.getProperty("velEl"));
-		accEl = Double.parseDouble(actSettings.getProperty("accEl"));
+		maxVelAz = Double.parseDouble(actSettings.getProperty("velAz"));
+		maxAccAz = Double.parseDouble(actSettings.getProperty("accAz"));
+		maxVelEl = Double.parseDouble(actSettings.getProperty("velEl"));
+		maxAccEl = Double.parseDouble(actSettings.getProperty("accEl"));
 		encTol = Integer.parseInt(actSettings.getProperty("encTol"));
 		scope.setOffsets(azOffset, elOffset);
 		window.setMinMaxAzEl(minAz, maxAz, minEl, maxEl);
-		window.setVelAccAzEl(velAz, accAz, velEl, accEl);
+		window.setVelAccAzEl(maxVelAz, maxAccAz, maxVelEl, maxAccEl);
 	}
 
 	private void closeGalil() {
@@ -152,10 +152,10 @@ public class Stage {
 		actSettings.setProperty("maxAz", String.valueOf(maxAz));
 		actSettings.setProperty("minEl", String.valueOf(minEl));
 		actSettings.setProperty("maxEl", String.valueOf(maxEl));
-		actSettings.setProperty("velAz", String.valueOf(velAz));
-		actSettings.setProperty("accAz", String.valueOf(accAz));
-		actSettings.setProperty("velEl", String.valueOf(velEl));
-		actSettings.setProperty("accEl", String.valueOf(accEl));
+		actSettings.setProperty("velAz", String.valueOf(maxVelAz));
+		actSettings.setProperty("accAz", String.valueOf(maxAccAz));
+		actSettings.setProperty("velEl", String.valueOf(maxVelEl));
+		actSettings.setProperty("accEl", String.valueOf(maxAccEl));
 		actSettings.setProperty("encTol", String.valueOf(encTol));
 		try {
 			actSettings.store(new FileOutputStream("Galil.ini"), "");
@@ -300,21 +300,17 @@ public class Stage {
 	public void move(final MoveCommand mc) {
 		exec.submit(new Runnable() {
 			public void run() {
-//				if (mc.getAzAmount() != null) {
-//					if (!scope.motorState(Axis.AZ)) {
-//						window.controlMoveButtons(true);
-//						return;
-//					}
-//				}
-//				if (mc.getElAmount() != null) {
-//					if (!scope.motorState(Axis.EL)) {
-//						window.controlMoveButtons(true);
-//						return;
-//					}
-//				}
+				if (mc.getAzAmount() != null) {
+					if (!scope.motorState(Axis.AZ) && !scope.motorState(Axis.EL)) {
+						window.controlMoveButtons(true);
+						statusArea("The motors must be on before moving.\n");
+						return;
+					}
+				}
 				
 				if (!scope.validMove(mc, minAz, maxAz, minEl, maxEl)) {
 					System.out.println("this is an invalid move");
+					statusArea("The desired position falls outside the allowed moving angles.\n");
 					window.controlMoveButtons(true);
 					return;
 				}
@@ -324,6 +320,10 @@ public class Stage {
 				window.controlMoveButtons(true);
 			}
 		});
+	}
+	
+	public void setVelocity(double vel, Axis axis) {
+		scope.setVelocity(vel, axis);
 	}
 	
 	public void moveRelative(Double amount, Axis axis, MoveType type) {
@@ -407,14 +407,14 @@ public class Stage {
 		this.maxEl = maxEl;
 	}
 	
-	public void setVelAccAz(double velAz, double accAz) {
-		this.velAz = velAz;
-		this.accAz = accAz;
+	public void setMaxVelAccAz(double maxVelAz, double maxAccAz) {
+		this.maxVelAz = maxVelAz;
+		this.maxAccAz = maxAccAz;
 	}
 	
-	public void setVelAccEl(double velEl, double accEl) {
-		this.velEl = velEl;
-		this.accEl = accEl;
+	public void setMaxVelAccEl(double maxVelEl, double maxAccEl) {
+		this.maxVelEl = maxVelEl;
+		this.maxAccEl = maxAccEl;
 	}
 
 	public int getEncTol() {return encTol;}
@@ -561,9 +561,9 @@ public class Stage {
 		window.updateTxtPosInfo(info);
 	}
 	
-	void updateVelAcc(String azVel, String azAcc, String elVel, String elAcc) {
-		window.updateVelAcc(azVel, azAcc, elVel, elAcc);
-	}
+//	void updateVelAcc(String azVel, String azAcc, String elVel, String elAcc) {
+//		window.updateVelAcc(azVel, azAcc, elVel, elAcc);
+//	}
 	
 	void setGoalPos(double deg, Axis axis) {
 		window.setGoalPos(Formatters.TWO_POINTS.format(deg), axis);
@@ -604,6 +604,42 @@ public class Stage {
 			return false;
 		}
 		return true;
+	}
+	
+	boolean validateSpeed(double proposedVel, Axis axis) {
+		switch (axis) {
+			case AZ:
+				if (Math.abs(proposedVel) <= maxVelAz) {
+					return true;
+				}
+				break;
+			case EL:
+				if (Math.abs(proposedVel) <= maxVelEl) {
+					return true;
+				}
+				break;
+			default:
+				assert false; //This is only reached if a new axis is added.
+		}
+		return false;
+	}
+	
+	boolean validateAccel(double proposedAcc, Axis axis) {
+		switch (axis) {
+			case AZ:
+				if (Math.abs(proposedAcc) <= maxAccAz) {
+					return true;
+				}
+				break;
+			case EL:
+				if (Math.abs(proposedAcc) <= maxAccEl) {
+					return true;
+				}
+				break;
+			default:
+				assert false; //This is only reached if a new axis is added.
+		}
+		return false;
 	}
 
 }

@@ -18,16 +18,7 @@ public class ScriptTest extends TestCase {
 		assertEquals("DL 5\r#HOMEB\rBG\rEN\r\\\r", homeB.getScript());
 	}
 	
-	/*@Test
-	public void testInit() {
-		assertEquals("DL\r#HOMEB\rEN\\\r", homeB.getScript());
-		
-	}
-	*/
-	
-//	@Test
-//	public void testPlsfail() {
-//		fail("NOT IMPLEMENTED");
-//	}
+
+
 
 }
