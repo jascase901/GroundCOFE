@@ -12,8 +12,8 @@ public class TelescopeGalil implements TelescopeInterface {
 	public TelescopeGalil(Stage stage, CommGalil protocol) {
 		this.stage = stage;
 		this.protocol = protocol;
-		az = new GalilAxis(Axis.AZ, 1000*1024);
-		el = new GalilAxis(Axis.EL, 4000);
+		az = new GalilAxis(Axis.AZ, 1000d*1024d);
+		el = new GalilAxis(Axis.EL, 4000d);
 	}
 
 	@Override
@@ -31,7 +31,7 @@ public class TelescopeGalil implements TelescopeInterface {
 			default:
 				assert false; //This can only be reached if another move mode is added.
 		}
-		out += " " + azEnc + "," + elEnc;
+		out += " " + azEnc*az.polarity + "," + elEnc*el.polarity;
 		System.out.println(out);
 		stage.setGoalPos(goalUserDeg(mc, Axis.AZ), Axis.AZ);
 		stage.setGoalPos(goalUserDeg(mc, Axis.EL), Axis.EL);
@@ -243,6 +243,14 @@ public class TelescopeGalil implements TelescopeInterface {
 		GalilAxis temp = picker(axis);
 		return temp.indexing;
 	}
+	
+	@Override
+	public double rpm(double vel, Axis axis) {
+		GalilAxis temp = picker(axis);
+		double encPerRev = temp.encPerDeg*360d;
+		double rpm = (vel / encPerRev) * 60d;
+		return rpm;
+	}
 
 	@Override
 	public void index(Axis axis) {
@@ -298,11 +306,13 @@ public class TelescopeGalil implements TelescopeInterface {
 		private String abbrev;
 		private double encPerDeg;
 		private double offset;
+		private int polarity;
 		
 		private GalilAxis(Axis axis, double encPerRev) {
 			this.axis = axis;
 			abbrev = axis.getAbbrev();
 			encPerDeg = encPerRev / 360d;
+			this.polarity = axis.getPolarity();
 		}
 		
 		private void motorOn() {

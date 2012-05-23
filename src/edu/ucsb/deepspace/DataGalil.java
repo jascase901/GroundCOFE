@@ -29,27 +29,21 @@ public class DataGalil implements DataInterface {
 		double dAc = Double.parseDouble(ac);
 		switch (axis) {
 			case AZ:
-				az = new GalilStatus(dPos, dVel, dJg, dAc); break;
+				az = new GalilStatus(dPos*Axis.AZ.getPolarity(), dVel, dJg, dAc); break;
 			case EL:
-				el = new GalilStatus(dPos, dVel, dJg, dAc); break;
+				el = new GalilStatus(dPos*Axis.EL.getPolarity(), dVel, dJg, dAc); break;
 		}
 	}
 
 	@Override
 	public String info() {
-		String out = "";
-		out += "Az Position:  " + az.pos + "\n";
-		out += "Az Velocity:  " + az.vel + "\n";
-		out += "Az Jog Speed: " + az.jg + "\n";
-		out += "Az Accel:     " + az.ac + "\n";
-		out += "\n";
-		out += "El Position:  " + el.pos + "\n";
-		out += "El Velocity:  " + el.vel + "\n";
-		out += "El Jog Speed: " + el.jg + "\n";
-		out += "El Accel:     " + el.ac + "\n";
-		out += "\n";
+		String out2 = String.format("%1$-10s %2$-9s %3$-9s", "Value", "Azimuth", "Elevation") + "\n\n";
+		out2 += String.format(Formatters.ACTINFO_FORMAT, "Position", az.pos, el.pos) + "\n";
+		out2 += String.format(Formatters.ACTINFO_FORMAT, "Velocity", az.vel, el.vel) + "\n";
+		out2 += String.format(Formatters.ACTINFO_FORMAT, "Max Speed", az.jg, el.jg) + "\n";
+		out2 += String.format(Formatters.ACTINFO_FORMAT, "Max Accel", az.ac, el.ac) + "\n";
 		
-		return out;
+		return out2;
 	}
 	
 	@Override
@@ -70,13 +64,13 @@ public class DataGalil implements DataInterface {
 		return el.pos;
 	}
 	
-	public double azVel() {
-		return az.vel;
-	}
-	
-	public double elVel() {
-		return el.vel;
-	}
+//	public double azVel() {
+//		return az.vel;
+//	}
+//	
+//	public double elVel() {
+//		return el.vel;
+//	}
 	
 	class GalilStatus {
 		double pos, vel, jg, ac;
@@ -87,6 +81,16 @@ public class DataGalil implements DataInterface {
 			this.ac = ac;
 		}
 		
+	}
+
+	@Override
+	public double azMaxVel() {
+		return az.jg;
+	}
+
+	@Override
+	public double elMaxVel() {
+		return el.jg;
 	}
 
 }

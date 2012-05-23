@@ -135,6 +135,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Group grpLatitutdeLongitudeControl;
 	private Text text;
 	private Group grpDebug;
+	private Button btnRADecCalibrate;
 
 	public MainWindow(Composite parent, int style, Stage stage, Stage.StageTypes StageTypes) {
 		super(parent, style);
@@ -171,7 +172,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
         area = new Group(this, SWT.NONE);
         area.setText("");
         area.setLayout(null);
-        area.setBounds(10, 0, 728, 876);
+        area.setBounds(10, 0, 734, 876);
         
         guiJoystick();
         guiRaDec();
@@ -190,12 +191,23 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	btnCalibrate = new Button(area, SWT.PUSH | SWT.CENTER);
     	btnCalibrate.setText("Calibrate");
-    	btnCalibrate.setBounds(387, 437, 87, 31);
+    	btnCalibrate.setBounds(387, 437, 96, 31);
     	popupWindowButtons.put("calibrate", btnCalibrate);
     	btnCalibrate.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
     			btnCalibrate.setEnabled(false);
     			new AzElWindow(minsec, "calibrate", stage);
+    		}
+    	});
+    	
+    	btnRADecCalibrate = new Button(area, SWT.NONE);
+    	btnRADecCalibrate.setBounds(387, 474, 96, 30);
+    	btnRADecCalibrate.setText("RA/Dec Calibrate");
+    	popupWindowButtons.put("radeccalibrate", btnRADecCalibrate);
+    	btnRADecCalibrate.addMouseListener(new MouseAdapter() {
+    		public void mouseDown(MouseEvent evt) {
+    			btnRADecCalibrate.setEnabled(false);
+    			new RaDecWindow(minsec, "radeccalibrate", stage);
     		}
     	});
     	
@@ -245,7 +257,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	txtPosInfo = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI);
-    	txtPosInfo.setBounds(290, 17, 181, 181);
+    	txtPosInfo.setBounds(290, 17, 255, 181);
+    	txtPosInfo.setFont(SWTResourceManager.getFont("Lucida Console", 10, SWT.NORMAL));
     	txtPosInfo.setText("Actuator Information\r\n");
     	
     	txtEncTol = new Text(area, SWT.BORDER);
@@ -301,7 +314,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	txtAzElRaDec = new Text(area, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.MULTI);
     	txtAzElRaDec.setText("Az:  \nEl:  \nRA:  \nDec:  \nUTC:  \nLST:  \nLocal:");
     	txtAzElRaDec.setFont(SWTResourceManager.getFont("Tahoma", 16, SWT.NORMAL));
-    	txtAzElRaDec.setBounds(477, 17, 237, 181);
+    	txtAzElRaDec.setBounds(551, 17, 173, 181);
     	
     	btnQuit = new Button(area, SWT.NONE);
     	btnQuit.setBounds(2, 171, 68, 23);
@@ -374,9 +387,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	popupWindowButtons.put("balloonloc", btnBalloonLocation);
 
-    	Button btnNewButton = new Button(area, SWT.NONE);
-    	btnNewButton.setBounds(387, 474, 87, 30);
-    	btnNewButton.setText("New Button");
+    	
 
     	//TODO hide the debug stuff
     	if (!debug) {

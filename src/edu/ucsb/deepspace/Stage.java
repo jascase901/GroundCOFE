@@ -545,6 +545,8 @@ public class Stage {
 
 	public void calibrate(Coordinate c) {
 		scope.calibrate(c);
+		System.out.println("az: " + c.getAz());
+		System.out.println("el: " + c.getEl());
 	}
 
 	public void buttonEnabler(String name) {
@@ -554,9 +556,14 @@ public class Stage {
 	void updatePosition(DataInterface data) {
 		position = data;
 		String info = position.info();
+		double azRpm = scope.rpm(data.azMaxVel(), Axis.AZ);
+		double elRpm = scope.rpm(data.elMaxVel(), Axis.EL);
+		info += String.format(Formatters.ACTINFO_FORMAT, "RPM", azRpm, elRpm) + "\n";
 		if (window.debug) {
-			info += "Az AbsPos: " + Formatters.TWO_POINTS.format(scope.getAbsolutePos(Axis.AZ)) + "\n";
-			info += "El AbsPos: " + Formatters.TWO_POINTS.format(scope.getAbsolutePos(Axis.EL)) + "\n";
+			double azAbsPos = scope.getAbsolutePos(Axis.AZ);
+			double elAbsPos = scope.getAbsolutePos(Axis.EL);
+			info += String.format(Formatters.ACTINFO_FORMAT, "Abs Pos", azAbsPos, elAbsPos);
+			System.out.println(String.format(Formatters.ACTINFO_FORMAT, "Abs Pos", azAbsPos, elAbsPos));
 		}
 		window.updateTxtPosInfo(info);
 	}

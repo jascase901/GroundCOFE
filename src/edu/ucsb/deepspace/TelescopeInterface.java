@@ -73,6 +73,14 @@ public interface TelescopeInterface {
 	public boolean isIndexing(Axis axis);
 	
 	/**
+	 * Calculates the RPM of the specified axis for the given velocity.
+	 * @param vel
+	 * @param axis
+	 * @return
+	 */
+	public double rpm(double vel, Axis axis);
+	
+	/**
 	 * Begin the indexing procedure for this axis.
 	 */
 	public void index(Axis axis);

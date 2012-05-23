@@ -10,4 +10,8 @@ public interface DataInterface {
 	
 	public double elPos();
 	
+	public double azMaxVel();
+	
+	public double elMaxVel();
+	
 }
