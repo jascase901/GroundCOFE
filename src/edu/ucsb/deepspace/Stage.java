@@ -64,15 +64,11 @@ public class Stage {
 			stageProtocol = new CommGalil(2222);
 			scopeProtocol = new CommGalil(23);
 			
-			ScriptLoader sl = new ScriptLoader();
-			sl.check();
-			sl.load();
-			pause(1000);
-			sl.close();
+			
 			
 			
 			scope = new TelescopeGalil(this, scopeProtocol);
-			scope.queryMotorState();
+			//scope.queryMotorState();
 //			window.updateMotorButton(scope.motorState(Axis.AZ), Axis.AZ);
 //			window.updateMotorButton(scope.motorState(Axis.EL), Axis.EL);
 			reader = new ReaderGalil(this);
@@ -85,6 +81,11 @@ public class Stage {
 		}
 		updateLst();
 		if (commStatus) {
+			ScriptLoader sl = new ScriptLoader();
+			sl.check();
+			sl.load();
+			pause(1000);
+			sl.close();
 			System.out.println("reader started");
 			reader.start();
 			stageProtocol.initialize();
@@ -173,16 +174,6 @@ public class Stage {
 
 	public void confirmCommConnection() {
 		commStatus = true;
-	}
-
-	//TODO When this method is called from MainWindow constructor, az and el have not
-	//been instantiated.  They are instantiated in Stage.initialize, which is called after MainWindow
-	// constructor.  Obviously this is a problem.  (Reed, 4/12/2012)
-	public String stageInfo() {
-		String out = "";
-		//String out = az.info() + "\n" + el.info();
-		//System.out.println(out);
-		return out;
 	}
 
 	//TODO test to make sure motor state stuff is working
