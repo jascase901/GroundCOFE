@@ -1,6 +1,5 @@
 package edu.ucsb.deepspace;
 
-import edu.ucsb.deepspace.ActInterface.axisType;
 
 public class ReaderGalil extends Thread implements ReaderInterface {
 	
@@ -40,15 +39,15 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 				String elJg = temp[7];
 				String elAc = temp[8];
 				
-//				String azMotor = temp[9];
-//				String elMotor = temp[10];
-//				
-//				String azMoving = temp[11];
-//				String elMoving = temp[12];
+				String azMotor = temp[9];
+				String elMotor = temp[10];
+				
+				String azMoving = temp[11];
+				String elMoving = temp[12];
 				
 				data = new DataGalil();
-				data.make(azPos, azVel, azJg, azAc, axisType.AZ);
-				data.make(elPos, elVel, elJg, elAc, axisType.EL);
+				data.make(azPos, azVel, azJg, azAc, azMotor, azMoving, Axis.AZ);
+				data.make(elPos, elVel, elJg, elAc, elMotor, elMoving, Axis.EL);
 				stage.updatePosition(data);
 			}
 			pause(1000);

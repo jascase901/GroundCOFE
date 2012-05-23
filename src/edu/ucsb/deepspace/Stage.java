@@ -40,7 +40,7 @@ public class Stage {
 	private MainWindow window;
 	private boolean commStatus = false;
 	private ReaderInterface reader;
-	private DataInterface position;
+	private DataInterface position = DataGalil.blank();
 	private final Properties actSettings = new Properties();
 	private final Properties settings = new Properties();
 	private LatLongAlt baseLocation, balloonLocation;
@@ -73,8 +73,8 @@ public class Stage {
 			
 			scope = new TelescopeGalil(this, scopeProtocol);
 			scope.queryMotorState();
-			window.updateMotorButton(scope.motorState(Axis.AZ), Axis.AZ);
-			window.updateMotorButton(scope.motorState(Axis.EL), Axis.EL);
+//			window.updateMotorButton(scope.motorState(Axis.AZ), Axis.AZ);
+//			window.updateMotorButton(scope.motorState(Axis.EL), Axis.EL);
 			reader = new ReaderGalil(this);
 			loadGalil();
 			break;
@@ -187,10 +187,10 @@ public class Stage {
 
 	//TODO test to make sure motor state stuff is working
 	public void startRaDecTracking(final double ra, final double dec) {
-		if (!scope.motorState(Axis.AZ)) {
+		if (!motorCheck(Axis.AZ)) {
 			return;
 		}
-		if (!scope.motorState(Axis.EL)) {
+		if (!motorCheck(Axis.EL)) {
 			return;
 		}
 		long period = 10000;
@@ -301,7 +301,7 @@ public class Stage {
 		exec.submit(new Runnable() {
 			public void run() {
 				if (mc.getAzAmount() != null) {
-					if (!scope.motorState(Axis.AZ) && !scope.motorState(Axis.EL)) {
+					if (!motorCheck(Axis.AZ) && !motorCheck(Axis.EL)) {
 						window.controlMoveButtons(true);
 						statusArea("The motors must be on before moving.\n");
 						return;
@@ -554,6 +554,12 @@ public class Stage {
 	}
 
 	void updatePosition(DataInterface data) {
+		if (data.motorState(Axis.AZ) != position.motorState(Axis.AZ) ||
+		data.motorState(Axis.EL) != position.motorState(Axis.EL)) {
+			window.updateMotorButton(data.motorState(Axis.AZ), Axis.AZ);
+			window.updateMotorButton(data.motorState(Axis.EL), Axis.EL);
+		}
+		
 		position = data;
 		String info = position.info();
 		double azRpm = scope.rpm(data.azMaxVel(), Axis.AZ);
@@ -563,7 +569,6 @@ public class Stage {
 			double azAbsPos = scope.getAbsolutePos(Axis.AZ);
 			double elAbsPos = scope.getAbsolutePos(Axis.EL);
 			info += String.format(Formatters.ACTINFO_FORMAT, "Abs Pos", azAbsPos, elAbsPos);
-			System.out.println(String.format(Formatters.ACTINFO_FORMAT, "Abs Pos", azAbsPos, elAbsPos));
 		}
 		window.updateTxtPosInfo(info);
 	}
@@ -606,7 +611,7 @@ public class Stage {
 	 * @return
 	 */
 	private boolean motorCheck(Axis axis) {
-		if (!scope.motorState(axis)) {
+		if (!position.motorState(axis)) {
 			statusArea(axis.getFullName() + " motor is off.  Please turn motor on before proceeding.\n");
 			return false;
 		}

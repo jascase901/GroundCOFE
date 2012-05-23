@@ -53,7 +53,7 @@ public interface TelescopeInterface {
 	/**
 	 * Returns true if motor is on, false if not.
 	 */
-	public boolean motorState(Axis axis);
+	//public boolean motorState(Axis axis);
 	
 	/**
 	 * Updates the motor state.

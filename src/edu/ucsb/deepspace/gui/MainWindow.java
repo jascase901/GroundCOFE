@@ -1041,7 +1041,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     			} catch (NumberFormatException f) {
     				f.printStackTrace();
     			}
-    			String out = "JG" + debugAxis + "=" + vel;
+    			//String out = "JG" + debugAxis + "=" + vel;
     			//stage.sendCommand(out);
     			stage.setVelocity(vel, debugAxis);
     		}
