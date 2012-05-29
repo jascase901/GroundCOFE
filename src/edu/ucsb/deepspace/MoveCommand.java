@@ -3,14 +3,11 @@ package edu.ucsb.deepspace;
 /**
  * Small data aggregate class that consolidates everything needed for one axis to move.
  * @author Reed
- *
  */
 public class MoveCommand {
-	//
+	
 	/**
 	 * Represents relative or absolute motion.
-	 * @author Reed
-	 *
 	 */
 	public static enum MoveMode {
 		RELATIVE, ABSOLUTE;
@@ -18,8 +15,6 @@ public class MoveCommand {
 	
 	/**
 	 * Represents the units of amount.  Either encoder pulses or degrees.
-	 * @author Reed
-	 *
 	 */
 	public static enum MoveType {
 		ENCODER, DEGREE;
@@ -27,25 +22,43 @@ public class MoveCommand {
 	
 	private MoveMode mode;
 	private MoveType type;
-	private ActInterface.axisType axis;
-	private double amount;
+	private Double azAmount;
+	private Double elAmount;
 	
 	/**
 	 * 
 	 * @param mode relative or absolute
 	 * @param type encoder or degree
 	 * @param axis az or el
-	 * @param amount of motion to move
+	 * @param azAmount of motion to move
 	 */
-	public MoveCommand(MoveMode mode, MoveType type, ActInterface.axisType axis, double amount) {
+	public MoveCommand(MoveMode mode, MoveType type, Double azAmount, Double elAmount) {
 		this.mode = mode;
 		this.type = type;
-		this.axis = axis;
-		this.amount = amount;
+		this.azAmount = azAmount;
+		this.elAmount = elAmount;
 	}
 	
+	/**
+	 * Represents relative or absolute motion.
+	 */
 	public MoveMode getMode(){ return mode;}
+	
+	/**
+	 * Represents the units of amount.  Either encoder pulses or degrees.
+	 */
 	public MoveType getType() { return type;}
-	public ActInterface.axisType getAxis() {return axis;}
-	public double getAmount() {return amount;}
+	public Double getAzAmount() {return azAmount;}
+	public Double getElAmount() {return elAmount;}
+	public Double getAmount(Axis axis) {
+		switch (axis) {
+			case AZ:
+				return azAmount;
+			case EL:
+				return elAmount;
+			default:
+				assert false; //This can only be reached if another axis is added.
+		}
+		return null;
+	}
 }

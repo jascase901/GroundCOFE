@@ -13,6 +13,7 @@ public class Formatters {
 	public static DateFormat HOUR_MIN_SEC = new SimpleDateFormat("HH:mm:ss");
 	public static DecimalFormat TWO_DIGITS = new DecimalFormat("00");
 	public static DecimalFormat DEGREE_POS = new DecimalFormat("###.##");
+	public static String ACTINFO_FORMAT = "%1$-10s %2$9.2f %3$9.2f";
 	
 	public static String lstFormatter(double hour, double min, double sec) {
 		String out = TWO_DIGITS.format(hour) + ":" + TWO_DIGITS.format(Math.floor(min)) + ":" + TWO_DIGITS.format(Math.floor(sec));

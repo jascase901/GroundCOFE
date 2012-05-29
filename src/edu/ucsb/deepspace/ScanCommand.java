@@ -26,4 +26,6 @@ public class ScanCommand {
 	public double getTime() {return time;}
 	public double getReps() {return reps;}
 	public boolean getContinuous() {return continuous;}
+	
+	
 }
