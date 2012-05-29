@@ -9,33 +9,28 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CommGalil implements CommInterface {
-	//Singleton
-	//private static final CommGalil INSTANCE = new CommGalil();
-	//public static CommGalil getInstance() {return INSTANCE;}
-	
-	PrintWriter out;
-	BufferedReader in;
-	Socket socket = null;
+	private PrintWriter out;
+	private BufferedReader in;
+	private Socket socket = null;
 	boolean connection = false;
-	String previousCommand = "";
-	private int port = 0;
-	private static int readCount = 0;
-	private static int sendCount = 0;
-	private static List<String> send = new ArrayList<String>();
-	private static List<String> response = new ArrayList<String>();
-	private static List<String> threads = new ArrayList<String>();
+	private String previousCommand = "";
+	
+	int port = 0;
+//	private static int readCount = 0;
+//	private static int sendCount = 0;
+//	private static List<String> send = new ArrayList<String>();
+//	private static List<String> response = new ArrayList<String>();
+//	private static List<String> threads = new ArrayList<String>();
 	
 	public CommGalil(int port) {
 		System.out.println("comm galil constructor" + port);
 		this.port = port;
 		try {
 			socket = new Socket();
-			socket.connect(new InetSocketAddress("192.168.1.200", port), 3000);
-			socket.setSoTimeout(3000);
+			socket.connect(new InetSocketAddress("192.168.1.200", port), 1000);
+			socket.setSoTimeout(500);
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			connection = true;
@@ -53,13 +48,13 @@ public class CommGalil implements CommInterface {
 	//Send message through output stream.
     public void send(String message) {
     	//sendCount++;
-    	
     	previousCommand = message;
     	out.println(message);
+    	//System.out.print(message);
     }
     
     public String read() {
-    	readCount++;
+    	//readCount++;
     	//Thread tr = Thread.currentThread();
     	//threads.add(tr.getName());
     	
@@ -80,7 +75,7 @@ public class CommGalil implements CommInterface {
     	
     	if (result.equalsIgnoreCase("?")) {
     		System.out.println("previousCommand: " + previousCommand);
-    		System.out.println("result: " + result);
+    		System.out.println(port + " result: " + result);
     		System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     	}
     	//Deal with error message, if necessary.
@@ -106,16 +101,19 @@ public class CommGalil implements CommInterface {
     
     //Simply calls send and then receive for convenience.
     public String sendRead(String message) {
+    	//System.out.println(port + "   " + message);
+    	//read();
     	
-    	send.add(message);
+    	//send.add(message);
     	send(message);
     	
-    	readCount++;
-    	Thread tr = Thread.currentThread();
-    	threads.add(port + tr.getName());
+    	//readCount++;
+    	//Thread tr = Thread.currentThread();
+    	//threads.add(port + tr.getName());
     	
     	String temp = read();
-    	response.add(temp);
+    	//System.out.println(temp);
+    	//response.add(temp);
     	return temp;
     }
     
@@ -131,26 +129,31 @@ public class CommGalil implements CommInterface {
     }
     
     public void close() {
-    	System.out.println("readCount: " + readCount);
-    	System.out.println("sendCount: " + sendCount);
-    	List<String> temp = new ArrayList<String>();
-    	for (int i = 0; i < send.size(); i++) {
-    		String a = "qq";
-    		try {
-    			a = i + " " + threads.get(i) + "   " + send.get(i) + " " + response.get(i);
-    		} catch (IndexOutOfBoundsException e) {
-    			//don't care
-    		}
-    		temp.add(a);
-    	}
-    	for (String s : temp) {
-    		System.out.println(s);
-    	}
+//    	System.out.println("readCount: " + readCount);
+//    	System.out.println("sendCount: " + sendCount);
+//    	List<String> temp = new ArrayList<String>();
+//    	for (int i = 0; i < send.size(); i++) {
+//    		String a = "qq";
+//    		try {
+//    			a = i + " " + threads.get(i) + "   " + send.get(i) + " " + response.get(i);
+//    		} catch (IndexOutOfBoundsException e) {
+//    			//don't care
+//    		}
+//    		temp.add(a);
+//    	}
+//    	for (String s : temp) {
+//    		System.out.println(s);
+//    	}
     	try {
 			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    }
+    
+    public void initialize() {
+    	sendRead("CF I"); //causes responses to be sent over the port that sent this command
+    	sendRead("CW 2"); //disables flipping of MSB
     }
     
     public void test() {

@@ -1,55 +1,53 @@
 package edu.ucsb.deepspace;
 
-import edu.ucsb.deepspace.ActInterface.axisType;
 
 public class ReaderGalil extends Thread implements ReaderInterface {
 	
-	private boolean flag = true;
+	private boolean flag = true, flag2 = false;
 	private CommGalil protocol;
 	private final Stage stage;
-	private String azAxis = "";
-	private String elAxis = "";
+	private DataGalil data;
 	
-	public ReaderGalil(Stage stage) {
+	public ReaderGalil(Stage stage, CommGalil protocol) {
 		this.setDaemon(true);
 		this.stage = stage;
 		this.setName("ReaderGalil");
-		azAxis = stage.axisName(axisType.AZ);
-		elAxis = stage.axisName(axisType.EL);
-		protocol = new CommGalil(4444);
-	}
-	
-	private String tellPos = "TP";
-	private String tellVel = "TV";
-	DataGalil data;
-	private boolean flag2 = true;
-	
-	public void togglePauseFlag() {
-		this.flag2 = !flag2;
+		this.protocol = protocol;
 	}
 	
 	public void readerOnOff(boolean onOff) {
 		this.flag2 = onOff;
 	}
 	
+	//TODO make use of motor data and motion data
 	public void run() {
 		while (flag) {
-			if (flag2) {
-				//System.out.println("\n\n");
-				String azPos = protocol.sendRead(tellPos + azAxis);
-				String azVel = protocol.sendRead(tellVel + azAxis);
-				String azJg = protocol.sendRead("JG?");
-				String azAc = protocol.sendRead("AC?");
+			if (flag2) {		
+				protocol.initialize();
+				protocol.sendRead("XQ #READERI,3");
+				String info = protocol.read();
+				//System.out.println(info);
+				String[] temp = info.split(" ");
 				
-				String elPos = protocol.sendRead(tellPos + elAxis);
-				String elVel = protocol.sendRead(tellVel + elAxis);
-				String elJg = protocol.sendRead("JG,?");
-				String elAc = protocol.sendRead("AC,?");
-				//System.out.println("\n\n");
+				String azPos = temp[1];
+				String azVel = temp[2];
+				String azJg = temp[3];
+				String azAc = temp[4];
+				
+				String elPos = temp[5];
+				String elVel = temp[6];
+				String elJg = temp[7];
+				String elAc = temp[8];
+				
+				String azMotor = temp[9];
+				String elMotor = temp[10];
+				
+				String azMoving = temp[11];
+				String elMoving = temp[12];
 				
 				data = new DataGalil();
-				data.make(azPos, azVel, azJg, azAc, axisType.AZ);
-				data.make(elPos, elVel, elJg, elAc, axisType.EL);
+				data.make(azPos, azVel, azJg, azAc, azMotor, azMoving, Axis.AZ);
+				data.make(elPos, elVel, elJg, elAc, elMotor, elMoving, Axis.EL);
 				stage.updatePosition(data);
 			}
 			pause(1000);

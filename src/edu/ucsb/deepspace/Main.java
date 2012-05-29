@@ -15,9 +15,9 @@ public class Main {
 	
 	public static void main(String[] args) {
 		stage = Stage.getInstance();
-		Stage.stageType stageType = stage.getType();
+		Stage.StageTypes StageTypes = stage.getType();
 		Shell shell = new Shell(Display.getDefault(), SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.MAX | SWT.RESIZE);
-		window = new MainWindow(shell, SWT.NULL, stage, stageType);
+		window = new MainWindow(shell, SWT.NULL, stage, StageTypes);
 		try {
 			stage.initialize(window);
 		} catch (FileNotFoundException e) {

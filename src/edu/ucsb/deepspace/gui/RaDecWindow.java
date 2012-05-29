@@ -195,12 +195,14 @@ public class RaDecWindow {
 		btnGO.setEnabled(false);
 		if (type.equals("gotoradec")) btnGO.setText("GO");
 		else if (type.equals("tracking")) btnGO.setText("Set RA/Dec");
+		else if (type.equals("radeccalibrate")) btnGO.setText("Ra/Dec Calibrate");
 		btnGO.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
 				Coordinate c = new Coordinate(el, az);
 				if (type.equals("gotoradec")) stage.goToPos(c);
 				else if (type.equals("tracking")) stage.setRaDecTracking(raVal, decVal);
+				else if (type.equals("radeccalibrate")) stage.calibrate(c);
 				close();
 			}
 		});
