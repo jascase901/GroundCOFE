@@ -17,8 +17,7 @@ public class CommGalil implements CommInterface {
 	boolean connection = false;
 	private String previousCommand = "";
 	
-	@SuppressWarnings("unused")
-	private int port = 0;
+	int port = 0;
 //	private static int readCount = 0;
 //	private static int sendCount = 0;
 //	private static List<String> send = new ArrayList<String>();
@@ -76,7 +75,7 @@ public class CommGalil implements CommInterface {
     	
     	if (result.equalsIgnoreCase("?")) {
     		System.out.println("previousCommand: " + previousCommand);
-    		System.out.println("result: " + result);
+    		System.out.println(port + " result: " + result);
     		System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     	}
     	//Deal with error message, if necessary.

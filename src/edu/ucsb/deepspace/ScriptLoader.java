@@ -24,6 +24,20 @@ public class ScriptLoader {
 		scripts.put("#READERI", readerInfo);
 	}
 	
+	public Set<String> findExpected() {
+		return scripts.keySet();
+	}
+	
+	public Set<String> findLoaded() {
+		String labels = protocol.sendRead("LL");
+		String[] split = labels.split("\r\n");
+		for (String s : split) {
+			String name = s.split("=")[0];
+			loadedScriptNames.add(name);
+		}
+		return loadedScriptNames;
+	}
+	
 	public void check() {
 		String labels = protocol.sendRead("LL");
 		String[] split = labels.split("\r\n");

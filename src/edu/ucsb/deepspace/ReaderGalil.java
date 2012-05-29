@@ -3,16 +3,16 @@ package edu.ucsb.deepspace;
 
 public class ReaderGalil extends Thread implements ReaderInterface {
 	
-	private boolean flag = true, flag2 = true;
+	private boolean flag = true, flag2 = false;
 	private CommGalil protocol;
 	private final Stage stage;
 	private DataGalil data;
 	
-	public ReaderGalil(Stage stage) {
+	public ReaderGalil(Stage stage, CommGalil protocol) {
 		this.setDaemon(true);
 		this.stage = stage;
 		this.setName("ReaderGalil");
-		protocol = new CommGalil(4444);
+		this.protocol = protocol;
 	}
 	
 	public void readerOnOff(boolean onOff) {
