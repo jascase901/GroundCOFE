@@ -61,6 +61,7 @@ public class LatLongAlt {
 		ra = ra * RTH;
 		ra = (ra + 24)%24;
 		return ra;
+		
 	}
 	
 	public double radecToAz(double ra, double dec) {
