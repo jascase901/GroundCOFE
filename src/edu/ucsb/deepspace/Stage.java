@@ -138,6 +138,7 @@ public class Stage {
 		scope.setOffsets(azOffset, elOffset);
 		window.setMinMaxAzEl(minAz, maxAz, minEl, maxEl);
 		window.setVelAccAzEl(maxVelAz, maxAccAz, maxVelEl, maxAccEl);
+		window.setMaxMoveRel(maxMoveRelAz, maxMoveRelEl);
 	}
 
 	private void closeGalil() {
@@ -311,9 +312,25 @@ public class Stage {
 				}
 				
 				if (mc.getMode() == MoveMode.RELATIVE && mc.getType() == MoveType.DEGREE) {
-					if (mc.getAmount(Axis.AZ) > maxMoveRelAz || mc.getAmount(Axis.EL) > maxMoveRelEl) {
-						System.out.println("this will crash due to null value");
+					if (mc.getAmount(Axis.AZ) == null) {
+						if (Math.abs(mc.getAmount(Axis.EL)) > maxMoveRelEl) {
+							window.controlMoveButtons(true);
+							statusArea("Maximum allowed relative move limit exceeded.\n");
+							return;
+						}
 					}
+					else if (mc.getAmount(Axis.EL) == null) {
+						if (Math.abs(mc.getAmount(Axis.AZ)) > maxMoveRelAz) {
+							window.controlMoveButtons(true);
+							statusArea("Maximum allowed relative move limit exceeded.\n");
+							return;
+						}
+					}
+//					if (mc.getAmount(Axis.AZ) > maxMoveRelAz || mc.getAmount(Axis.EL) > maxMoveRelEl) {
+//						window.controlMoveButtons(true);
+//						statusArea("Maximum allowed relative move limit exceeded.\n");
+//						return;
+//					}
 				}
 				
 				if (!scope.validMove(mc, minAz, maxAz, minEl, maxEl)) {

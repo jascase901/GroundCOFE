@@ -569,7 +569,9 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	btnSetMaxRel.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
-    			
+    			double maxMoveRelAz = Double.parseDouble(txtMaxRelAz.getText());
+    			double maxMoveRelEl = Double.parseDouble(txtMaxRelEl.getText());
+    			stage.setMaxMoveRel(maxMoveRelAz, maxMoveRelEl);
     		}
     	});
 	}
@@ -1242,6 +1244,16 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 				txtAccAz.setText(String.valueOf(accAz));
 				txtVelEl.setText(String.valueOf(velEl));
 				txtAccEl.setText(String.valueOf(accEl));
+			}
+		});
+	}
+	
+	public void setMaxMoveRel(final double maxMoveRelAz, final double maxMoveRelEl) {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				txtMaxRelAz.setText(String.valueOf(maxMoveRelAz));
+				txtMaxRelEl.setText(String.valueOf(maxMoveRelEl));
 			}
 		});
 	}
