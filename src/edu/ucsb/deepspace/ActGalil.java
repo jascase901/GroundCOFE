@@ -1,6 +1,16 @@
 package edu.ucsb.deepspace;
 
+<<<<<<< HEAD
 
+=======
+import edu.ucsb.deepspace.MoveCommand.MoveMode;
+import edu.ucsb.deepspace.MoveCommand.MoveType;
+/**
+ * All methods that convert between encoder pulses and degrees and move Galil.
+ * 
+ *
+ */
+>>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
 public class ActGalil implements ActInterface {
 	
 	private Axis axis;
@@ -12,9 +22,18 @@ public class ActGalil implements ActInterface {
 	private String axisAbbrev = "";
 	private double offset = 0;
 	private boolean scanning = false;
+<<<<<<< HEAD
 	private boolean motorState = false;
 
 	public ActGalil(Axis axis, CommGalil protocol) {
+=======
+	/**
+	 * Creates an ActGalil object to control each axis.
+	 * @param axis
+	 * @param protocol to talk to Galil
+	 */
+	public ActGalil(axisType axis, CommGalil protocol) {
+>>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
 		this.axis = axis;
 		this.protocol = protocol;
 		if (axis == Axis.AZ) {
@@ -25,7 +44,9 @@ public class ActGalil implements ActInterface {
 		}
 		encPulsePerDeg = ((double) encPulsePerRev) / 360d;
 	}
-	
+	/**
+	 * Creates a stage object with the correct instance variables.
+	 */
 	public void registerStage(Stage stage) {
 		this.stage = stage;
 		axisAbbrev = axis.getAbbrev();
@@ -268,6 +289,7 @@ public class ActGalil implements ActInterface {
 		System.out.println("error ActGalil.motorState");
 		return false;
 	}
+<<<<<<< HEAD
 	
 	private void motorOn() {
 		protocol.sendRead("SH" + axisAbbrev);
@@ -302,6 +324,25 @@ public class ActGalil implements ActInterface {
 		protocol.sendRead("ST" + axisAbbrev);
 	}
 	
+=======
+	/**
+	 * Turns an axis motor on.
+	 */
+	void motorOn() {
+		protocol.send("SH" + axisName);
+	}
+	/**
+	 * Turns an axis motor off.
+	 */
+	void motorOff() {
+		protocol.send("MO" + axisName);
+	}
+	
+	/**
+	 * Sets the velocity of az or el movement.
+	 * @param vel in encoder pulses per second
+	 */
+>>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
 	public void setVelocity(double vel) {
 		String out = "JG" + axisAbbrev + "=" + vel;
 		protocol.sendRead(out);
@@ -313,10 +354,18 @@ public class ActGalil implements ActInterface {
 	public boolean indexing() {return indexing;}
 	public void setIndexing(boolean indexing) {this.indexing = indexing;}
 	
+<<<<<<< HEAD
+=======
+	/**
+	 * Sets a new coordinate as the relative (0,0).
+	 */
+>>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
 	public void calibrate(double degVal) {
 		offset = degVal - convEncToDeg(stage.encPos(axis));
 	}
-	
+	/**
+	 * Moves everything to its default position.
+	 */
 	public void index() {
 		if (!motorState()) {
 			stage.statusArea(axis.getFullName() + " motor is not on.  Please turn on motor before proceeding.\n");
@@ -333,7 +382,9 @@ public class ActGalil implements ActInterface {
 		//protocol.read(); //there's an erroneous : that pops up at the end of indexing. this gets rid of it
 		//protocol.read();
 	}
-	
+	/**
+	 * Indexes the AZ axis.
+	 */
 	private void indexGalilAz() {
 //		// Save acceleration and jog speed values
 //		protocol.sendRead("T1 = _JG" + axisName);
@@ -369,7 +420,9 @@ public class ActGalil implements ActInterface {
 //		protocol.sendRead("AC" + axisName + "=T2");
 		protocol.sendRead("XQ #HOMEA,0");
 	}
-	
+	/**
+	 * Indexes the EL axis.
+	 */
 	private void indexGalilEl() {
 //		// Save acceleration and jog speed values
 //		protocol.sendRead("T1 = _JG" + axisName);
@@ -429,13 +482,22 @@ public class ActGalil implements ActInterface {
 		protocol.read();
 		return flag;
 	}
-	
+	/**
+	 * Sets the offset of an axis.
+	 */
 	public void setOffset(double indexOffset) {
 		offset = indexOffset;
 	}
-	
+	/**
+	 * @return offset
+	 */
 	public double getOffset() {return offset;}
-
+	/**
+	 * Moves an axis between a min and max multiple times.
+	 * @param time to move between min and max
+	 * @param repitions to be completed before stopping
+	 * @param continuous if true never stops until told to
+	 */
 	public void scan(ScanCommand sc) {
 		if (sc == null) return;
 		
@@ -468,11 +530,16 @@ public class ActGalil implements ActInterface {
 			if (i >= sc.getReps() && !sc.getContinuous()) scanning = false;
 		}
 	}
-	
+	/**
+	 * Stops the scanning loop.
+	 */
 	public void stopScanning() {
 		this.scanning = false;
 	}
-	
+	/**
+	 * Stops the thread from doing anything.
+	 * @param timeInMS
+	 */
 	private void pause(double timeInMS) {
 		try {
 			Thread.sleep((long) timeInMS);

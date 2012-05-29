@@ -46,9 +46,16 @@ public class Stage {
 	private final Properties settings = new Properties();
 	private LatLongAlt baseLocation, balloonLocation;
 	private double azToBalloon = 0, elToBalloon = 0;
+<<<<<<< HEAD
 	private CommGalil stageProtocol, scopeProtocol, readerProtocol;
 	ScriptLoader sl;
 
+=======
+	private CommGalil protocol, protocolTest;
+	/**
+	 * Creates a new stage object and loads all the preset settings into it.
+	 */
+>>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
 	public Stage() {
 		try {
 			loadSettings();
@@ -58,7 +65,12 @@ public class Stage {
 			e.printStackTrace();
 		}
 	}
-
+	/**
+	 * Creates all the CommGalil, ActGalil, etc. objects and starts the connection. 
+	 * @param window
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	public void initialize(MainWindow window) throws FileNotFoundException, IOException {
 		this.window = window;
 		switch (stageType) {
@@ -83,7 +95,31 @@ public class Stage {
 			reader.start();
 		}
 	}
+<<<<<<< HEAD
 
+=======
+	/**
+	 * Returns the axis name: A for azimuth and B for elevation.
+	 * @param axis
+	 * @return A or B
+	 */
+	public String axisName(axisType axis) {
+		switch (axis) {
+		case AZ:
+			return "A";
+		case EL:
+			return "B";
+		default:
+			System.out.println("this should never happen.  Stage.axisName()");
+		}
+		return "error Stage.axisName()";
+	}
+	/**
+	 * Loads the settings.ini file and saves all its variables.
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+>>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
 	private void loadSettings() throws FileNotFoundException, IOException {
 		//read settings from file
 		settings.load(new FileInputStream("Settings.ini"));
@@ -102,7 +138,11 @@ public class Stage {
 		double balloonAltitude = Double.parseDouble(settings.getProperty("balloonAltitude", "0"));
 		balloonLocation =  new LatLongAlt(balloonLatitude, balloonLongitude, balloonAltitude);
 	}
-
+	/**
+	 * Saves new settings to settings.ini.
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	private void saveSettings() throws FileNotFoundException, IOException {
 		//prep settings to be stored
 		settings.setProperty("baseLatitude", String.valueOf(baseLocation.getLatitude()));
@@ -119,7 +159,11 @@ public class Stage {
 		//store settings
 		settings.store(new FileOutputStream("Settings.ini"), "");
 	}
-
+	/**
+	 * Loads the galil.ini file and reads all its variables.
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	private void loadGalil() throws FileNotFoundException, IOException {
 		actSettings.load(new FileInputStream("Galil.ini"));
 		double azOffset = Double.parseDouble(actSettings.getProperty("azOffset", "0"));
@@ -140,7 +184,9 @@ public class Stage {
 		window.setVelAccAzEl(maxVelAz, maxAccAz, maxVelEl, maxAccEl);
 		window.setMaxMoveRel(maxMoveRelAz, maxMoveRelEl);
 	}
-
+	/**
+	 * Saves the settings of Galil back into galil.ini.
+	 */
 	private void closeGalil() {
 		actSettings.setProperty("azOffset", String.valueOf(scope.getOffset(Axis.AZ)));
 		actSettings.setProperty("elOffset", String.valueOf(scope.getOffset(Axis.EL)));
@@ -185,7 +231,11 @@ public class Stage {
 		sl.load();
 		sl.close();
 	}
-
+	/**
+	 * Points to a ra dec position every amount of time specified until told to stop.
+	 * @param ra
+	 * @param dec
+	 */
 	public void startRaDecTracking(final double ra, final double dec) {
 		if (!motorCheck(Axis.AZ)) {
 			window.raDecTrackingButtonUpdater(true, false);
@@ -212,12 +262,16 @@ public class Stage {
 			}
 		}, 0, period);
 	}
-
+	/**
+	 * Stops ra dec tracking.
+	 */
 	public void stopRaDecTracking() {
 		if (raDecTracker == null) return;
 		raDecTracker.cancel();
 	}
-
+	/**
+	 * Updates information on the Galil position, times, and ra dec coordinates every second.
+	 */
 	private void updateLst() {
 		lstUpdater = new Timer("LST Updater", true);
 		lstUpdater.scheduleAtFixedRate(new TimerTask() {
@@ -251,7 +305,12 @@ public class Stage {
 			}
 		}, 0, 1000);
 	}
-	
+	/**
+	 * Moves over a specified min and max az and el a specified or continuous number of times. 
+	 * 
+	 * @param azSc
+	 * @param elSc
+	 */
 	public void startScanning(final ScanCommand azSc, final ScanCommand elSc) {
 		if (azSc == null && elSc == null) {
 			window.updateStatusArea("Fatal error.  The ScanCommands associated with Az and El are both null.\n");
@@ -277,10 +336,14 @@ public class Stage {
 		//TODO fix!
 		//window.setScanEnabled(axisType.BOTH);
 	}
-	
+	/**
+	 * Stops movement caused by scanning.
+	 * 
+	 */
 	public void stopScanning() {
 		scope.stopScanning();
 	}
+<<<<<<< HEAD
 	
 //	public void raster(ScanCommand azSc, ScanCommand elSc) {
 //		moveAbsolute(azSc.getMin(), elSc.getMin());
@@ -349,6 +412,41 @@ public class Stage {
 	public void moveRelative(Double amount, Axis axis, MoveType type) {
 		MoveCommand mc = new MoveCommand(MoveMode.RELATIVE, type, null, null);
 		switch (axis) {
+=======
+	/**
+	 * Moves the axes to the minimum of the ScanCommands is two separate threads.
+	 * 
+	 * @param azSc
+	 * @param elSc
+	 */
+	public void raster(ScanCommand azSc, ScanCommand elSc) {
+		moveAbsolute(azSc.getMin(), elSc.getMin());
+		double deltaAz = azSc.getMax() - azSc.getMin();
+		double deltaEl = elSc.getMax() - elSc.getMin();
+		double reps = azSc.getReps();
+		
+		
+//		moveAbsolute(minAz, minEl)
+//		int i = 1
+//		int mask = 0
+//		int parity = 1
+//		while (i<2*reps) {
+//		  moveRelative(parity*deltaAz, mask*deltaEl/reps)
+//		  parity = -1*parity
+//		  mask++
+//		  mask%2
+		
+	}
+	/**
+	 * Determines if a move is valid and if so executes the correct move command based on mc.
+	 * @param mc the move command to be executed
+	 */
+	public void move(MoveCommand mc) {
+		ActInterface act = null;
+		double min = 0, max = 0;
+		
+		switch (mc.getAxis()) {
+>>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
 			case AZ:
 				mc = new MoveCommand(MoveMode.RELATIVE, type, amount, null); break;
 			case EL:
@@ -374,7 +472,38 @@ public class Stage {
 			buttonEnabler("indexEl");
 			return;
 		}
+<<<<<<< HEAD
 		
+=======
+		window.controlMoveButtons(true);
+	}
+	
+	/**
+	 * Convenience method that moves the az and el axis to an absolute position in degrees in two separate 
+	 * threads.
+	 * @param azDeg
+	 * @param elDeg
+	 */
+	private void moveAbsolute(double azDeg, double elDeg) {
+		final MoveCommand mcAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, axisType.AZ, azDeg);
+		final MoveCommand mcEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, axisType.EL, elDeg);
+		exec.submit(new Runnable() {
+			public void run() {
+				move(mcAz);
+			}
+		});
+		exec.submit(new Runnable() {
+			public void run() {
+				move(mcEl);
+			}
+		});
+	}
+	/**
+	 * Moves an axis to its default position.
+	 * @param type of axis
+	 */
+	public void index(final axisType type) {
+>>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
@@ -387,7 +516,10 @@ public class Stage {
 		});
 	}
 
-	//should return true if something is moving, false if not
+	/**
+	 * Returns true if something is moving, false if not.
+	 * @return boolean
+	 */
 	public boolean isMoving() {
 		switch (stageType) {
 			case FTDI:
@@ -408,7 +540,10 @@ public class Stage {
 			pause(100);
 		}
 	}
-
+	/**
+	 * Sleeps for the waitTime.
+	 * @param waitTimeInMS
+	 */
 	private void pause(long waitTimeInMS) {
 		try {
 			Thread.sleep(waitTimeInMS);
@@ -416,12 +551,20 @@ public class Stage {
 			e.printStackTrace();
 		}
 	}
-	
+	/**
+	 * Sets Galil's min and max az value.
+	 * @param minAz
+	 * @param maxAz
+	 */
 	public void setMinMaxAz(double minAz, double maxAz) {
 		this.minAz = minAz;
 		this.maxAz = maxAz;
 	}
-
+	/**
+	 * Sets Galil's min and max el value.
+	 * @param minEl
+	 * @param maxEl
+	 */
 	public void setMinMaxEl(double minEl, double maxEl) {
 		this.minEl = minEl;
 		this.maxEl = maxEl;
@@ -448,31 +591,45 @@ public class Stage {
 	}
 
 	public int getEncTol() {return encTol;}
+	/**
+	 * Sets some value of Galil, I'm not sure which.
+	 * @param encTol
+	 */
 	public void setEncTol(int encTol) {
 		this.encTol = encTol;
 	}
-
+	/** 
+	 * Gets and updates the velocity and position of the az axis.
+	 */
 	public void status() {
 		stageProtocol.initialize();
 		System.out.println(stageProtocol.sendRead("XQ #READERI"));
 		System.out.println(stageProtocol.read());
 	}
-
+	/**
+	 * Sends a message to Galil and prints its reply.
+	 * @param command to send
+	 */
 	public void sendCommand(String command) {
 		System.out.println(stageProtocol.sendRead(command));
 	}
-
+	/**
+	 * Gets and prints the amount of bytes waiting to be read from Galil.
+	 */
 	public void queueSize() {
 		System.out.println("stage protocol queue size: " + stageProtocol.queueSize());
 		System.out.println("scope protocol queue size: " + scopeProtocol.queueSize());
 		System.out.println(readerProtocol.port + " reader protocol queue size: " + readerProtocol.queueSize());
 	}
-
+	/**
+	 * Reads off what Galil is waiting to send.
+	 */
 	public void readQueue() {
 		stageProtocol.test();
 		System.out.println("--------");
 		scopeProtocol.test();
 	}
+<<<<<<< HEAD
 	
 	/**
 	 * Stops the desired axis.
@@ -503,29 +660,73 @@ public class Stage {
 				return position.elPos();
 			default:
 				return 0;
+=======
+	/**
+	 * Gets the position of a certain axis.
+	 * @param axisType
+	 * @return
+	 */
+	public double encPos(axisType axisType) {
+		if (position == null) return 0;
+		switch (axisType) {
+		case AZ:
+			return position.azPos();
+		case EL:
+			return position.elPos();
+		default:
+			return 0;
 		}
 	}
-
+	/**
+	 * Tells the user and everything else that indexing is done.
+	 * @param type
+	 */
+	public void indexingDone(axisType type) {
+		System.out.println("indexing done");
+		switch (type) {
+		case AZ:
+			az.setIndexing(false); break;
+		case EL:
+			el.setIndexing(false); break;
+>>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
+		}
+	}
+	/**
+	 * Moves Galil to a specified coordinate.
+	 * @param c coordinate
+	 */
 	public void goToPos(Coordinate c) {
 		moveAbsolute(c.getAz(), c.getEl());
 	}
-
+	/**
+	 * Sets the coordinate for ra dec tracking.
+	 * @param ra
+	 * @param dec
+	 */
 	public void setRaDecTracking(double ra, double dec) {
 		window.setRaDec(ra, dec);
 	}
-
+	/**
+	 * Sets the base location.
+	 * @param pos in latitude, longitude, and position
+	 */
 	public void setBaseLocation(LatLongAlt pos) {
 		baseLocation = pos;
 		calcAzElToBalloon();
 		window.updateBaseBalloonLoc();
 	}
-	
+	/**
+	 * Sets the balloon location.
+	 * @param pos in latitude, longitude, and position
+	 */
 	public void setBalloonLocation(LatLongAlt pos) {
 		balloonLocation = pos;
 		calcAzElToBalloon();
 		window.updateBaseBalloonLoc();
 	}
-	
+	/**
+	 * Converts the longitude and latitude position of the balloon to an az and el coordinate.
+	 */
 	private void calcAzElToBalloon() {
 		Coordinate base = new Coordinate(baseLocation);
 		Coordinate balloon = new Coordinate(balloonLocation);
@@ -550,40 +751,63 @@ public class Stage {
 		azToBalloon = Math.toDegrees(Math.atan2(xRel, yRel));
 		if (azToBalloon < 0) azToBalloon = azToBalloon + 360;
 	}
-
+	/**
+	 * Returns the balloon location.
+	 * @return
+	 */
 	public LatLongAlt getBalloonLocation() {
 		return balloonLocation;
 	}
-
+	/**
+	 * Return the base location.
+	 * @return
+	 */
 	public LatLongAlt getBaseLocation() {
 		return baseLocation;
 	}
-
+	/**
+	 * The string that displays the base location in the program.
+	 * @return
+	 */
 	public String baseLocDisplay() {
 		return "Base Location\n" + baseLocation.guiString();
 	}
-
+	/**
+	 * The string that displays the balloon location in the program.
+	 * @return
+	 */
 	public String balloonLocDisplay() {
 		String out = "BalloonLocation\n" + balloonLocation.guiString();
 		out += "\nAz to balloon:  " + Formatters.TWO_POINTS_FORCE.format(azToBalloon) + "\n";
 		out += "El to balloon:  " + Formatters.TWO_POINTS_FORCE.format(elToBalloon);
 		return out;
 	}
-
+	/**
+	 * Moves Galil to the balloon position.
+	 */
 	public void goToBalloon() {
 		moveAbsolute(azToBalloon, elToBalloon);
 	}
-
+	/**
+	 * Sets a new coordinate as the relative (0,0).
+	 * @param c coordinate
+	 */
 	public void calibrate(Coordinate c) {
 		scope.calibrate(c);
 		System.out.println("az: " + c.getAz());
 		System.out.println("el: " + c.getEl());
 	}
-
+	/**
+	 * Convenience method for enabling a method.
+	 * @param name
+	 */
 	public void buttonEnabler(String name) {
 		window.buttonEnabler(name);
 	}
-
+	/**
+	 * Updates Galil's position for the user.
+	 * @param data to update with
+	 */
 	void updatePosition(DataInterface data) {
 		if (data.motorState(Axis.AZ) != position.motorState(Axis.AZ) ||
 		data.motorState(Axis.EL) != position.motorState(Axis.EL)) {
@@ -603,15 +827,50 @@ public class Stage {
 		}
 		window.updateTxtPosInfo(info);
 	}
+<<<<<<< HEAD
 	
 //	void updateVelAcc(String azVel, String azAcc, String elVel, String elAcc) {
 //		window.updateVelAcc(azVel, azAcc, elVel, elAcc);
 //	}
 	
 	void setGoalPos(double deg, Axis axis) {
-		window.setGoalPos(Formatters.TWO_POINTS.format(deg), axis);
+=======
+	/**
+	 * Updates the axes velocity and acceleration for the user.
+	 * @param azVel
+	 * @param azAcc
+	 * @param elVel
+	 * @param elAcc
+	 */
+	void updateVelAcc(String azVel, String azAcc, String elVel, String elAcc) {
+		window.updateVelAcc(azVel, azAcc, elVel, elAcc);
+	}
+	/**
+	 * Allows data to be read from Galil to update the velocity, acceleration and position for the user.
+	 */
+	void toggleReader() {
+		reader.togglePauseFlag();
 	}
 
+//	void setGoalAz(double goalAz) {
+//		window.setGoalAz(goalAz);
+//	}
+//
+//	void setGoalEl(double goalEl) {
+//		window.setGoalEl(goalEl);
+//	}
+	/**
+	 * Sets where an axis wants to go if it were to complete a successful move.
+	 * @param deg absolute position it will end up
+	 * @param axis
+	 */
+	void setGoalPos(double deg, axisType axis) {
+>>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
+		window.setGoalPos(Formatters.TWO_POINTS.format(deg), axis);
+	}
+	/**
+	 * Closes the program and saves all settings.
+	 */
 	public void shutdown() {
 		exec.shutdown();
 		reader.stop2();

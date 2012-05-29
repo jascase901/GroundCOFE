@@ -9,12 +9,17 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-
+/**
+ * Lowest level methods that communicate with Galil.
+ *
+ *
+ */
 public class CommGalil implements CommInterface {
 	private PrintWriter out;
 	private BufferedReader in;
 	private Socket socket = null;
 	boolean connection = false;
+<<<<<<< HEAD
 	private String previousCommand = "";
 	
 	int port = 0;
@@ -24,6 +29,12 @@ public class CommGalil implements CommInterface {
 //	private static List<String> response = new ArrayList<String>();
 //	private static List<String> threads = new ArrayList<String>();
 	
+=======
+	/**
+	 * Creates a connection with Galil and instantiates a CommGalil object.
+	 * @param port to connect to
+	 */
+>>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
 	public CommGalil(int port) {
 		System.out.println("comm galil constructor" + port);
 		this.port = port;
@@ -46,13 +57,19 @@ public class CommGalil implements CommInterface {
 	}
 	
 	//Send message through output stream.
+	/**
+	 * Sends a message to Galil which is how the program communicates with it.
+	 * @param message to send
+	 */
     public void send(String message) {
     	//sendCount++;
     	previousCommand = message;
     	out.println(message);
     	//System.out.print(message);
     }
-    
+    /**
+     * Reads output from Galil.
+     */
     public String read() {
     	//readCount++;
     	//Thread tr = Thread.currentThread();
@@ -100,6 +117,11 @@ public class CommGalil implements CommInterface {
     }
     
     //Simply calls send and then receive for convenience.
+    /**
+     * Sends a message to Galil and receives a reply.
+     * @param message to send
+     * @return message from Galil
+     */
     public String sendRead(String message) {
     	//System.out.println(port + "   " + message);
     	//read();
@@ -118,6 +140,9 @@ public class CommGalil implements CommInterface {
     }
     
     //How many bytes are waiting to be read.
+    /**
+     * Gets the amount of bytes waiting to be read from Galil.
+     */
     public int queueSize() {
     	int size = 0;
     	try {
@@ -127,7 +152,9 @@ public class CommGalil implements CommInterface {
 		}
     	return size;
     }
-    
+    /**
+     * Closes the connection with Galil.
+     */
     public void close() {
 //    	System.out.println("readCount: " + readCount);
 //    	System.out.println("sendCount: " + sendCount);
@@ -150,12 +177,18 @@ public class CommGalil implements CommInterface {
 			e.printStackTrace();
 		}
     }
+<<<<<<< HEAD
     
     public void initialize() {
     	sendRead("CF I"); //causes responses to be sent over the port that sent this command
     	sendRead("CW 2"); //disables flipping of MSB
     }
     
+=======
+    /**
+     * Reads off what Galil is wanting to send.
+     */
+>>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
     public void test() {
     	try {
 			InputStream asdf = socket.getInputStream();
