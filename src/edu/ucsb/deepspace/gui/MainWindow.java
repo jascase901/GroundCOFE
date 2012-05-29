@@ -121,6 +121,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Text txtMaxRelEl;
 	private Button btnLoadScripts;
 	private Text txtCommandArea;
+	private Text txtAzRpm;
+	private Text txtElRpm;
 
 	public MainWindow(Composite parent, int style, Stage stage, Stage.StageTypes StageTypes) {
 		super(parent, style);
@@ -830,6 +832,24 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	btnStopEl.addMouseListener(new MouseAdapter() {
     		public void mouseDown(MouseEvent evt) {
     			stage.stop(Axis.EL);
+    		}
+    	});
+    	
+    	txtAzRpm = new Text(grpAxisControl, SWT.BORDER);
+    	txtAzRpm.setBounds(110, 297, 60, 19);
+    	
+    	txtElRpm = new Text(grpAxisControl, SWT.BORDER);
+    	txtElRpm.setBounds(204, 297, 60, 19);
+    	
+    	Button btnSetRpm = new Button(grpAxisControl, SWT.NONE);
+    	btnSetRpm.setBounds(14, 293, 68, 23);
+    	btnSetRpm.setText("Set RPM");
+    	btnSetRpm.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			double azRpm = Double.parseDouble(txtAzRpm.getText());
+    			double elRpm = Double.parseDouble(txtElRpm.getText());
+    			stage.setRpm(azRpm, elRpm);
     		}
     	});
     	

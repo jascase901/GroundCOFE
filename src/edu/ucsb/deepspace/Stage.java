@@ -326,11 +326,6 @@ public class Stage {
 							return;
 						}
 					}
-//					if (mc.getAmount(Axis.AZ) > maxMoveRelAz || mc.getAmount(Axis.EL) > maxMoveRelEl) {
-//						window.controlMoveButtons(true);
-//						statusArea("Maximum allowed relative move limit exceeded.\n");
-//						return;
-//					}
 				}
 				
 				if (!scope.validMove(mc, minAz, maxAz, minEl, maxEl)) {
@@ -445,6 +440,11 @@ public class Stage {
 	public void setMaxMoveRel(double maxMoveRelAz, double maxMoveRelEl) {
 		this.maxMoveRelAz = maxMoveRelAz;
 		this.maxMoveRelEl = maxMoveRelEl;
+	}
+	
+	public void setRpm(double azRpm, double elRpm) {
+		scope.setSpeedByRpm(azRpm, Axis.AZ);
+		scope.setSpeedByRpm(elRpm, Axis.EL);
 	}
 
 	public int getEncTol() {return encTol;}

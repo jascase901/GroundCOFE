@@ -152,8 +152,8 @@ public class CommGalil implements CommInterface {
     }
     
     public void initialize() {
-    	sendRead("CF I");
-    	sendRead("CW 2");
+    	sendRead("CF I"); //causes responses to be sent over the port that sent this command
+    	sendRead("CW 2"); //disables flipping of MSB
     }
     
     public void test() {

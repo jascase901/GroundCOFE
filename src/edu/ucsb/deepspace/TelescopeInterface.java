@@ -81,6 +81,13 @@ public interface TelescopeInterface {
 	public double rpm(double vel, Axis axis);
 	
 	/**
+	 * Sets the speed of the axis so that it rotates at the specified RPM.
+	 * @param rpm
+	 * @param axis
+	 */
+	public void setSpeedByRpm(double rpm, Axis axis);
+	
+	/**
 	 * Begin the indexing procedure for this axis.
 	 */
 	public void index(Axis axis);

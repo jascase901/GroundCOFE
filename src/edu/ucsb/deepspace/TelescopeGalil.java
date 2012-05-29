@@ -251,6 +251,13 @@ public class TelescopeGalil implements TelescopeInterface {
 		double rpm = (vel / encPerRev) * 60d;
 		return rpm;
 	}
+	
+	@Override
+	public void setSpeedByRpm(double rpm, Axis axis) {
+		GalilAxis temp = picker(axis);
+		double speed = (rpm / 60d) * 360d * temp.encPerDeg;
+		temp.setVelocity(speed);
+	}
 
 	@Override
 	public void index(Axis axis) {
@@ -445,7 +452,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		}
 		
 		private void setAccel(double acc) {
-			protocol.sendRead("SP" + abbrev + "=" + (int) acc);
+			protocol.sendRead("AC" + abbrev + "=" + (int) acc);
 		}
 		
 	}
