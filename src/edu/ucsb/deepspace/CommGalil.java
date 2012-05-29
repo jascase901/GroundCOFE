@@ -120,7 +120,7 @@ public class CommGalil implements CommInterface {
      * @return message from Galil
      */
     public String sendRead(String message) {
-    	//System.out.println(port + "   " + message);
+    	//System.out.println("\n" + port + "   " + message + "\n");
     	//read();
     	
     	//send.add(message);
@@ -176,8 +176,9 @@ public class CommGalil implements CommInterface {
     }
     
     public void initialize() {
-    	sendRead("CF I"); //causes responses to be sent over the port that sent this command
-    	sendRead("CW 2"); //disables flipping of MSB
+    	sendRead("CF I;CW 2"); //causes responses to be sent over the port that sent this command
+    	read();
+    	//sendRead("CW 2"); //disables flipping of MSB
     }
     
     /**
