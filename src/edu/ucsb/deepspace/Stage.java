@@ -46,16 +46,12 @@ public class Stage {
 	private final Properties settings = new Properties();
 	private LatLongAlt baseLocation, balloonLocation;
 	private double azToBalloon = 0, elToBalloon = 0;
-<<<<<<< HEAD
 	private CommGalil stageProtocol, scopeProtocol, readerProtocol;
 	ScriptLoader sl;
 
-=======
-	private CommGalil protocol, protocolTest;
 	/**
 	 * Creates a new stage object and loads all the preset settings into it.
 	 */
->>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
 	public Stage() {
 		try {
 			loadSettings();
@@ -95,31 +91,12 @@ public class Stage {
 			reader.start();
 		}
 	}
-<<<<<<< HEAD
-
-=======
-	/**
-	 * Returns the axis name: A for azimuth and B for elevation.
-	 * @param axis
-	 * @return A or B
-	 */
-	public String axisName(axisType axis) {
-		switch (axis) {
-		case AZ:
-			return "A";
-		case EL:
-			return "B";
-		default:
-			System.out.println("this should never happen.  Stage.axisName()");
-		}
-		return "error Stage.axisName()";
-	}
+	
 	/**
 	 * Loads the settings.ini file and saves all its variables.
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
->>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
 	private void loadSettings() throws FileNotFoundException, IOException {
 		//read settings from file
 		settings.load(new FileInputStream("Settings.ini"));
@@ -343,7 +320,6 @@ public class Stage {
 	public void stopScanning() {
 		scope.stopScanning();
 	}
-<<<<<<< HEAD
 	
 //	public void raster(ScanCommand azSc, ScanCommand elSc) {
 //		moveAbsolute(azSc.getMin(), elSc.getMin());
@@ -409,10 +385,6 @@ public class Stage {
 		scope.setVelocity(vel, axis);
 	}
 	
-	public void moveRelative(Double amount, Axis axis, MoveType type) {
-		MoveCommand mc = new MoveCommand(MoveMode.RELATIVE, type, null, null);
-		switch (axis) {
-=======
 	/**
 	 * Moves the axes to the minimum of the ScanCommands is two separate threads.
 	 * 
@@ -437,29 +409,45 @@ public class Stage {
 //		  mask%2
 		
 	}
-	/**
-	 * Determines if a move is valid and if so executes the correct move command based on mc.
-	 * @param mc the move command to be executed
-	 */
-	public void move(MoveCommand mc) {
-		ActInterface act = null;
-		double min = 0, max = 0;
-		
-		switch (mc.getAxis()) {
->>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
-			case AZ:
-				mc = new MoveCommand(MoveMode.RELATIVE, type, amount, null); break;
-			case EL:
-				mc = new MoveCommand(MoveMode.RELATIVE, type, null, amount); break;
-		}
-		move(mc);
-	}
 	
+	public void moveRelative(Double amount, Axis axis, MoveType type) {
+		MoveCommand mc = new MoveCommand(MoveMode.RELATIVE, type, null, null);
+		switch (axis) {
+		}
+	}
+
+//	/**
+//	 * Determines if a move is valid and if so executes the correct move command based on mc.
+//	 * @param mc the move command to be executed
+//	 */
+//	public void move(MoveCommand mc) {
+//		ActInterface act = null;
+//		double min = 0, max = 0;
+//		
+//		switch (mc.getAxis()) {
+//			case AZ:
+//				mc = new MoveCommand(MoveMode.RELATIVE, type, amount, null); break;
+//			case EL:
+//				mc = new MoveCommand(MoveMode.RELATIVE, type, null, amount); break;
+//		}
+//		move(mc);
+//	}
+	
+	/**
+	 * Convenience method that moves the az and el axis to an absolute position in degrees in two separate 
+	 * threads.
+	 * @param azDeg
+	 * @param elDeg
+	 */
 	private void moveAbsolute(double azDeg, double elDeg) {
 		MoveCommand mc = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, azDeg, elDeg);
 		move(mc);
 	}
 
+	/**
+	 * Moves an axis to its default position.
+	 * @param type of axis
+	 */
 	public void index(final Axis axis) {
 		if (scope.isIndexing(axis)) {
 			buttonEnabler("indexAz");
@@ -472,38 +460,6 @@ public class Stage {
 			buttonEnabler("indexEl");
 			return;
 		}
-<<<<<<< HEAD
-		
-=======
-		window.controlMoveButtons(true);
-	}
-	
-	/**
-	 * Convenience method that moves the az and el axis to an absolute position in degrees in two separate 
-	 * threads.
-	 * @param azDeg
-	 * @param elDeg
-	 */
-	private void moveAbsolute(double azDeg, double elDeg) {
-		final MoveCommand mcAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, axisType.AZ, azDeg);
-		final MoveCommand mcEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, axisType.EL, elDeg);
-		exec.submit(new Runnable() {
-			public void run() {
-				move(mcAz);
-			}
-		});
-		exec.submit(new Runnable() {
-			public void run() {
-				move(mcEl);
-			}
-		});
-	}
-	/**
-	 * Moves an axis to its default position.
-	 * @param type of axis
-	 */
-	public void index(final axisType type) {
->>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
@@ -514,7 +470,24 @@ public class Stage {
 				reader.readerOnOff(true);
 			}
 		});
+		window.controlMoveButtons(true);
 	}
+	
+
+//	private void moveAbsolute(double azDeg, double elDeg) {
+//		final MoveCommand mcAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, axisType.AZ, azDeg);
+//		final MoveCommand mcEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, axisType.EL, elDeg);
+//		exec.submit(new Runnable() {
+//			public void run() {
+//				move(mcAz);
+//			}
+//		});
+//		exec.submit(new Runnable() {
+//			public void run() {
+//				move(mcEl);
+//			}
+//		});
+//	}
 
 	/**
 	 * Returns true if something is moving, false if not.
@@ -629,7 +602,6 @@ public class Stage {
 		System.out.println("--------");
 		scopeProtocol.test();
 	}
-<<<<<<< HEAD
 	
 	/**
 	 * Stops the desired axis.
@@ -651,6 +623,11 @@ public class Stage {
 		});
 	}
 
+	/**
+	 * Gets the position of a certain axis.
+	 * @param axisType
+	 * @return
+	 */
 	double encPos(Axis axis) {
 		if (position == null) return 0;
 		switch (axis) {
@@ -660,37 +637,9 @@ public class Stage {
 				return position.elPos();
 			default:
 				return 0;
-=======
-	/**
-	 * Gets the position of a certain axis.
-	 * @param axisType
-	 * @return
-	 */
-	public double encPos(axisType axisType) {
-		if (position == null) return 0;
-		switch (axisType) {
-		case AZ:
-			return position.azPos();
-		case EL:
-			return position.elPos();
-		default:
-			return 0;
 		}
 	}
-	/**
-	 * Tells the user and everything else that indexing is done.
-	 * @param type
-	 */
-	public void indexingDone(axisType type) {
-		System.out.println("indexing done");
-		switch (type) {
-		case AZ:
-			az.setIndexing(false); break;
-		case EL:
-			el.setIndexing(false); break;
->>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
-		}
-	}
+
 	/**
 	 * Moves Galil to a specified coordinate.
 	 * @param c coordinate
@@ -827,47 +776,21 @@ public class Stage {
 		}
 		window.updateTxtPosInfo(info);
 	}
-<<<<<<< HEAD
 	
 //	void updateVelAcc(String azVel, String azAcc, String elVel, String elAcc) {
 //		window.updateVelAcc(azVel, azAcc, elVel, elAcc);
 //	}
 	
-	void setGoalPos(double deg, Axis axis) {
-=======
-	/**
-	 * Updates the axes velocity and acceleration for the user.
-	 * @param azVel
-	 * @param azAcc
-	 * @param elVel
-	 * @param elAcc
-	 */
-	void updateVelAcc(String azVel, String azAcc, String elVel, String elAcc) {
-		window.updateVelAcc(azVel, azAcc, elVel, elAcc);
-	}
-	/**
-	 * Allows data to be read from Galil to update the velocity, acceleration and position for the user.
-	 */
-	void toggleReader() {
-		reader.togglePauseFlag();
-	}
 
-//	void setGoalAz(double goalAz) {
-//		window.setGoalAz(goalAz);
-//	}
-//
-//	void setGoalEl(double goalEl) {
-//		window.setGoalEl(goalEl);
-//	}
 	/**
 	 * Sets where an axis wants to go if it were to complete a successful move.
 	 * @param deg absolute position it will end up
 	 * @param axis
 	 */
-	void setGoalPos(double deg, axisType axis) {
->>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
+	void setGoalPos(double deg, Axis axis) {
 		window.setGoalPos(Formatters.TWO_POINTS.format(deg), axis);
 	}
+	
 	/**
 	 * Closes the program and saves all settings.
 	 */

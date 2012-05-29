@@ -1,16 +1,8 @@
 package edu.ucsb.deepspace;
 
-<<<<<<< HEAD
-
-=======
-import edu.ucsb.deepspace.MoveCommand.MoveMode;
-import edu.ucsb.deepspace.MoveCommand.MoveType;
 /**
  * All methods that convert between encoder pulses and degrees and move Galil.
- * 
- *
  */
->>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
 public class ActGalil implements ActInterface {
 	
 	private Axis axis;
@@ -22,18 +14,14 @@ public class ActGalil implements ActInterface {
 	private String axisAbbrev = "";
 	private double offset = 0;
 	private boolean scanning = false;
-<<<<<<< HEAD
 	private boolean motorState = false;
 
-	public ActGalil(Axis axis, CommGalil protocol) {
-=======
 	/**
 	 * Creates an ActGalil object to control each axis.
 	 * @param axis
 	 * @param protocol to talk to Galil
 	 */
-	public ActGalil(axisType axis, CommGalil protocol) {
->>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
+	public ActGalil(Axis axis, CommGalil protocol) {
 		this.axis = axis;
 		this.protocol = protocol;
 		if (axis == Axis.AZ) {
@@ -289,13 +277,18 @@ public class ActGalil implements ActInterface {
 		System.out.println("error ActGalil.motorState");
 		return false;
 	}
-<<<<<<< HEAD
 	
+	/**
+	 * Turns an axis motor on.
+	 */
 	private void motorOn() {
 		protocol.sendRead("SH" + axisAbbrev);
 		motorState();
 	}
 	
+	/**
+	 * Turns an axis motor off.
+	 */
 	private void motorOff() {
 		protocol.sendRead("MO" + axisAbbrev);
 		motorState();
@@ -324,25 +317,10 @@ public class ActGalil implements ActInterface {
 		protocol.sendRead("ST" + axisAbbrev);
 	}
 	
-=======
-	/**
-	 * Turns an axis motor on.
-	 */
-	void motorOn() {
-		protocol.send("SH" + axisName);
-	}
-	/**
-	 * Turns an axis motor off.
-	 */
-	void motorOff() {
-		protocol.send("MO" + axisName);
-	}
-	
 	/**
 	 * Sets the velocity of az or el movement.
 	 * @param vel in encoder pulses per second
 	 */
->>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
 	public void setVelocity(double vel) {
 		String out = "JG" + axisAbbrev + "=" + vel;
 		protocol.sendRead(out);
@@ -354,12 +332,9 @@ public class ActGalil implements ActInterface {
 	public boolean indexing() {return indexing;}
 	public void setIndexing(boolean indexing) {this.indexing = indexing;}
 	
-<<<<<<< HEAD
-=======
 	/**
 	 * Sets a new coordinate as the relative (0,0).
 	 */
->>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
 	public void calibrate(double degVal) {
 		offset = degVal - convEncToDeg(stage.encPos(axis));
 	}

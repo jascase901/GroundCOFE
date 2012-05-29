@@ -19,7 +19,6 @@ public class CommGalil implements CommInterface {
 	private BufferedReader in;
 	private Socket socket = null;
 	boolean connection = false;
-<<<<<<< HEAD
 	private String previousCommand = "";
 	
 	int port = 0;
@@ -29,12 +28,10 @@ public class CommGalil implements CommInterface {
 //	private static List<String> response = new ArrayList<String>();
 //	private static List<String> threads = new ArrayList<String>();
 	
-=======
 	/**
 	 * Creates a connection with Galil and instantiates a CommGalil object.
 	 * @param port to connect to
 	 */
->>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
 	public CommGalil(int port) {
 		System.out.println("comm galil constructor" + port);
 		this.port = port;
@@ -177,18 +174,15 @@ public class CommGalil implements CommInterface {
 			e.printStackTrace();
 		}
     }
-<<<<<<< HEAD
     
     public void initialize() {
     	sendRead("CF I"); //causes responses to be sent over the port that sent this command
     	sendRead("CW 2"); //disables flipping of MSB
     }
     
-=======
     /**
      * Reads off what Galil is wanting to send.
      */
->>>>>>> ccd8e4f4271c63dbf1ae70e44821f934eb385664
     public void test() {
     	try {
 			InputStream asdf = socket.getInputStream();
