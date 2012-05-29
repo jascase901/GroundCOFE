@@ -385,6 +385,28 @@ public class Stage {
 		scope.setVelocity(vel, axis);
 	}
 	
+	public void moveRelative(Double amount, Axis axis, MoveType type) {
+		MoveCommand mc = new MoveCommand(MoveMode.RELATIVE, type, null, null);
+		switch (axis) {
+			case AZ:
+				mc = new MoveCommand(MoveMode.RELATIVE, type, amount, null); break;
+			case EL:
+				mc = new MoveCommand(MoveMode.RELATIVE, type, null, amount); break;
+		}
+		move(mc);
+	}
+	
+	/**
+	 * Convenience method that moves the az and el axis to an absolute position in degrees in two separate 
+	 * threads.
+	 * @param azDeg
+	 * @param elDeg
+	 */
+	private void moveAbsolute(double azDeg, double elDeg) {
+		MoveCommand mc = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, azDeg, elDeg);
+		move(mc);
+	}
+	
 	/**
 	 * Moves the axes to the minimum of the ScanCommands is two separate threads.
 	 * 
@@ -408,40 +430,6 @@ public class Stage {
 //		  mask++
 //		  mask%2
 		
-	}
-	
-	public void moveRelative(Double amount, Axis axis, MoveType type) {
-		MoveCommand mc = new MoveCommand(MoveMode.RELATIVE, type, null, null);
-		switch (axis) {
-		}
-	}
-
-//	/**
-//	 * Determines if a move is valid and if so executes the correct move command based on mc.
-//	 * @param mc the move command to be executed
-//	 */
-//	public void move(MoveCommand mc) {
-//		ActInterface act = null;
-//		double min = 0, max = 0;
-//		
-//		switch (mc.getAxis()) {
-//			case AZ:
-//				mc = new MoveCommand(MoveMode.RELATIVE, type, amount, null); break;
-//			case EL:
-//				mc = new MoveCommand(MoveMode.RELATIVE, type, null, amount); break;
-//		}
-//		move(mc);
-//	}
-	
-	/**
-	 * Convenience method that moves the az and el axis to an absolute position in degrees in two separate 
-	 * threads.
-	 * @param azDeg
-	 * @param elDeg
-	 */
-	private void moveAbsolute(double azDeg, double elDeg) {
-		MoveCommand mc = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, azDeg, elDeg);
-		move(mc);
 	}
 
 	/**
