@@ -47,13 +47,9 @@ public class Stage {
 	private final Properties settings = new Properties();
 	private LatLongAlt baseLocation, balloonLocation;
 	private double azToBalloon = 0, elToBalloon = 0;
-<<<<<<< HEAD
-	private CommGalil protocol, protocolTest;
-	private boolean azMotorState = false, elMotorState = false;
-	private Scanner scanner = new Scanner(this,az, el );
-=======
+
 	private CommGalil stageProtocol, scopeProtocol;
->>>>>>> a9fef00b83aad03044e5f637d0ced2f39f30522e
+
 
 	public Stage() {
 		try {
@@ -140,19 +136,7 @@ public class Stage {
 		actSettings.load(new FileInputStream("Galil.ini"));
 		double azOffset = Double.parseDouble(actSettings.getProperty("azOffset"));
 		double elOffset = Double.parseDouble(actSettings.getProperty("elOffset"));
-<<<<<<< HEAD
-		minAz = Double.parseDouble(actSettings.getProperty("minAz","0"));
-		maxAz = Double.parseDouble(actSettings.getProperty("maxAz","0"));
-		minEl = Double.parseDouble(actSettings.getProperty("minEl","0"));
-		maxEl = Double.parseDouble(actSettings.getProperty("maxEl", "0"));
-		velAz = Double.parseDouble(actSettings.getProperty("velAz", "0"));
-		accAz = Double.parseDouble(actSettings.getProperty("accAz", "0"));
-		velEl = Double.parseDouble(actSettings.getProperty("velEl", "0"));
-		accEl = Double.parseDouble(actSettings.getProperty("accEl","0"));
-		encTol = Integer.parseInt(actSettings.getProperty("encTol", "0"));
-		az.setOffset(azOffset);
-		el.setOffset(elOffset);
-=======
+
 		minAz = Double.parseDouble(actSettings.getProperty("minAz"));
 		maxAz = Double.parseDouble(actSettings.getProperty("maxAz"));
 		minEl = Double.parseDouble(actSettings.getProperty("minEl"));
@@ -163,7 +147,7 @@ public class Stage {
 		maxAccEl = Double.parseDouble(actSettings.getProperty("accEl"));
 		encTol = Integer.parseInt(actSettings.getProperty("encTol"));
 		scope.setOffsets(azOffset, elOffset);
->>>>>>> a9fef00b83aad03044e5f637d0ced2f39f30522e
+
 		window.setMinMaxAzEl(minAz, maxAz, minEl, maxEl);
 		window.setVelAccAzEl(maxVelAz, maxAccAz, maxVelEl, maxAccEl);
 	}
@@ -293,7 +277,7 @@ public class Stage {
 	}
 	
 	public void raster(ScanCommand azSc, ScanCommand elSc){
-		scanner.rasterScan(azSc.getMin(), azSc.getMax(), elSc.getMin(), elSc.getMax());
+		//scanner.rasterScan(azSc.getMin(), azSc.getMax(), elSc.getMin(), elSc.getMax());
 	}
 	
 //	public void raster(ScanCommand azSc, ScanCommand elSc) {

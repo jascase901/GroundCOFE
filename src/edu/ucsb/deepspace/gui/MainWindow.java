@@ -185,17 +185,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
-<<<<<<< HEAD
-    	//TODO
-    	btnRaCalibrate = new Button(area, SWT.PUSH | SWT.CENTER);
-    	btnRaCalibrate.setText("Ra Calibrate");
-    	btnRaCalibrate.setBounds(296, 500, 87, 31);
-    	popupWindowButtons.put("ra calibrate", btnCalibrate);
-    	btnRaCalibrate.addMouseListener(new MouseAdapter() {
-    		public void mouseDown(MouseEvent evt) {
-    			btnRaCalibrate.setEnabled(false);
-    			new RaDecCalibrateWindow(minsec, "calibrate", stage);
-=======
+
     	btnRADecCalibrate = new Button(area, SWT.NONE);
     	btnRADecCalibrate.setBounds(387, 474, 96, 30);
     	btnRADecCalibrate.setText("RA/Dec Calibrate");
@@ -204,7 +194,6 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		public void mouseDown(MouseEvent evt) {
     			btnRADecCalibrate.setEnabled(false);
     			new RaDecWindow(minsec, "radeccalibrate", stage);
->>>>>>> a9fef00b83aad03044e5f637d0ced2f39f30522e
     		}
     	});
     	
@@ -1180,100 +1169,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		});
 	}
 	
-<<<<<<< HEAD
-	public void enableButtons() {
-		btnGoToPosition.setEnabled(true);
-    	btnBalloonLocation.setEnabled(true);
-    	btnCalibrate.setEnabled(true);
-    	btnRaCalibrate.setEnabled(true);
-    	btnBaseLocation.setEnabled(true);
-    	azPlus.setEnabled(true);
-    	azMinus.setEnabled(true);
-    	elPlus.setEnabled(true);
-    	elMinus.setEnabled(true);
-    	status.setEnabled(true);
-    	indexAz.setEnabled(true);
-    	indexEl.setEnabled(true);
-    	btnMinutesSeconds.setEnabled(true);
-    	btnDecimalMinutes.setEnabled(true);
-    	btnRadioSteps.setEnabled(true);
-    	btnRadioDegrees.setEnabled(true);
-    	//btnEncoderSteps.setEnabled(true);
-    	txtEncTol.setEnabled(true);
-    	if (radecOn) btnRaDecOff.setEnabled(true);
-    	else if (txtRa.getText().equals("") && txtDec.getText().equals("")) {}
-    	else btnRaDecOn.setEnabled(true);
-    	btnGoToRaDec.setEnabled(true);
-    	btnChangeRadec.setEnabled(true);
-    	btnQuit.setEnabled(true);
-    	btnSetMinMaxEl.setEnabled(true);
-    	txtMaxEl.setEnabled(true);
-    	txtMinEl.setEnabled(true);
-    	txtMaxAz.setEnabled(true);
-    	txtMinAz.setEnabled(true);
-    	moveAmount.setEnabled(true);
-    	btnGoToBalloon.setEnabled(true);
-    	btnSetMinMaxAz.setEnabled(true);
-    	
-    	btnScanAz.setEnabled(true);
-    	btnScanEl.setEnabled(true);
-    	btnScanBoth.setEnabled(true);
-    	txtMinAzScan.setEnabled(true);
-    	txtMaxAzScan.setEnabled(true);
-    	txtTimeAzScan.setEnabled(true);
-    	txtMinElScan.setEnabled(true);
-    	txtMaxElScan.setEnabled(true);
-    	txtTimeElScan.setEnabled(true);
-    	txtRepScan.setEnabled(true);
-	}
-	
-	public void disableButtons() {
-		btnGoToPosition.setEnabled(false);
-    	btnBalloonLocation.setEnabled(false);
-    	btnCalibrate.setEnabled(false);
-    	btnCalibrate.setEnabled(false);
-    	btnBaseLocation.setEnabled(false);
-    	azPlus.setEnabled(false);
-    	azMinus.setEnabled(false);
-    	elPlus.setEnabled(false);
-    	elMinus.setEnabled(false);
-    	status.setEnabled(false);
-    	indexAz.setEnabled(false);
-    	indexEl.setEnabled(false);
-    	btnMinutesSeconds.setEnabled(false);
-    	btnRaDecOff.setEnabled(false);
-    	btnDecimalMinutes.setEnabled(false);
-    	btnRadioSteps.setEnabled(false);
-    	btnRadioDegrees.setEnabled(false);
-    	//btnEncoderSteps.setEnabled(false);
-    	txtEncTol.setEnabled(false);
-    	btnRaDecOn.setEnabled(false);
-    	btnGoToRaDec.setEnabled(false);
-    	btnChangeRadec.setEnabled(false);
-    	btnQuit.setEnabled(false);
-    	btnSetMinMaxEl.setEnabled(false);
-    	txtMaxEl.setEnabled(false);
-    	txtMinEl.setEnabled(false);
-    	txtMaxAz.setEnabled(false);
-    	txtMinAz.setEnabled(false);
-    	moveAmount.setEnabled(false);
-    	btnGoToBalloon.setEnabled(false);
-    	btnSetMinMaxAz.setEnabled(false);
-    	
-    	btnScanAz.setEnabled(false);
-    	btnScanEl.setEnabled(false);
-    	btnScanBoth.setEnabled(false);
-    	txtMinAzScan.setEnabled(false);
-    	txtMaxAzScan.setEnabled(false);
-    	txtTimeAzScan.setEnabled(false);
-    	txtMinElScan.setEnabled(false);
-    	txtMaxElScan.setEnabled(false);
-    	txtTimeElScan.setEnabled(false);
-    	txtRepScan.setEnabled(false);
-	}
-	
-=======
->>>>>>> a9fef00b83aad03044e5f637d0ced2f39f30522e
+
 	public void enableScanButtons() {
 		btnScanAz.setEnabled(true);
 		btnScanEl.setEnabled(true);
