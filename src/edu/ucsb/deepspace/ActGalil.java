@@ -1,25 +1,23 @@
 package edu.ucsb.deepspace;
 
-import edu.ucsb.deepspace.MoveCommand.MoveMode;
-import edu.ucsb.deepspace.MoveCommand.MoveType;
 
 public class ActGalil implements ActInterface {
 	
-	private axisType axis;
+	private Axis axis;
 	private Stage stage;
 	private CommGalil protocol;
 	private double encPulsePerRev;
 	private double encPulsePerDeg;
 	private boolean indexing = false;
-	private String axisName = "";
+	private String axisAbbrev = "";
 	private double offset = 0;
 	private boolean scanning = false;
 	private boolean motorState = false;
 
-	public ActGalil(axisType axis, CommGalil protocol) {
+	public ActGalil(Axis axis, CommGalil protocol) {
 		this.axis = axis;
 		this.protocol = protocol;
-		if (axis == axisType.AZ) {
+		if (axis == Axis.AZ) {
 			encPulsePerRev = 1000*1024;
 		}
 		else {
@@ -30,7 +28,7 @@ public class ActGalil implements ActInterface {
 	
 	public void registerStage(Stage stage) {
 		this.stage = stage;
-		axisName = stage.axisName(axis);
+		axisAbbrev = axis.getAbbrev();
 	}
 	
 	public void configure() {
@@ -67,22 +65,22 @@ public class ActGalil implements ActInterface {
 	private double goalUserDeg(MoveCommand mc) {
 		double goal = 0;
 		
-		if (mc.getMode() == MoveMode.RELATIVE) {
-			if (mc.getType() == MoveType.ENCODER) {
-				goal = userPos() + convEncToDeg(mc.getAmount());
-			}
-			else if (mc.getType() == MoveType.DEGREE) {
-				goal = userPos() + mc.getAmount();
-			}
-		}
-		else if (mc.getMode() == MoveMode.ABSOLUTE) {
-			if (mc.getType() == MoveType.ENCODER) {
-				goal = convEncToDeg(mc.getAmount());
-			}
-			else if (mc.getType() == MoveType.DEGREE) {
-				goal = mc.getAmount();
-			}
-		}
+//		if (mc.getMode() == MoveMode.RELATIVE) {
+//			if (mc.getType() == MoveType.ENCODER) {
+//				goal = userPos() + convEncToDeg(mc.getAmount());
+//			}
+//			else if (mc.getType() == MoveType.DEGREE) {
+//				goal = userPos() + mc.getAmount();
+//			}
+//		}
+//		else if (mc.getMode() == MoveMode.ABSOLUTE) {
+//			if (mc.getType() == MoveType.ENCODER) {
+//				goal = convEncToDeg(mc.getAmount());
+//			}
+//			else if (mc.getType() == MoveType.DEGREE) {
+//				goal = mc.getAmount();
+//			}
+		//}
 		
 //		switch (mc.getMode()) {
 //			case RELATIVE:
@@ -150,6 +148,7 @@ public class ActGalil implements ActInterface {
 	 * @param deg
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private double userDegToEnc(double deg) {
 		double absDeg = userDegToAbsDeg(deg);
 		return absDegToEnc(absDeg);
@@ -195,9 +194,10 @@ public class ActGalil implements ActInterface {
 	 * Moves the actuator to the specified absolute position.
 	 * @param value
 	 */
+	@SuppressWarnings("unused")
 	private void encoderAbsolute(double value) {
-		protocol.sendRead("PA" + axisName + "=" + value);
-		protocol.sendRead("BG" + axisName);
+		protocol.sendRead("PA" + axisAbbrev + "=" + value);
+		protocol.sendRead("BG" + axisAbbrev);
 		waitWhileMoving();
 	}
 	
@@ -205,10 +205,11 @@ public class ActGalil implements ActInterface {
 	 * Moves the actuator relative to the current position by the specified amount.
 	 * @param value
 	 */
+	@SuppressWarnings("unused")
 	private void encoderRelative(double value) {
-		protocol.sendRead("PR" + axisName + "=" + value);
+		protocol.sendRead("PR" + axisAbbrev + "=" + value);
 		//System.out.println("send bg");
-		protocol.sendRead("BG" + axisName);
+		protocol.sendRead("BG" + axisAbbrev);
 		waitWhileMoving();
 	}
 	
@@ -219,12 +220,12 @@ public class ActGalil implements ActInterface {
 	 */
 	public void moveRelative(MoveCommand mc) {
 		stage.setGoalPos(goalUserDeg(mc), axis);
-		switch (mc.getType()) {
-			case ENCODER:
-				encoderRelative(mc.getAmount()); break;
-			case DEGREE:
-				encoderRelative(convDegToEnc(mc.getAmount())); break;
-		}
+//		switch (mc.getType()) {
+//			case ENCODER:
+//				encoderRelative(mc.getAmount()); break;
+//			case DEGREE:
+//				encoderRelative(convDegToEnc(mc.getAmount())); break;
+//		}
 	}
 	
 	/**
@@ -232,13 +233,13 @@ public class ActGalil implements ActInterface {
 	 */
 	public void moveAbsolute(MoveCommand mc) {
 		stage.setGoalPos(goalUserDeg(mc), axis);
-		switch (mc.getType()) {
-			case ENCODER:
-				encoderAbsolute(mc.getAmount()); break;
-			case DEGREE:
-				double enc = userDegToEnc(mc.getAmount());
-				encoderAbsolute(enc); break;
-		}
+//		switch (mc.getType()) {
+//			case ENCODER:
+//				encoderAbsolute(mc.getAmount()); break;
+//			case DEGREE:
+//				double enc = userDegToEnc(mc.getAmount());
+//				encoderAbsolute(enc); break;
+//		}
 	}
 	
 	/**
@@ -246,7 +247,7 @@ public class ActGalil implements ActInterface {
 	 * @return true if motor is on, false if not
 	 */
 	public boolean motorState() {
-		String response = protocol.sendRead("MG _MO" + axisName);
+		String response = protocol.sendRead("MG _MO" + axisAbbrev);
 		double state = 0;
 		try {
 			state = Double.parseDouble(response);
@@ -269,12 +270,12 @@ public class ActGalil implements ActInterface {
 	}
 	
 	private void motorOn() {
-		protocol.sendRead("SH" + axisName);
+		protocol.sendRead("SH" + axisAbbrev);
 		motorState();
 	}
 	
 	private void motorOff() {
-		protocol.sendRead("MO" + axisName);
+		protocol.sendRead("MO" + axisAbbrev);
 		motorState();
 	}
 	
@@ -284,24 +285,25 @@ public class ActGalil implements ActInterface {
 	 * This updates motorState to the current state.  True for on, false for off. <BR>
 	 * 
 	 */
-	public void motorControl() {
+	public boolean motorControl() {
 		if (motorState) {
 			motorOff();
 		}
 		else {
 			motorOn();
 		}
+		return motorState;
 	}
 	
 	/**
 	 * Stops the current motion.
 	 */
 	public void stop() {
-		protocol.sendRead("ST" + axisName);
+		protocol.sendRead("ST" + axisAbbrev);
 	}
 	
 	public void setVelocity(double vel) {
-		String out = "JG" + axisName + "=" + vel;
+		String out = "JG" + axisAbbrev + "=" + vel;
 		protocol.sendRead(out);
 	}
 	
@@ -317,7 +319,7 @@ public class ActGalil implements ActInterface {
 	
 	public void index() {
 		if (!motorState()) {
-			stage.statusArea(stage.axisNameLong(axis) + " motor is not on.  Please turn on motor before proceeding.\n");
+			stage.statusArea(axis.getFullName() + " motor is not on.  Please turn on motor before proceeding.\n");
 			return;
 		}
 		indexing = true;
@@ -333,66 +335,68 @@ public class ActGalil implements ActInterface {
 	}
 	
 	private void indexGalilAz() {
-		// Save acceleration and jog speed values
-		protocol.sendRead("T1 = _JG" + axisName);
-		protocol.sendRead("T2 = _AC" + axisName);
-
-		// then overwrite them
-		protocol.sendRead("MG \"Homing\", T1");
-		double jg = 150000d;
-		//System.out.println(jg);
-		protocol.sendRead("JG" + axisName + "=" + jg);
-		double ac = 50000d;
-		protocol.sendRead("AC" + axisName + "=" + ac);
-
-		// "FE" - find the opto-edge
-		protocol.sendRead("FE" + axisName);
-		protocol.sendRead("BG" + axisName);
-		//waitWhileMoving();
-		protocol.sendRead("AM" + axisName);
-		protocol.sendRead("MG \"Found Opto-Index\"; TP" + axisName);
-
-		// Turn the jog speed WAAAY down when searching for the index
-		jg = 500d;
-		protocol.sendRead("JG" + axisName + "=" + jg);
-
-		// Do the index search ("FI")
-		protocol.sendRead("FI" + axisName);
-		protocol.sendRead("BG" + axisName);
-		
-		waitWhileMoving();
-
-		// Finally, restore accel and jog speeds from before routine was run
-		protocol.sendRead("JG" + axisName + "=T1");
-		protocol.sendRead("AC" + axisName + "=T2");
+//		// Save acceleration and jog speed values
+//		protocol.sendRead("T1 = _JG" + axisName);
+//		protocol.sendRead("T2 = _AC" + axisName);
+//
+//		// then overwrite them
+//		protocol.sendRead("MG \"Homing\", T1");
+//		double jg = 150000d;
+//		//System.out.println(jg);
+//		protocol.sendRead("JG" + axisName + "=" + jg);
+//		double ac = 50000d;
+//		protocol.sendRead("AC" + axisName + "=" + ac);
+//
+//		// "FE" - find the opto-edge
+//		protocol.sendRead("FE" + axisName);
+//		protocol.sendRead("BG" + axisName);
+//		//waitWhileMoving();
+//		protocol.sendRead("AM" + axisName);
+//		protocol.sendRead("MG \"Found Opto-Index\"; TP" + axisName);
+//
+//		// Turn the jog speed WAAAY down when searching for the index
+//		jg = 500d;
+//		protocol.sendRead("JG" + axisName + "=" + jg);
+//
+//		// Do the index search ("FI")
+//		protocol.sendRead("FI" + axisName);
+//		protocol.sendRead("BG" + axisName);
+//		
+//		waitWhileMoving();
+//
+//		// Finally, restore accel and jog speeds from before routine was run
+//		protocol.sendRead("JG" + axisName + "=T1");
+//		protocol.sendRead("AC" + axisName + "=T2");
+		protocol.sendRead("XQ #HOMEA,0");
 	}
 	
 	private void indexGalilEl() {
-		// Save acceleration and jog speed values
-		protocol.sendRead("T1 = _JG" + axisName);
-		protocol.sendRead("T2 = _AC" + axisName);
-		
-		double jg = 1000d;
-		protocol.sendRead("JG" + axisName + "=" + jg);
-		
-		// Do the index search ("FI")
-		protocol.sendRead("FI" + axisName);
-		protocol.sendRead("BG" + axisName);
-		protocol.sendRead("AM" + axisName);
-		encoderRelative(3900);
-		jg = 50d;
-		protocol.sendRead("AM" + axisName);
-		protocol.sendRead("JG" + axisName + "=" + jg);
-		protocol.sendRead("FI" + axisName);
-		protocol.sendRead("BG" + axisName);
-		//protocol.sendRead("AM" + axisName);
-		//protocol.sendRead("MG \"Motion Done\";");
-		
-		waitWhileMoving();
-		
-		// Finally, restore accel and jog speeds from before routine was run
-		protocol.sendRead("JG" + axisName + "=T1");
-		protocol.sendRead("AC" + axisName + "=T2");
+//		// Save acceleration and jog speed values
+//		protocol.sendRead("T1 = _JG" + axisName);
+//		protocol.sendRead("T2 = _AC" + axisName);
+//		
+//		double jg = 1000d;
+//		protocol.sendRead("JG" + axisName + "=" + jg);
+//		
+//		// Do the index search ("FI")
+//		protocol.sendRead("FI" + axisName);
+//		protocol.sendRead("BG" + axisName);
+//		protocol.sendRead("AM" + axisName);
+//		encoderRelative(3900);
+//		jg = 50d;
+//		protocol.sendRead("AM" + axisName);
+//		protocol.sendRead("JG" + axisName + "=" + jg);
+//		protocol.sendRead("FI" + axisName);
+//		protocol.sendRead("BG" + axisName);
+//		//protocol.sendRead("AM" + axisName);
+//		//protocol.sendRead("MG \"Motion Done\";");
+//		
+//		waitWhileMoving();
+//		
+//		// Finally, restore accel and jog speeds from before routine was run
+//		protocol.sendRead("JG" + axisName + "=T1");
+//		protocol.sendRead("AC" + axisName + "=T2");
+		protocol.sendRead("XQ #HOMEB,0");
 	}
 	
 	private void waitWhileMoving() {
@@ -418,7 +422,7 @@ public class ActGalil implements ActInterface {
 	 */
 	public boolean moving() {
 		boolean flag = true;
-		String temp = protocol.sendRead("MG _BG" + axisName);
+		String temp = protocol.sendRead("MG _BG" + axisAbbrev);
 		if (temp.contains("0.0000")) {
 			flag =  false;
 		}
