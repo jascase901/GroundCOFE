@@ -14,6 +14,7 @@ public class ScriptLoader {
 	private Script readerInfo;
 	private Set<String> loadedScriptNames;
 	private Map<String, Script> scripts;
+	private int size = 0;
 	
 	public ScriptLoader() {
 		protocol = new CommGalil(23);
@@ -25,27 +26,37 @@ public class ScriptLoader {
 	}
 	
 	public Set<String> findExpected() {
+		System.out.println(scripts.keySet());
 		return scripts.keySet();
 	}
 	
 	public Set<String> findLoaded() {
+		protocol.read();
+		protocol.read();
+		protocol.read();
 		String labels = protocol.sendRead("LL");
+		System.out.println(labels);
 		String[] split = labels.split("\r\n");
 		for (String s : split) {
 			String name = s.split("=")[0];
 			loadedScriptNames.add(name);
 		}
+		System.out.println(loadedScriptNames);
 		return loadedScriptNames;
 	}
 	
-	public void check() {
-		String labels = protocol.sendRead("LL");
-		String[] split = labels.split("\r\n");
-		for (String s : split) {
-			String name = s.split("=")[0];
-			loadedScriptNames.add(name);
-		}
+	public boolean readerReady() {
+		return loadedScriptNames.contains("#READERI");
 	}
+	
+//	public void check() {
+//		String labels = protocol.sendRead("LL");
+//		String[] split = labels.split("\r\n");
+//		for (String s : split) {
+//			String name = s.split("=")[0];
+//			loadedScriptNames.add(name);
+//		}
+//	}
 	
 	public void load() {
 		Set<String> scriptsToLoad = scripts.keySet();
@@ -58,11 +69,11 @@ public class ScriptLoader {
 		indexEl();
 		readerInfo();
 		
-		protocol.send(homeA.getScript());
+		protocol.sendRead(homeA.getScript());
 		pause();
-		protocol.send(homeB.getScript());
+		protocol.sendRead(homeB.getScript());
 		pause();
-		protocol.send(readerInfo.getScript());
+		protocol.sendRead(readerInfo.getScript());
 		pause();
 	}
 	
@@ -71,7 +82,7 @@ public class ScriptLoader {
 	}
 	
 	private void indexAz() {
-		homeA = new Script("#HOMEAZ", 0);
+		homeA = new Script("#HOMEAZ", size);
 		homeA.add("IF (_MOA)");
 		//"BG" commands fail if the motor is off. Therefore, check motor state
 		homeA.add("MG \"Motor is off. Cannot execute home operation\"");
@@ -108,10 +119,11 @@ public class ScriptLoader {
 
 		homeA.add("ENDIF");
 		homeA.add("EN");
+		size = homeA.size();
 	}
 	
 	private void indexEl() {
-		homeB = new Script("#HOMEB", homeA.size()+20);
+		homeB = new Script("#HOMEB", size);
 		String axisAbbrev = Axis.EL.getAbbrev();
 		
 		homeB.add("T1 = _JG" + axisAbbrev);
@@ -131,14 +143,18 @@ public class ScriptLoader {
 		homeB.add("JG" + axisAbbrev + "=" + jg);
 		homeB.add("FI" + axisAbbrev);
 		homeB.add("BG" + axisAbbrev);
+		homeB.add("JG" + axisAbbrev + "=T1");
+		homeB.add("AC" + axisAbbrev + "=T2");
 		homeB.add("EN");
+		size += homeB.size();
 	}
 	
 	private void readerInfo() {
-		readerInfo = new Script("#READERI", homeB.size()+20);
+		readerInfo = new Script("#READERI", size);
 		String temp = "MG _TPA, _TVA, _JGA, _ACA, _TPB, _TVB, _JGB, _ACB, _MOA, _MOB, _BGA, _BGB";
 		readerInfo.add(temp);
 		readerInfo.add("EN");
+		size += readerInfo.size();
 	}
 	
 	private void pause() {

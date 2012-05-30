@@ -61,6 +61,7 @@ public class Stage {
 			e.printStackTrace();
 		}
 	}
+	
 	/**
 	 * Creates all the CommGalil, ActGalil, etc. objects and starts the connection. 
 	 * @param window
@@ -86,9 +87,11 @@ public class Stage {
 		}
 		updateLst();
 		if (commStatus) {
-			window.updateScriptArea("expected", sl.findExpected());
-			window.updateScriptArea("loaded", sl.findLoaded());
+			refreshScripts();
 			reader.start();
+			if (sl.readerReady()) {
+				reader.readerOnOff(true);
+			}
 		}
 	}
 	
@@ -115,6 +118,7 @@ public class Stage {
 		double balloonAltitude = Double.parseDouble(settings.getProperty("balloonAltitude", "0"));
 		balloonLocation =  new LatLongAlt(balloonLatitude, balloonLongitude, balloonAltitude);
 	}
+	
 	/**
 	 * Saves new settings to settings.ini.
 	 * @throws FileNotFoundException
@@ -136,6 +140,7 @@ public class Stage {
 		//store settings
 		settings.store(new FileOutputStream("Settings.ini"), "");
 	}
+	
 	/**
 	 * Loads the galil.ini file and reads all its variables.
 	 * @throws FileNotFoundException
@@ -161,6 +166,7 @@ public class Stage {
 		window.setVelAccAzEl(maxVelAz, maxAccAz, maxVelEl, maxAccEl);
 		window.setMaxMoveRel(maxMoveRelAz, maxMoveRelEl);
 	}
+	
 	/**
 	 * Saves the settings of Galil back into galil.ini.
 	 */
@@ -206,8 +212,15 @@ public class Stage {
 	
 	public void loadScripts() {
 		sl.load();
+		window.updateScriptArea("loaded", sl.findLoaded());
 		sl.close();
 	}
+	
+	public void refreshScripts() {
+		window.updateScriptArea("expected", sl.findExpected());
+		window.updateScriptArea("loaded", sl.findLoaded());
+	}
+	
 	/**
 	 * Points to a ra dec position every amount of time specified until told to stop.
 	 * @param ra
