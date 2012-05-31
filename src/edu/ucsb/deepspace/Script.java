@@ -1,12 +1,11 @@
 package edu.ucsb.deepspace;
 
-
-
 public class Script {
 	
 	private String out;
-	private int index;
+	//private int index;
 	private String scriptName;
+	private int length;
 	
 	/**
 	 * Instantiates a the beginning of a script with its name being scriptName, 
@@ -15,7 +14,7 @@ public class Script {
 	public Script(String scriptName, int index) {
 		this.scriptName = scriptName;
 		this.out = "DL " + index + "\r" + scriptName + "\r";
-		this.index = index;
+		//this.index = index;
 	}
 	
 	/**
@@ -24,7 +23,7 @@ public class Script {
 	 * appends the command to your script
 	 */
 	public void add(String str) {
-		index++;
+		length++;
 		out = out + str + "\r";
 	}
 	/**
@@ -36,11 +35,15 @@ public class Script {
 	}
 	
 	public int size() {
-		return index;
+		return length + 1;
 	}
 	
-	String getScriptName() {
-		return scriptName;
+	public int length() {
+		return length;
 	}
+	
+//	String getScriptName() {
+//		return scriptName;
+//	}
 
 }

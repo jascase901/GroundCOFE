@@ -115,7 +115,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Group grpDebug;
 	private Button btnRADecCalibrate;
 	private Label lblActual;
-	private Button btnStartReader;
+	private Button btnReaderControl;
 	private org.eclipse.swt.widgets.List expectedScripts;
 	private org.eclipse.swt.widgets.List loadedScripts;
 	private Text txtMaxRelEl;
@@ -414,7 +414,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	lblActual.setText("Actual");
     	
     	btnLoadScripts = new Button(grpScripts, SWT.NONE);
-    	btnLoadScripts.setBounds(10, 112, 81, 23);
+    	btnLoadScripts.setBounds(97, 112, 71, 23);
     	btnLoadScripts.setText("Load Scripts");
     	btnLoadScripts.addMouseListener(new MouseAdapter() {
     		@Override
@@ -424,14 +424,14 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
-    	btnStartReader = new Button(grpScripts, SWT.NONE);
-    	btnStartReader.setBounds(97, 112, 81, 23);
-    	btnStartReader.setText("Start Reader");
-    	btnStartReader.addMouseListener(new MouseAdapter() {
+    	Button btnRefreshScripts = new Button(grpScripts, SWT.NONE);
+    	btnRefreshScripts.setBounds(10, 112, 85, 23);
+    	btnRefreshScripts.setText("Refresh Scripts");
+    	btnRefreshScripts.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
-    			stage.toggleReader();
-    			btnStartReader.setVisible(false);
+    			stage.refreshScripts();
+    			//btnLoadScripts.setVisible(false);
     		}
     	});
     	
@@ -1053,7 +1053,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnStop = new Button(grpDebug, SWT.NONE);
-    	btnStop.setBounds(72, 94, 68, 23);
+    	btnStop.setBounds(48, 94, 42, 23);
     	btnStop.setText("Stop");
     	btnStop.addMouseListener(new MouseAdapter() {
     		@Override
@@ -1063,7 +1063,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnBegin = new Button(grpDebug, SWT.NONE);
-    	btnBegin.setBounds(0, 94, 68, 23);
+    	btnBegin.setBounds(0, 94, 42, 23);
     	btnBegin.setText("Begin");
     	btnBegin.addMouseListener(new MouseAdapter() {
     		@Override
@@ -1105,7 +1105,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	btnDebugAz = new Button(grpDebug, SWT.RADIO);
     	btnDebugAz.setSelection(true);
-    	btnDebugAz.setBounds(133, 22, 59, 16);
+    	btnDebugAz.setBounds(123, 11, 59, 16);
     	btnDebugAz.setText("Azimuth");
     	btnDebugAz.addSelectionListener(new SelectionAdapter() {
     		@Override
@@ -1115,7 +1115,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnDebugEl = new Button(grpDebug, SWT.RADIO);
-    	btnDebugEl.setBounds(133, 43, 68, 16);
+    	btnDebugEl.setBounds(123, 32, 68, 16);
     	btnDebugEl.setText("Elevation");
     	btnDebugEl.addSelectionListener(new SelectionAdapter() {
     		@Override
@@ -1129,8 +1129,25 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	txtDebugVel.setBounds(0, 69, 76, 19);
     	
     	Button btnSetVelocity = new Button(grpDebug, SWT.NONE);
-    	btnSetVelocity.setBounds(77, 65, 68, 23);
+    	btnSetVelocity.setBounds(81, 65, 68, 23);
     	btnSetVelocity.setText("Set Velocity");
+    	
+    	btnReaderControl = new Button(grpDebug, SWT.NONE);
+    	btnReaderControl.setBounds(96, 94, 68, 23);
+    	btnReaderControl.setText("Start Reader");
+    	btnReaderControl.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			stage.toggleReader();
+    			if (btnReaderControl.getText().equals("Start Reader")) {
+    				btnReaderControl.setText("Stop Reader");
+    			}
+    			else if (btnReaderControl.getText().equals("Stop Reader")) {
+    				btnReaderControl.setText("Start Reader");
+    			}
+    			//btnReaderControl.setVisible(false);
+    		}
+    	});
     	btnSetVelocity.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
@@ -1387,6 +1404,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
+				temp2.removeAll();
 				for (String s : scripts) {
 					temp2.add(s);
 				}

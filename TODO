@@ -14,3 +14,5 @@ Raster Scan
 
 start up procedure:
 index, motor state, etc
+
+scripts aren't properly refreshed when loading.  otherwise, loading works correctly.
