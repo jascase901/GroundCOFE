@@ -102,7 +102,7 @@ public class LatLongAltTest extends TestCase {
 		Coordinate c = new Coordinate(el, az);
 		LatLongAlt l = new LatLongAlt(c);
 		double expectedRa = ((l.lst()) + 24) % 24;
-		assertEquals(expectedRa, l.azelToRa(az,el));
+		assertEquals(expectedRa, l.azelToRa(az,el), .00000001);
 		
 		az = 90;
 		el = 90;
@@ -119,7 +119,7 @@ public class LatLongAltTest extends TestCase {
 		ra = ra * RTH;
 		ra = (ra + 24)%24;
 		expectedRa = ra;
-		assertEquals(expectedRa, l.azelToRa(az,el));
+		assertEquals(expectedRa, l.azelToRa(az,el), .00000001);
 		
 		az = 180;
 		el = -45;
@@ -136,7 +136,7 @@ public class LatLongAltTest extends TestCase {
 		ra = ra * RTH;
 		ra = (ra + 24)%24;
 		expectedRa = ra;
-		assertEquals(expectedRa, l.azelToRa(az,el));
+		assertEquals(expectedRa, l.azelToRa(az,el), .00000001);
 		
 		
 	}
@@ -168,7 +168,7 @@ public class LatLongAltTest extends TestCase {
 		az = az * RTD;
 		if (az < 0) az = az + 360;
 		double expectedAz = az;
-		assertEquals(expectedAz, l.radecToAz(ra, dec));
+		assertEquals(expectedAz, l.radecToAz(ra, dec), .00000001);
 		
 		ra = 20;
 		dec = 1;
@@ -181,7 +181,7 @@ public class LatLongAltTest extends TestCase {
 		az = az * RTD;
 		if (az < 0) az = az + 360;
 		expectedAz = az;
-		assertEquals(expectedAz, l.radecToAz(ra, dec));
+		assertEquals(expectedAz, l.radecToAz(ra, dec), .00000001);
 		
 		ra = 240;
 		dec = -100;
@@ -194,7 +194,7 @@ public class LatLongAltTest extends TestCase {
 		az = az * RTD;
 		if (az < 0) az = az + 360;
 		expectedAz = az;
-		assertEquals(expectedAz, l.radecToAz(ra, dec));
+		assertEquals(expectedAz, l.radecToAz(ra, dec), .00000001);
 	}
 
 	@Test
@@ -208,7 +208,7 @@ public class LatLongAltTest extends TestCase {
 		double lat = l.getLatitude() * DTR;
 		
 		double expectedDec = calcZ(newel, lat, newaz);
-		assertEquals(expectedDec, l.azelToDec(az,el));
+		assertEquals(expectedDec, l.azelToDec(az,el), .00000001);
 		
 		az = 90;
 		el = 90;
@@ -219,7 +219,7 @@ public class LatLongAltTest extends TestCase {
 		lat = l.getLatitude() * DTR;
 		
 		expectedDec = calcZ(newel, lat, newaz);
-		assertEquals(expectedDec, l.azelToDec(az,el));
+		assertEquals(expectedDec, l.azelToDec(az,el), .00000001);
 		
 		az = 180;
 		el = -45;
@@ -230,7 +230,7 @@ public class LatLongAltTest extends TestCase {
 		lat = l.getLatitude() * DTR;
 		
 		expectedDec = calcZ(newel, lat, newaz);
-		assertEquals(expectedDec, l.azelToDec(az,el));
+		assertEquals(expectedDec, l.azelToDec(az,el), .00000001);
 	}
 
 	@Test
@@ -246,7 +246,7 @@ public class LatLongAltTest extends TestCase {
 		double H = (l.lst() - ra) * HTR;
 		
 		double expectedEl = calcZ(newdec, newlat, H);
-		assertEquals(expectedEl, l.radecToEl(ra, dec));
+		assertEquals(expectedEl, l.radecToEl(ra, dec), .00000001);
 		
 		ra = 80;
 		dec = -80;
@@ -255,7 +255,7 @@ public class LatLongAltTest extends TestCase {
 		H = (l.lst() - ra) * HTR;
 		
 		expectedEl = calcZ(newdec, newlat, H);
-		assertEquals(expectedEl, l.radecToEl(ra, dec));
+		assertEquals(expectedEl, l.radecToEl(ra, dec), .00000001);
 		
 		ra = 25;
 		dec = 240;
@@ -264,7 +264,7 @@ public class LatLongAltTest extends TestCase {
 		H = (l.lst() - ra) * HTR;
 		
 		expectedEl = calcZ(newdec, newlat, H);
-		assertEquals(expectedEl, l.radecToEl(ra, dec));
+		assertEquals(expectedEl, l.radecToEl(ra, dec), .00000001);
 	}
 
 	@Test
@@ -303,7 +303,7 @@ public class LatLongAltTest extends TestCase {
 		if (lst < 0) lst = lst + 24;
 		
 		double expectedlst = lst;
-		assertEquals(expectedlst, asdf.lst());
+		assertEquals(expectedlst, asdf.lst(), .00000001);
 	}
 
 }
