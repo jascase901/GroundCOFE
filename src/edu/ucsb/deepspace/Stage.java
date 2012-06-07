@@ -16,7 +16,7 @@ import edu.ucsb.deepspace.MoveCommand.MoveType;
 import edu.ucsb.deepspace.gui.MainWindow;
 
 public class Stage {
-
+	
 	private static final Stage INSTANCE = new Stage();
 	public static Stage getInstance() {return INSTANCE;}
 	
@@ -27,12 +27,10 @@ public class Stage {
 	public StageTypes getType() {
 		return this.stageType;
 	}
-	
-	
 
 	private double minAz, maxAz, minEl, maxEl;
 	private double maxVelAz, maxAccAz, maxVelEl, maxAccEl;
-	//TODO private double maxMoveRel = 360;
+	private double maxMoveRelAz, maxMoveRelEl;
 	private int encTol = 10;
 	
 	private TelescopeInterface scope;
@@ -42,13 +40,14 @@ public class Stage {
 	private MainWindow window;
 	private boolean commStatus = false;
 	private ReaderInterface reader;
+	private boolean readerState = false;
 	private DataInterface position = DataGalil.blank();
 	private final Properties actSettings = new Properties();
 	private final Properties settings = new Properties();
 	private LatLongAlt baseLocation, balloonLocation;
 	private double azToBalloon = 0, elToBalloon = 0;
-
-	private CommGalil stageProtocol, scopeProtocol;
+    private CommGalil stageProtocol, scopeProtocol, readerProtocol;
+	ScriptLoader sl;
 
 
 	public Stage() {
@@ -67,15 +66,10 @@ public class Stage {
 		case GALIL:
 			stageProtocol = new CommGalil(2222);
 			scopeProtocol = new CommGalil(23);
-			
-			
-			
-			
+			readerProtocol = new CommGalil(4444);
 			scope = new TelescopeGalil(this, scopeProtocol);
-			//scope.queryMotorState();
-//			window.updateMotorButton(scope.motorState(Axis.AZ), Axis.AZ);
-//			window.updateMotorButton(scope.motorState(Axis.EL), Axis.EL);
-			reader = new ReaderGalil(this);
+			reader = new ReaderGalil(this, readerProtocol);
+			sl = new ScriptLoader();
 			loadGalil();
 			break;
 		case FTDI:
@@ -85,14 +79,9 @@ public class Stage {
 		}
 		updateLst();
 		if (commStatus) {
-			ScriptLoader sl = new ScriptLoader();
-			sl.check();
-			sl.load();
-			pause(1000);
-			sl.close();
-			System.out.println("reader started");
+			window.updateScriptArea("expected", sl.findExpected());
+			window.updateScriptArea("loaded", sl.findLoaded());
 			reader.start();
-			stageProtocol.initialize();
 		}
 	}
 
@@ -134,18 +123,19 @@ public class Stage {
 
 	private void loadGalil() throws FileNotFoundException, IOException {
 		actSettings.load(new FileInputStream("Galil.ini"));
-		double azOffset = Double.parseDouble(actSettings.getProperty("azOffset"));
-		double elOffset = Double.parseDouble(actSettings.getProperty("elOffset"));
-
-		minAz = Double.parseDouble(actSettings.getProperty("minAz"));
-		maxAz = Double.parseDouble(actSettings.getProperty("maxAz"));
-		minEl = Double.parseDouble(actSettings.getProperty("minEl"));
-		maxEl = Double.parseDouble(actSettings.getProperty("maxEl"));
-		maxVelAz = Double.parseDouble(actSettings.getProperty("velAz"));
-		maxAccAz = Double.parseDouble(actSettings.getProperty("accAz"));
-		maxVelEl = Double.parseDouble(actSettings.getProperty("velEl"));
-		maxAccEl = Double.parseDouble(actSettings.getProperty("accEl"));
-		encTol = Integer.parseInt(actSettings.getProperty("encTol"));
+		double azOffset = Double.parseDouble(actSettings.getProperty("azOffset", "0"));
+		double elOffset = Double.parseDouble(actSettings.getProperty("elOffset", "0"));
+		minAz = Double.parseDouble(actSettings.getProperty("minAz", "0"));
+		maxAz = Double.parseDouble(actSettings.getProperty("maxAz", "0"));
+		minEl = Double.parseDouble(actSettings.getProperty("minEl", "0"));
+		maxEl = Double.parseDouble(actSettings.getProperty("maxEl", "0"));
+		maxVelAz = Double.parseDouble(actSettings.getProperty("maxVelAz", "0"));
+		maxAccAz = Double.parseDouble(actSettings.getProperty("maxAccAz", "0"));
+		maxVelEl = Double.parseDouble(actSettings.getProperty("maxVelEl", "0"));
+		maxAccEl = Double.parseDouble(actSettings.getProperty("maxAccEl", "0"));
+		maxMoveRelAz = Double.parseDouble(actSettings.getProperty("maxMoveRelAz", "360"));
+		maxMoveRelEl = Double.parseDouble(actSettings.getProperty("maxMoveRelEl", "360"));
+		encTol = Integer.parseInt(actSettings.getProperty("encTol", "10"));
 		scope.setOffsets(azOffset, elOffset);
 
 		window.setMinMaxAzEl(minAz, maxAz, minEl, maxEl);
@@ -159,10 +149,12 @@ public class Stage {
 		actSettings.setProperty("maxAz", String.valueOf(maxAz));
 		actSettings.setProperty("minEl", String.valueOf(minEl));
 		actSettings.setProperty("maxEl", String.valueOf(maxEl));
-		actSettings.setProperty("velAz", String.valueOf(maxVelAz));
-		actSettings.setProperty("accAz", String.valueOf(maxAccAz));
-		actSettings.setProperty("velEl", String.valueOf(maxVelEl));
-		actSettings.setProperty("accEl", String.valueOf(maxAccEl));
+		actSettings.setProperty("maxVelAz", String.valueOf(maxVelAz));
+		actSettings.setProperty("maxAccAz", String.valueOf(maxAccAz));
+		actSettings.setProperty("maxVelEl", String.valueOf(maxVelEl));
+		actSettings.setProperty("maxAccEl", String.valueOf(maxAccEl));
+		actSettings.setProperty("maxMoveRelAz", String.valueOf(maxMoveRelAz));
+		actSettings.setProperty("maxMoveRelEl", String.valueOf(maxMoveRelEl));
 		actSettings.setProperty("encTol", String.valueOf(encTol));
 		try {
 			actSettings.store(new FileOutputStream("Galil.ini"), "");
@@ -181,13 +173,27 @@ public class Stage {
 	public void confirmCommConnection() {
 		commStatus = true;
 	}
+	
+	/**
+	 * Toggles the reader on or off.
+	 */
+	public void toggleReader() {
+		readerState = !readerState;
+		reader.readerOnOff(readerState);
+	}
+	
+	public void loadScripts() {
+		sl.load();
+		sl.close();
+	}
 
-	//TODO test to make sure motor state stuff is working
 	public void startRaDecTracking(final double ra, final double dec) {
 		if (!motorCheck(Axis.AZ)) {
+			window.raDecTrackingButtonUpdater(true, false);
 			return;
 		}
 		if (!motorCheck(Axis.EL)) {
+			window.raDecTrackingButtonUpdater(true, false);
 			return;
 		}
 		long period = 10000;
@@ -209,6 +215,7 @@ public class Stage {
 	}
 
 	public void stopRaDecTracking() {
+		if (raDecTracker == null) return;
 		raDecTracker.cancel();
 	}
 
@@ -276,9 +283,7 @@ public class Stage {
 		scope.stopScanning();
 	}
 	
-	public void raster(ScanCommand azSc, ScanCommand elSc){
-		//scanner.rasterScan(azSc.getMin(), azSc.getMax(), elSc.getMin(), elSc.getMax());
-	}
+	
 	
 //	public void raster(ScanCommand azSc, ScanCommand elSc) {
 //		moveAbsolute(azSc.getMin(), elSc.getMin());
@@ -306,6 +311,12 @@ public class Stage {
 						window.controlMoveButtons(true);
 						statusArea("The motors must be on before moving.\n");
 						return;
+					}
+				}
+				
+				if (mc.getMode() == MoveMode.RELATIVE && mc.getType() == MoveType.DEGREE) {
+					if (mc.getAmount(Axis.AZ) > maxMoveRelAz || mc.getAmount(Axis.EL) > maxMoveRelEl) {
+						System.out.println("this will crash due to null value");
 					}
 				}
 				
@@ -367,6 +378,18 @@ public class Stage {
 			}
 		});
 	}
+	public void raster(final ScanCommand azSc, final ScanCommand elSc){
+		exec.submit(new Runnable() {
+			@Override
+			public void run() {
+				reader.readerOnOff(false);
+				scope.rasterScan(azSc.getMin(), azSc.getMax(), elSc.getMin(), elSc.getMax(), elSc.getReps());
+				reader.readerOnOff(true);
+			}
+		});
+		
+	}
+
 
 	//should return true if something is moving, false if not
 	public boolean isMoving() {
@@ -417,6 +440,11 @@ public class Stage {
 		this.maxVelEl = maxVelEl;
 		this.maxAccEl = maxAccEl;
 	}
+	
+	public void setMaxMoveRel(double maxMoveRelAz, double maxMoveRelEl) {
+		this.maxMoveRelAz = maxMoveRelAz;
+		this.maxMoveRelEl = maxMoveRelEl;
+	}
 
 	public int getEncTol() {return encTol;}
 	public void setEncTol(int encTol) {
@@ -436,6 +464,7 @@ public class Stage {
 	public void queueSize() {
 		System.out.println("stage protocol queue size: " + stageProtocol.queueSize());
 		System.out.println("scope protocol queue size: " + scopeProtocol.queueSize());
+		System.out.println(readerProtocol.port + " reader protocol queue size: " + readerProtocol.queueSize());
 	}
 
 	public void readQueue() {

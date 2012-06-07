@@ -298,7 +298,55 @@ public class TelescopeGalil implements TelescopeInterface {
 			e.printStackTrace();
 		}
 	}
+	public void rasterScan(double minAz, double maxAz, double minEl, double maxEl, double reps) {
+		//el.indexing = true;
+		int el_inc= 5; 
+		//min az
+		protocol.sendRead("V7 = "+az.convDegToEnc(minAz));
+		System.out.println(el.convDegToEnc(maxEl));
+		//mine el
+		protocol.sendRead("V0 = "+el.convDegToEnc(minEl));
+		pause();
+		//max az
+		protocol.sendRead("V1 = "+az.convDegToEnc(maxAz));
+		// EL Inc
+		pause();
+		protocol.sendRead("V2 = "+el_inc);
+		pause();
+		//El speed
+		protocol.sendRead("V3 = 100000");
+		pause();
+		//El speed
+		protocol.sendRead("V4 = 100000");
+		pause();
+		//el speed
+		protocol.sendRead("V5 = "+el.convDegToEnc(maxEl)/el_inc);
+		pause();
+		//number of increments
+		protocol.sendRead("V6 = "+reps);
+		pause();
+		
+		
+		protocol.sendRead("XQ #RASTER,1");
+		
+		
+		}
+		//waitWhileMoving(axis);
+		//az.indexing = false;
+
 	
+
+
+	private void pause() {
+
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	private class GalilAxis {
 		private Axis axis;
 		private boolean indexing = false;
@@ -448,6 +496,17 @@ public class TelescopeGalil implements TelescopeInterface {
 			protocol.sendRead("SP" + abbrev + "=" + (int) acc);
 		}
 		
+		
+		
+			
+				
+				
+				
+
+
+		
+		
 	}
+	
 
 }
