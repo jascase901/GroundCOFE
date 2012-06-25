@@ -64,6 +64,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Button indexAz;
 	private Button indexEl;
 	private Button btnCalibrate;
+	private Button btnRaCalibrate;
 	private Button btnGoToPosition;
 	private Button btnGoToRaDec;
 	private Button btnBaseLocation, btnBalloonLocation;
@@ -186,6 +187,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
+
     	btnRADecCalibrate = new Button(area, SWT.NONE);
     	btnRADecCalibrate.setBounds(387, 474, 96, 30);
     	btnRADecCalibrate.setText("RA/Dec Calibrate");
@@ -1026,13 +1028,21 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
-    	Button btnScnRaster = new Button(grpScanning, SWT.CHECK);
+    	Button btnScnRaster = new Button(grpScanning, SWT.None);
     	btnScnRaster.setBounds(119, 154, 85, 16);
     	btnScnRaster.setText("Raster Scan");
     	btnScnRaster.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
+    			double minAz = Double.parseDouble(txtMinAzScan.getText());
+				double maxAz = Double.parseDouble(txtMaxAzScan.getText());
+				double timeAz = Double.parseDouble(txtTimeAzScan.getText());
+				double minEl = Double.parseDouble(txtMinElScan.getText());
+    			double maxEl = Double.parseDouble(txtMaxElScan.getText());
+    			ScanCommand azSc = new ScanCommand(minAz, maxAz, continuousScanOn);
+				ScanCommand elSc = new ScanCommand(minEl, maxEl, continuousScanOn);
     			rasterScan = !rasterScan;
+    			stage.raster(azSc, elSc);
     		}
     	});
 	}
@@ -1227,6 +1237,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		});
 	}
 	
+
 	public void enableScanButtons() {
 		btnScanAz.setEnabled(true);
 		btnScanEl.setEnabled(true);

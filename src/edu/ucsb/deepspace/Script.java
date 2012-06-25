@@ -1,5 +1,6 @@
 package edu.ucsb.deepspace;
 
+
 public class Script {
 	
 	private String out;
@@ -42,8 +43,5 @@ public class Script {
 		return length;
 	}
 	
-//	String getScriptName() {
-//		return scriptName;
-//	}
 
 }

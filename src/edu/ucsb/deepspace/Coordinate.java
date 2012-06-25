@@ -119,3 +119,4 @@ public class Coordinate implements Comparable<Coordinate> {
 		return new CompareToBuilder().append(this.x, o.x).append(this.y, o.y).append(this.z, o.z).toComparison();
 	}
 }
+

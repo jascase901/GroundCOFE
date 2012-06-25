@@ -16,7 +16,7 @@ import edu.ucsb.deepspace.MoveCommand.MoveType;
 import edu.ucsb.deepspace.gui.MainWindow;
 
 public class Stage {
-
+	
 	private static final Stage INSTANCE = new Stage();
 	public static Stage getInstance() {return INSTANCE;}
 	
@@ -45,9 +45,15 @@ public class Stage {
 	private final Properties actSettings = new Properties();
 	private final Properties settings = new Properties();
 	private LatLongAlt baseLocation, balloonLocation;
+<<<<<<< HEAD
 	private double azToBalloon = 0, elToBalloon = 0;
 	private CommGalil stageProtocol, scopeProtocol, readerProtocol;
+=======
+	private double azToBalloon = 0, elToBalloon = 0;
+    private CommGalil stageProtocol, scopeProtocol, readerProtocol;
+>>>>>>> FETCH_HEAD
 	ScriptLoader sl;
+
 
 	/**
 	 * Creates a new stage object and loads all the preset settings into it.
@@ -162,6 +168,7 @@ public class Stage {
 		maxMoveRelEl = Double.parseDouble(actSettings.getProperty("maxMoveRelEl", "360"));
 		encTol = Integer.parseInt(actSettings.getProperty("encTol", "10"));
 		scope.setOffsets(azOffset, elOffset);
+
 		window.setMinMaxAzEl(minAz, maxAz, minEl, maxEl);
 		window.setVelAccAzEl(maxVelAz, maxAccAz, maxVelEl, maxAccEl);
 		window.setMaxMoveRel(maxMoveRelAz, maxMoveRelEl);
@@ -334,6 +341,8 @@ public class Stage {
 		scope.stopScanning();
 	}
 	
+	
+	
 //	public void raster(ScanCommand azSc, ScanCommand elSc) {
 //		moveAbsolute(azSc.getMin(), elSc.getMin());
 //		double deltaAz = azSc.getMax() - azSc.getMin();
@@ -474,6 +483,7 @@ public class Stage {
 		});
 		window.controlMoveButtons(true);
 	}
+<<<<<<< HEAD
 	
 
 //	private void moveAbsolute(double azDeg, double elDeg) {
@@ -490,6 +500,20 @@ public class Stage {
 //			}
 //		});
 //	}
+=======
+	public void raster(final ScanCommand azSc, final ScanCommand elSc){
+		exec.submit(new Runnable() {
+			@Override
+			public void run() {
+				reader.readerOnOff(false);
+				scope.rasterScan(azSc.getMin(), azSc.getMax(), elSc.getMin(), elSc.getMax(), elSc.getReps());
+				reader.readerOnOff(true);
+			}
+		});
+		
+	}
+
+>>>>>>> FETCH_HEAD
 
 	/**
 	 * Returns true if something is moving, false if not.

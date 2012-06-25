@@ -11,6 +11,8 @@ public class ScriptLoader {
 	
 	private Script homeA;
 	private Script homeB;
+	private Script raster;
+	
 	private Script readerInfo;
 	private Set<String> loadedScriptNames;
 	private Map<String, Script> scripts;
@@ -23,6 +25,7 @@ public class ScriptLoader {
 		scripts.put("#HOMEAZ", homeA);
 		scripts.put("#HOMEB", homeB);
 		scripts.put("#READERI", readerInfo);
+		scripts.put("#RASTER", raster);
 	}
 	
 	public Set<String> findExpected() {
@@ -68,12 +71,15 @@ public class ScriptLoader {
 		indexAz();
 		indexEl();
 		readerInfo();
+		raster();
 		
 		protocol.sendRead(homeA.getScript());
 		pause();
 		protocol.sendRead(homeB.getScript());
 		pause();
 		protocol.sendRead(readerInfo.getScript());
+		pause();
+		protocol.send(raster.getScript());
 		pause();
 	}
 	
@@ -147,6 +153,42 @@ public class ScriptLoader {
 		homeB.add("AC" + axisAbbrev + "=T2");
 		homeB.add("EN");
 		size += homeB.size();
+	}
+	
+	public void raster() {
+		raster = new Script("#RASTER", readerInfo.size()+20);
+		raster.add("n=0");
+		raster.add("j=0");
+		raster.add("i=0");
+		
+		
+	
+
+		raster.add ("SP V3,V4");
+		raster.add("#LOOP2");
+		raster.add("#LOOP");
+		raster.add("j=n*-V2");
+		raster.add("WT 200");
+		raster.add("PA V7,j");
+		raster.add(" BG");
+		raster.add("AM");
+		raster.add("WT 200");
+		raster.add("PA V1,j");
+		raster.add("BG");
+		raster.add("AM");
+		raster.add("n=n+1");
+		raster.add("JP #LOOP, n<V5");
+		raster.add("j=0");
+		raster.add("n=0");
+		raster.add("i=i+1");
+		raster.add("MG i");
+		raster.add("JP #LOOP2, i<V6");
+		raster.add("EN");
+
+		
+		
+		
+	
 	}
 	
 	private void readerInfo() {

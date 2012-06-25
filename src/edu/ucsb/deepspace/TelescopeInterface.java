@@ -23,6 +23,7 @@ public interface TelescopeInterface {
 	public double getOffset(Axis axis);
 	
 	public void calibrate(Coordinate c);
+	public void rasterScan(double minAz, double maxAz, double minEl, double maxEl, double reps);
 	
 	
 	
