@@ -45,13 +45,9 @@ public class Stage {
 	private final Properties actSettings = new Properties();
 	private final Properties settings = new Properties();
 	private LatLongAlt baseLocation, balloonLocation;
-<<<<<<< HEAD
 	private double azToBalloon = 0, elToBalloon = 0;
 	private CommGalil stageProtocol, scopeProtocol, readerProtocol;
-=======
-	private double azToBalloon = 0, elToBalloon = 0;
-    private CommGalil stageProtocol, scopeProtocol, readerProtocol;
->>>>>>> FETCH_HEAD
+
 	ScriptLoader sl;
 
 
@@ -429,31 +425,7 @@ public class Stage {
 		move(mc);
 	}
 	
-	/**
-	 * Moves the axes to the minimum of the ScanCommands is two separate threads.
-	 * 
-	 * @param azSc
-	 * @param elSc
-	 */
-	public void raster(ScanCommand azSc, ScanCommand elSc) {
-		moveAbsolute(azSc.getMin(), elSc.getMin());
-		double deltaAz = azSc.getMax() - azSc.getMin();
-		double deltaEl = elSc.getMax() - elSc.getMin();
-		double reps = azSc.getReps();
-		
-		
-		
-//		moveAbsolute(minAz, minEl)
-//		int i = 1
-//		int mask = 0
-//		int parity = 1
-//		while (i<2*reps) {
-//		  moveRelative(parity*deltaAz, mask*deltaEl/reps)
-//		  parity = -1*parity
-//		  mask++
-//		  mask%2
-		
-	}
+	
 
 	/**
 	 * Moves an axis to its default position.
@@ -483,37 +455,21 @@ public class Stage {
 		});
 		window.controlMoveButtons(true);
 	}
-<<<<<<< HEAD
-	
 
-//	private void moveAbsolute(double azDeg, double elDeg) {
-//		final MoveCommand mcAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, axisType.AZ, azDeg);
-//		final MoveCommand mcEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, axisType.EL, elDeg);
-//		exec.submit(new Runnable() {
-//			public void run() {
-//				move(mcAz);
-//			}
-//		});
-//		exec.submit(new Runnable() {
-//			public void run() {
-//				move(mcEl);
-//			}
-//		});
-//	}
-=======
 	public void raster(final ScanCommand azSc, final ScanCommand elSc){
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
 				reader.readerOnOff(false);
 				scope.rasterScan(azSc.getMin(), azSc.getMax(), elSc.getMin(), elSc.getMax(), elSc.getReps());
+				buttonEnabler("raster");
 				reader.readerOnOff(true);
 			}
 		});
 		
 	}
 
->>>>>>> FETCH_HEAD
+
 
 	/**
 	 * Returns true if something is moving, false if not.
@@ -788,6 +744,7 @@ public class Stage {
 		data.motorState(Axis.EL) != position.motorState(Axis.EL)) {
 			window.updateMotorButton(data.motorState(Axis.AZ), Axis.AZ);
 			window.updateMotorButton(data.motorState(Axis.EL), Axis.EL);
+			
 		}
 		
 		position = data;
@@ -892,5 +849,7 @@ public class Stage {
 		}
 		return false;
 	}
+	
+
 
 }

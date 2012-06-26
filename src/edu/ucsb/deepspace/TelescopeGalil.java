@@ -14,6 +14,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		this.protocol = protocol;
 		az = new GalilAxis(Axis.AZ, 1000d*1024d);
 		el = new GalilAxis(Axis.EL, 4000d);
+		
 	}
 
 	@Override
@@ -308,6 +309,8 @@ public class TelescopeGalil implements TelescopeInterface {
 	public void rasterScan(double minAz, double maxAz, double minEl, double maxEl, double reps) {
 		//el.indexing = true;
 		int el_inc= 5; 
+		
+		
 		//min az
 		protocol.sendRead("V7 = "+az.convDegToEnc(minAz));
 		System.out.println(el.convDegToEnc(maxEl));
@@ -333,9 +336,14 @@ public class TelescopeGalil implements TelescopeInterface {
 		protocol.sendRead("V6 = "+reps);
 		pause();
 		
-		
+		az.scanning = true;
+		el.scanning = true;
 		protocol.sendRead("XQ #RASTER,1");
-		
+		waitWhileMoving(Axis.AZ);
+		waitWhileMoving(Axis.EL);
+		az.scanning = false;
+		el.scanning = false;
+				
 		
 		}
 		//waitWhileMoving(axis);
@@ -357,6 +365,7 @@ public class TelescopeGalil implements TelescopeInterface {
 	private class GalilAxis {
 		private Axis axis;
 		private boolean indexing = false;
+		private boolean scanning = false;
 		private boolean motorState = true;
 		private String abbrev;
 		private double encPerDeg;

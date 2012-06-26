@@ -156,7 +156,7 @@ public class ScriptLoader {
 	}
 	
 	public void raster() {
-		raster = new Script("#RASTER", readerInfo.size()+20);
+		raster = new Script("#RASTER", size);
 		raster.add("n=0");
 		raster.add("j=0");
 		raster.add("i=0");
@@ -184,6 +184,7 @@ public class ScriptLoader {
 		raster.add("MG i");
 		raster.add("JP #LOOP2, i<V6");
 		raster.add("EN");
+		size += raster.size();
 
 		
 		
