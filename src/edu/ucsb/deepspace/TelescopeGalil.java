@@ -308,6 +308,7 @@ public class TelescopeGalil implements TelescopeInterface {
 	public void rasterScan(double minAz, double maxAz, double minEl, double maxEl, double reps) {
 		//el.indexing = true;
 		int el_inc= 5; 
+		
 		//min az
 		protocol.sendRead("V7 = "+az.convDegToEnc(minAz));
 		System.out.println(el.convDegToEnc(maxEl));
@@ -335,6 +336,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		
 		
 		protocol.sendRead("XQ #RASTER,1");
+		
 		
 		
 		}
