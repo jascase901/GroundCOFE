@@ -2,7 +2,7 @@ package edu.ucsb.deepspace;
 
 public class DataGalil implements DataInterface {
 	
-	private GalilStatus az = new GalilStatus(0, 0, 0, 0, false, false), el = new GalilStatus(0, 0, 0, 0, false, false);
+	private GalilStatus az = new GalilStatus(0, 0, 0, 0,  false, false), el = new GalilStatus(0, 0, 0, 0, false, false);
 	
 	public DataGalil() {
 		
@@ -34,6 +34,7 @@ public class DataGalil implements DataInterface {
 		double dVel = Double.parseDouble(vel);
 		double dJg = Double.parseDouble(jg);
 		double dAc = Double.parseDouble(ac);
+		
 		boolean motorState = (0 == Double.parseDouble(motor));
 		boolean motionState = (1 == Double.parseDouble(motion));
 		switch (axis) {
@@ -75,7 +76,9 @@ public class DataGalil implements DataInterface {
 	
 	class GalilStatus {
 		double pos, vel, jg, ac;
+	
 		boolean motorState, motionState;
+		
 		private GalilStatus(double pos, double vel, double jg, double ac, boolean motorState, boolean motionState) {
 			this.pos = pos;
 			this.vel = vel;
@@ -83,6 +86,7 @@ public class DataGalil implements DataInterface {
 			this.ac = ac;
 			this.motorState = motorState;
 			this.motionState = motionState;
+			
 		}
 		
 	}
@@ -122,5 +126,7 @@ public class DataGalil implements DataInterface {
 		}
 		return false;
 	}
+	
+	
 
 }
