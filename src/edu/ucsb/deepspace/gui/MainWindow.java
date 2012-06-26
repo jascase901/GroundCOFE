@@ -1028,9 +1028,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
-    	Button btnScnRaster = new Button(grpScanning, SWT.None);
+    	final Button btnScnRaster = new Button(grpScanning, SWT.None);
     	btnScnRaster.setBounds(119, 154, 85, 16);
     	btnScnRaster.setText("Raster Scan");
+    	popupWindowButtons.put("raster", btnScnRaster);
     	btnScnRaster.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
@@ -1041,8 +1042,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     			double maxEl = Double.parseDouble(txtMaxElScan.getText());
     			ScanCommand azSc = new ScanCommand(minAz, maxAz, continuousScanOn);
 				ScanCommand elSc = new ScanCommand(minEl, maxEl, continuousScanOn);
+				btnScnRaster.setEnabled(false);
     			rasterScan = !rasterScan;
     			stage.raster(azSc, elSc);
+    			
     		}
     	});
 	}

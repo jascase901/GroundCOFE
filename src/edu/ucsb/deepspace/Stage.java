@@ -462,6 +462,7 @@ public class Stage {
 			public void run() {
 				reader.readerOnOff(false);
 				scope.rasterScan(azSc.getMin(), azSc.getMax(), elSc.getMin(), elSc.getMax(), elSc.getReps());
+				buttonEnabler("raster");
 				reader.readerOnOff(true);
 			}
 		});
@@ -743,6 +744,7 @@ public class Stage {
 		data.motorState(Axis.EL) != position.motorState(Axis.EL)) {
 			window.updateMotorButton(data.motorState(Axis.AZ), Axis.AZ);
 			window.updateMotorButton(data.motorState(Axis.EL), Axis.EL);
+			
 		}
 		
 		position = data;
@@ -847,5 +849,7 @@ public class Stage {
 		}
 		return false;
 	}
+	
+
 
 }

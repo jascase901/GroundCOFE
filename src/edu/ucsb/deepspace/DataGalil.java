@@ -2,22 +2,22 @@ package edu.ucsb.deepspace;
 
 public class DataGalil implements DataInterface {
 	
-	private GalilStatus az = new GalilStatus(0, 0, 0, 0, 0, false, false), el = new GalilStatus(0, 0, 0, 0,0, false, false);
+	private GalilStatus az = new GalilStatus(0, 0, 0, 0,  false, false), el = new GalilStatus(0, 0, 0, 0, false, false);
 	
 	public DataGalil() {
 		
 	}
 	static DataGalil asdf = new DataGalil();
 	static {
-		asdf.make("0", "0", "0", "0", "1", "0", "65", Axis.AZ);
-		asdf.make("0", "0", "0", "0", "1", "0", "65", Axis.EL);
+		asdf.make("0", "0", "0", "0", "1", "0", Axis.AZ);
+		asdf.make("0", "0", "0", "0", "1", "0", Axis.EL);
 	}
 	
 	static DataGalil blank() {
 		return asdf;
 	}
 	
-	void make (String pos, String vel, String jg, String ac, String status_byte, String motor, String motion, Axis axis) {
+	void make (String pos, String vel, String jg, String ac, String motor, String motion, Axis axis) {
 //		if (pos.equals("")) {
 //			pos = "0";
 //		}
@@ -34,14 +34,14 @@ public class DataGalil implements DataInterface {
 		double dVel = Double.parseDouble(vel);
 		double dJg = Double.parseDouble(jg);
 		double dAc = Double.parseDouble(ac);
-		double dStatusByte = Double.parseDouble(status_byte);
+		
 		boolean motorState = (0 == Double.parseDouble(motor));
 		boolean motionState = (1 == Double.parseDouble(motion));
 		switch (axis) {
 			case AZ:
-				az = new GalilStatus(dPos*Axis.AZ.getPolarity(), dVel, dJg, dAc, dStatusByte, motorState, motionState); break;
+				az = new GalilStatus(dPos*Axis.AZ.getPolarity(), dVel, dJg, dAc, motorState, motionState); break;
 			case EL:
-				el = new GalilStatus(dPos*Axis.EL.getPolarity(), dVel, dJg, dAc, dStatusByte, motorState, motionState); break;
+				el = new GalilStatus(dPos*Axis.EL.getPolarity(), dVel, dJg, dAc, motorState, motionState); break;
 		}
 	}
 
@@ -75,17 +75,18 @@ public class DataGalil implements DataInterface {
 	}
 	
 	class GalilStatus {
-		double pos, vel, jg, ac, statusByte;
+		double pos, vel, jg, ac;
+	
 		boolean motorState, motionState;
 		
-		private GalilStatus(double pos, double vel, double jg, double ac, double statusByte, boolean motorState, boolean motionState) {
+		private GalilStatus(double pos, double vel, double jg, double ac, boolean motorState, boolean motionState) {
 			this.pos = pos;
 			this.vel = vel;
 			this.jg = jg;
 			this.ac = ac;
 			this.motorState = motorState;
 			this.motionState = motionState;
-			this.statusByte = statusByte;
+			
 		}
 		
 	}
@@ -125,5 +126,7 @@ public class DataGalil implements DataInterface {
 		}
 		return false;
 	}
+	
+	
 
 }

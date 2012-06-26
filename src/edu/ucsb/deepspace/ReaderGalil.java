@@ -44,11 +44,12 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 				
 				String azMoving = temp[11];
 				String elMoving = temp[12];
-				String statusByte = temp[13];
+				
 				
 				data = new DataGalil();
-				data.make(azPos, azVel, azJg, azAc,statusByte, azMotor, azMoving, Axis.AZ);
-				data.make(elPos, elVel, elJg, elAc, statusByte, elMotor, elMoving, Axis.EL);
+				data.make(azPos, azVel, azJg, azAc, azMotor, azMoving, Axis.AZ);
+				data.make(elPos, elVel, elJg, elAc, elMotor, elMoving, Axis.EL);
+				System.out.println("should be updateing position");
 				stage.updatePosition(data);
 			}
 			pause(1000);

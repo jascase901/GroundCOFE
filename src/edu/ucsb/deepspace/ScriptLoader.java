@@ -156,7 +156,7 @@ public class ScriptLoader {
 	}
 	
 	public void raster() {
-		raster = new Script("#RASTER", readerInfo.size()+20);
+		raster = new Script("#RASTER", size);
 		raster.add("n=0");
 		raster.add("j=0");
 		raster.add("i=0");
@@ -184,6 +184,7 @@ public class ScriptLoader {
 		raster.add("MG i");
 		raster.add("JP #LOOP2, i<V6");
 		raster.add("EN");
+		size += raster.size();
 
 		
 		
@@ -193,7 +194,7 @@ public class ScriptLoader {
 	
 	private void readerInfo() {
 		readerInfo = new Script("#READERI", size);
-		String temp = "MG _TPA, _TVA, _JGA, _ACA, _TPB, _TVB, _JGB, _ACB, _MOA, _MOB, _BGA, _BGB, _TB";
+		String temp = "MG _TPA, _TVA, _JGA, _ACA, _TPB, _TVB, _JGB, _ACB, _MOA, _MOB, _BGA, _BGB";
 		readerInfo.add(temp);
 		readerInfo.add("EN");
 		size += readerInfo.size();
