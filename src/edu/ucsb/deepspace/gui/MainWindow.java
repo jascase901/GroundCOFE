@@ -946,7 +946,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     				int reps = Integer.parseInt(txtRepScan.getText());
     				//stage.startScanning(min, max, time, reps, axisType.AZ, continuousScanOn);
     				
-    				ScanCommand azSc = new ScanCommand(min, max, time, reps, continuousScanOn);
+    				ScanCommand azSc = new ScanCommand(min, max, time, reps);
     				stage.startScanning(azSc, null);
     			}
     		}
@@ -977,7 +977,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
         			int reps = Integer.parseInt(txtRepScan.getText());
         			//stage.startScanning(min, max, time, reps, axisType.EL,continuousScanOn);
         			
-        			ScanCommand elSc = new ScanCommand(min, max, time, reps, continuousScanOn);
+        			ScanCommand elSc = new ScanCommand(min, max, time, reps);
         			stage.startScanning(null, elSc);
     			}
     		}
@@ -1007,8 +1007,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
         			double timeEl = Double.parseDouble(txtTimeElScan.getText());
     				int reps = Integer.parseInt(txtRepScan.getText());
     				
-    				ScanCommand azSc = new ScanCommand(minAz, maxAz, timeAz, reps, continuousScanOn);
-    				ScanCommand elSc = new ScanCommand(minEl, maxEl, timeEl, reps, continuousScanOn);
+    				ScanCommand azSc = new ScanCommand(minAz, maxAz, timeAz, reps);
+    				ScanCommand elSc = new ScanCommand(minEl, maxEl, timeEl, reps);
     				stage.startScanning(azSc, elSc);
     				
     				btnScanBoth.setText("Stop Scan");
@@ -1024,7 +1024,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	btnContinuousScan.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
+    			
     			continuousScanOn = !continuousScanOn;
+    			stage.setContinousScanOn(continuousScanOn);
+    			
     		}
     	});
     	
@@ -1040,8 +1043,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 				double timeAz = Double.parseDouble(txtTimeAzScan.getText());
 				double minEl = Double.parseDouble(txtMinElScan.getText());
     			double maxEl = Double.parseDouble(txtMaxElScan.getText());
-    			ScanCommand azSc = new ScanCommand(minAz, maxAz, continuousScanOn);
-				ScanCommand elSc = new ScanCommand(minEl, maxEl, continuousScanOn);
+    			ScanCommand azSc = new ScanCommand(minAz, maxAz);
+				ScanCommand elSc = new ScanCommand(minEl, maxEl);
 				btnScnRaster.setEnabled(false);
     			rasterScan = !rasterScan;
     			stage.raster(azSc, elSc);

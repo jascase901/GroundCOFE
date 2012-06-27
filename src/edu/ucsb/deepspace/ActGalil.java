@@ -502,7 +502,7 @@ public class ActGalil implements ActInterface {
 			pause(1000*(sc.getTime()+ .1));
 			
 			i++;
-			if (i >= sc.getReps() && !sc.getContinuous()) scanning = false;
+			if (i >= sc.getReps()) scanning = false;
 		}
 	}
 	/**
