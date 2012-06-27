@@ -47,6 +47,7 @@ public class Stage {
 	private LatLongAlt baseLocation, balloonLocation;
 	private double azToBalloon = 0, elToBalloon = 0;
 	private CommGalil stageProtocol, scopeProtocol, readerProtocol;
+	private Boolean continousScanOn;
 
 	ScriptLoader sl;
 
@@ -460,15 +461,18 @@ public class Stage {
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
-				reader.readerOnOff(false);
-				scope.rasterScan(azSc.getMin(), azSc.getMax(), elSc.getMin(), elSc.getMax(), elSc.getReps());
+				do {
+					//reader.readerOnOff(false);
+					scope.rasterScan(azSc.getMin(), azSc.getMax(), elSc.getMin(), elSc.getMax(), elSc.getReps());
+					//reader.readerOnOff(true);
+					waitWhileMoving();
+				}while(continousScanOn);
 				buttonEnabler("raster");
-				reader.readerOnOff(true);
 			}
 		});
 		
 	}
-
+	
 
 
 	/**
@@ -848,6 +852,14 @@ public class Stage {
 				assert false; //This is only reached if a new axis is added.
 		}
 		return false;
+	}
+
+	public Boolean getContinousScanOn() {
+		return continousScanOn;
+	}
+
+	public void setContinousScanOn(Boolean continousScanOn) {
+		this.continousScanOn = continousScanOn;
 	}
 	
 

@@ -194,7 +194,8 @@ public class TelescopeGalil implements TelescopeInterface {
 
 	@Override
 	public void stopScanning() {
-		// TODO Auto-generated method stub
+		// All scans are on thread 1
+		protocol.sendRead("ST");
 		
 	}
 

@@ -26,6 +26,7 @@ public class ScriptLoader {
 		scripts.put("#HOMEB", homeB);
 		scripts.put("#READERI", readerInfo);
 		scripts.put("#RASTER", raster);
+		
 	}
 	
 	public Set<String> findExpected() {
