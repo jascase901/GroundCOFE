@@ -13,6 +13,7 @@ public class ScriptLoader {
 	private Script homeB;
 	private Script raster;
 	private Script azScan;
+	private Script elScan;
 	
 	private Script readerInfo;
 	private Set<String> loadedScriptNames;
@@ -28,6 +29,7 @@ public class ScriptLoader {
 		scripts.put("#READERI", readerInfo);
 		scripts.put("#RASTER", raster);
 		scripts.put("#AZSCAN", azScan);
+		scripts.put("#ELSCAN", elScan);
 		
 	}
 	
@@ -76,6 +78,7 @@ public class ScriptLoader {
 		readerInfo();
 		raster();
 		azScan();
+		elScan();
 		
 		protocol.sendRead(homeA.getScript());
 		pause();
@@ -86,6 +89,8 @@ public class ScriptLoader {
 		protocol.sendRead(raster.getScript());
 		pause();
 		protocol.sendRead(azScan.getScript());
+		pause();
+		protocol.sendRead(elScan.getScript());
 		pause();
 	}
 	
@@ -212,13 +217,39 @@ public class ScriptLoader {
 		azScan.add("AM");
 		azScan.add("WT 200");
 		azScan.add("n = n+1");
-		azScan.add("JP #LOOP3, n<V6");
+		azScan.add("JP #LOOP3, n<V6 ");
 		azScan.add("EN");
 		size += azScan.size();
 		
 		
 		
 	}
+	private void elScan() {
+		elScan = new Script("#ELSCAN", size);
+		//counter
+		elScan.add("n=0");
+		//v3 = speed
+		elScan.add("SP V3");
+		elScan.add("#LOOP4");
+		//v7=min az
+		elScan.add("PA ,V7");
+		elScan.add("BG");
+		elScan.add("AM");
+		elScan.add("WT 200");
+		//v1 = max az
+		elScan.add("PA ,V1");
+		elScan.add("BG");
+		elScan.add("AM");
+		elScan.add("WT 200");
+		elScan.add("n = n+1");
+		elScan.add("JP #LOOP4, n<V6 ");
+		elScan.add("EN");
+		size += elScan.size();
+		
+		
+		
+	}
+	
 	
 	private void readerInfo() {
 		readerInfo = new Script("#READERI", size);

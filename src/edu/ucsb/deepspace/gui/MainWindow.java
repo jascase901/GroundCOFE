@@ -462,7 +462,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	moveAmount = new Text(grpJoystick, SWT.BORDER);
     	moveAmount.setBounds(10, 28, 90, 16);
-    	moveAmount.setText("amount to move");
+    	moveAmount.setText("0");
     	moveAmount.addModifyListener(new ModifyListener() {
     		public void modifyText(ModifyEvent e) {
     			Long temp = moveAmountVal;
@@ -889,26 +889,34 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	txtMinAzScan = new Text(grpScanning, SWT.BORDER);
     	txtMinAzScan.setBounds(59, 16, 43, 19);
+    	txtMinAzScan.setText("0");
     	scanAzTexts.add(txtMinAzScan);
+    	
     	
     	txtMaxAzScan = new Text(grpScanning, SWT.BORDER);
     	txtMaxAzScan.setBounds(59, 41, 43, 19);
+    	txtMaxAzScan.setText("0");
     	scanAzTexts.add(txtMaxAzScan);
+    	
     	
     	txtTimeAzScan = new Text(grpScanning, SWT.BORDER);
     	txtTimeAzScan.setBounds(59, 66, 43, 19);
+    	txtTimeAzScan.setText("0");
     	scanAzTexts.add(txtTimeAzScan);
     	
     	txtMinElScan = new Text(grpScanning, SWT.BORDER);
     	txtMinElScan.setBounds(154, 16, 43, 19);
+    	txtMinElScan.setText("0");
     	scanElTexts.add(txtMinElScan);
     	
     	txtMaxElScan = new Text(grpScanning, SWT.BORDER);
     	txtMaxElScan.setBounds(154, 41, 43, 19);
+    	txtMaxElScan.setText("0");
     	scanElTexts.add(txtMaxElScan);
     	
     	txtTimeElScan = new Text(grpScanning, SWT.BORDER);
     	txtTimeElScan.setBounds(154, 66, 43, 19);
+    	txtTimeElScan.setText("0");
     	scanElTexts.add(txtTimeElScan);
     	
     	Label lblRepetitionsScan = new Label(grpScanning, SWT.NONE);
@@ -917,6 +925,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	txtRepScan = new Text(grpScanning, SWT.BORDER);
     	txtRepScan.setBounds(72, 96, 43, 19);
+    	txtRepScan.setText("0");
     	scanAzTexts.add(txtRepScan);
     	scanElTexts.add(txtRepScan);
     	
