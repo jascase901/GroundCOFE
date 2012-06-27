@@ -12,6 +12,7 @@ public class ScriptLoader {
 	private Script homeA;
 	private Script homeB;
 	private Script raster;
+	private Script azScan;
 	
 	private Script readerInfo;
 	private Set<String> loadedScriptNames;
@@ -26,6 +27,7 @@ public class ScriptLoader {
 		scripts.put("#HOMEB", homeB);
 		scripts.put("#READERI", readerInfo);
 		scripts.put("#RASTER", raster);
+		scripts.put("#AZSCAN", azScan);
 		
 	}
 	
@@ -73,6 +75,7 @@ public class ScriptLoader {
 		indexEl();
 		readerInfo();
 		raster();
+		azScan();
 		
 		protocol.sendRead(homeA.getScript());
 		pause();
@@ -80,7 +83,9 @@ public class ScriptLoader {
 		pause();
 		protocol.sendRead(readerInfo.getScript());
 		pause();
-		protocol.send(raster.getScript());
+		protocol.sendRead(raster.getScript());
+		pause();
+		protocol.sendRead(azScan.getScript());
 		pause();
 	}
 	
@@ -187,10 +192,32 @@ public class ScriptLoader {
 		raster.add("EN");
 		size += raster.size();
 
-		
-		
-		
 	
+	}
+	private void azScan() {
+		azScan = new Script("#AZSCAN", size);
+		//counter
+		azScan.add("n=0");
+		//v3 = speed
+		azScan.add("SP V3");
+		azScan.add("#LOOP3");
+		//v7=min az
+		azScan.add("PA V7,");
+		azScan.add("BG");
+		azScan.add("AM");
+		azScan.add("WT 200");
+		//v1 = max az
+		azScan.add("PA V1,");
+		azScan.add("BG");
+		azScan.add("AM");
+		azScan.add("WT 200");
+		azScan.add("n = n+1");
+		azScan.add("JP #LOOP3, n<V6");
+		azScan.add("EN");
+		size += azScan.size();
+		
+		
+		
 	}
 	
 	private void readerInfo() {

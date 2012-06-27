@@ -188,7 +188,9 @@ public class TelescopeGalil implements TelescopeInterface {
 
 	@Override
 	public void scan(ScanCommand azSc, ScanCommand elSc) {
-		// TODO Auto-generated method stub
+			//rasterScan(azSc.getMin(), azSc.getMax(), elSc.getMin(), elSc.getMax(), (int)elSc.getReps());
+			azScan(azSc.getMin(), azSc.getMax(), (int)azSc.getReps());
+			System.out.println("executed");
 		
 	}
 
@@ -307,7 +309,7 @@ public class TelescopeGalil implements TelescopeInterface {
 			e.printStackTrace();
 		}
 	}
-	public void rasterScan(double minAz, double maxAz, double minEl, double maxEl, double reps) {
+	public void rasterScan(double minAz, double maxAz, double minEl, double maxEl, int reps) {
 		//el.indexing = true;
 		int el_inc= 5; 
 		
@@ -347,6 +349,27 @@ public class TelescopeGalil implements TelescopeInterface {
 				
 		
 		}
+	
+	public void azScan(double minAz, double maxAz, int reps) {
+		//min az
+		protocol.sendRead("V7 = "+az.convDegToEnc(minAz));
+		pause();
+		//max az
+		protocol.sendRead("V1 = "+az.convDegToEnc(maxAz));
+		pause();
+		//az speed
+		protocol.sendRead("V3 = 100000");
+		pause();
+		protocol.sendRead("V6 = "+reps);
+		pause();
+		
+		az.scanning = true;
+		protocol.sendRead("XQ #AZSCAN,1");
+		waitWhileMoving(Axis.AZ);
+		az.scanning = false;		
+
+
+	}
 		//waitWhileMoving(axis);
 		//az.indexing = false;
 

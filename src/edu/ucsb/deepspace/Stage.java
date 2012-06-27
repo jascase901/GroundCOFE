@@ -317,6 +317,7 @@ public class Stage {
 			@Override
 			public void run() {
 				scope.scan(azSc, elSc);
+				waitWhileMoving();
 			}
 		});
 		
@@ -463,7 +464,7 @@ public class Stage {
 			public void run() {
 				do {
 					//reader.readerOnOff(false);
-					scope.rasterScan(azSc.getMin(), azSc.getMax(), elSc.getMin(), elSc.getMax(), elSc.getReps());
+					scope.rasterScan(azSc.getMin(), azSc.getMax(), elSc.getMin(), elSc.getMax(), (int)elSc.getReps());
 					//reader.readerOnOff(true);
 					waitWhileMoving();
 				}while(continousScanOn);
