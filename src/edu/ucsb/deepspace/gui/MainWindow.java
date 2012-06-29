@@ -1056,7 +1056,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 				ScanCommand elSc = new ScanCommand(minEl, maxEl);
 				btnScnRaster.setEnabled(false);
     			rasterScan = !rasterScan;
-    			stage.raster(azSc, elSc);
+    			stage.startScanning(azSc, elSc);
     			
     		}
     	});

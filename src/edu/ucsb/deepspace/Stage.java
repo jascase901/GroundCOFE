@@ -299,6 +299,15 @@ public class Stage {
 			}
 		}, 0, 1000);
 	}
+	
+	/**
+	 * updates scan command min and max using ra/dec conversions
+	 * @param sc
+	 * @param axis
+	 */
+	public void updateScanCommand(ScanCommand sc, Axis axis) {
+		
+	}
 	/**
 	 * Moves over a specified min and max az and el a specified or continuous number of times. 
 	 * 
@@ -316,10 +325,16 @@ public class Stage {
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
-				scope.scan(azSc, elSc);
-				waitWhileMoving();
-			}
-		});
+				do {
+					ScanCommand[] commands= baseLocation.returnUpdatedSc(azSc, elSc);
+					
+					scope.scan(commands[0], commands[1]);
+					System.out.println(commands[0].getMax());
+					//get azSc, elSc  ra/dec
+					waitWhileMoving();
+					//generate azSc, elSc  Az/El
+				}while(continousScanOn);
+			}});
 		
 		//TODO is this correct?
 		if (elSc == null) {
@@ -458,21 +473,7 @@ public class Stage {
 		window.controlMoveButtons(true);
 	}
 
-	public void raster(final ScanCommand azSc, final ScanCommand elSc){
-		exec.submit(new Runnable() {
-			@Override
-			public void run() {
-				do {
-					//reader.readerOnOff(false);
-					scope.rasterScan(azSc.getMin(), azSc.getMax(), elSc.getMin(), elSc.getMax(), (int)elSc.getReps());
-					//reader.readerOnOff(true);
-					waitWhileMoving();
-				}while(continousScanOn);
-				buttonEnabler("raster");
-			}
-		});
-		
-	}
+	
 	
 
 

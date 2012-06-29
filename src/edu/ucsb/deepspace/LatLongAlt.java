@@ -1,5 +1,6 @@
 package edu.ucsb.deepspace;
 
+import java.sql.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -149,5 +150,35 @@ public class LatLongAlt {
 		out += "Altitude:  " + altitude + " (km)";
 		return out;
 	}
+	/**
+	 * 
+	 * 
+	 * @param elSc
+	 * @param azSc
+	 * @return an Array, with the with updated{azSc, elSc}
+	 */
+	public ScanCommand[] returnUpdatedSc(ScanCommand azSc, ScanCommand elSc) {
+		if (azSc != null && elSc !=null) {
+			double minRa = azelToRa(azSc.getMin(), elSc.getMin());
+			double minDec = azelToDec(azSc.getMin(), elSc.getMin());
+
+			double maxRa = azelToRa(azSc.getMax(), elSc.getMax());
+			double maxDec = azelToDec(azSc.getMax(), elSc.getMax());
+
+			double minAz = radecToAz(minRa, minDec);
+			double minEl = radecToEl(minRa, minDec);
+
+			double maxAz = radecToAz(maxRa, maxDec);
+			double maxEl = radecToEl(maxRa, maxDec);
+
+			elSc = new ScanCommand(minEl, maxEl, elSc.getTime(), (int)elSc.getReps());
+			azSc = new ScanCommand(minAz, maxAz, azSc.getTime(), (int)azSc.getReps());
+		}
+		
+		
+
+		ScanCommand[] ar = {azSc, elSc};
+		return ar;
 	
+	}
 }

@@ -30,5 +30,4 @@ public class ScanCommand {
 	public double getReps() {return reps;}
 	
 	
-	
 }
