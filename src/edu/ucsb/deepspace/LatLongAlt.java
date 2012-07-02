@@ -150,26 +150,27 @@ public class LatLongAlt {
 		out += "Altitude:  " + altitude + " (km)";
 		return out;
 	}
-	/**
+/*	*//**
 	 * 
 	 * 
 	 * @param elSc
 	 * @param azSc
-	 * @return an Array, with the with updated{azSc, elSc}
-	 */
-	public ScanCommand[] returnUpdatedSc(ScanCommand azSc, ScanCommand elSc) {
+	 * @return an Array, with the with updated{ra, dec}
+	 *//*
+	public ScanCommand raDecSc(ScanCommand azSc, ScanCommand elSc) {
 		if (azSc != null && elSc !=null) {
+			double roundPlace = 1000.0;
 			double minRa = azelToRa(azSc.getMin(), elSc.getMin());
 			double minDec = azelToDec(azSc.getMin(), elSc.getMin());
 
 			double maxRa = azelToRa(azSc.getMax(), elSc.getMax());
 			double maxDec = azelToDec(azSc.getMax(), elSc.getMax());
 
-			double minAz = radecToAz(minRa, minDec);
-			double minEl = radecToEl(minRa, minDec);
+			double minAz = Math.round(roundPlace*radecToAz(minRa, minDec))/roundPlace;
+			double minEl = Math.round(roundPlace*radecToEl(minRa, minDec))/roundPlace;
 
-			double maxAz = radecToAz(maxRa, maxDec);
-			double maxEl = radecToEl(maxRa, maxDec);
+			double maxAz = Math.round(roundPlace*radecToAz(maxRa, maxDec))/roundPlace;
+			double maxEl = Math.round(roundPlace*radecToEl(maxRa, maxDec))/roundPlace;
 
 			elSc = new ScanCommand(minEl, maxEl, elSc.getTime(), (int)elSc.getReps());
 			azSc = new ScanCommand(minAz, maxAz, azSc.getTime(), (int)azSc.getReps());
@@ -177,8 +178,8 @@ public class LatLongAlt {
 		
 		
 
-		ScanCommand[] ar = {azSc, elSc};
+		ScanCommand ar;
 		return ar;
 	
-	}
+	}*/
 }

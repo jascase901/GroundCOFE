@@ -325,15 +325,42 @@ public class Stage {
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
-				do {
-					ScanCommand[] commands= baseLocation.returnUpdatedSc(azSc, elSc);
-					
-					scope.scan(commands[0], commands[1]);
-					System.out.println(commands[0].getMax());
-					//get azSc, elSc  ra/dec
-					waitWhileMoving();
-					//generate azSc, elSc  Az/El
-				}while(continousScanOn);
+				//If user presses scan both
+				if (azSc != null && elSc!=null) {
+					double minAz = azSc.getMin();
+					double maxAz = azSc.getMax();
+					double minEl = azSc.getMin();
+					double maxEl = azSc.getMax();
+					double roundPlace = 1000;
+					//convert cords to time dependent RADEC
+					double minDec = baseLocation.azelToDec(azSc.getMin(), elSc.getMin());
+					double maxDec =baseLocation.azelToDec(azSc.getMax(), elSc.getMax());
+					double minRa = baseLocation.azelToRa(azSc.getMin(), elSc.getMin());
+					double maxRa = baseLocation.azelToRa(azSc.getMax(), elSc.getMax());
+
+					do {
+
+
+						waitWhileMoving();
+						//scan uses Az/El coord not ra dec so make scan commands with az/el
+						scope.scan(new ScanCommand(minAz, maxAz, azSc.getTime(), (int)azSc.getReps()), new ScanCommand(minEl, maxEl, elSc.getTime(), (int)elSc.getReps()));		
+						//convert ra coords, to az el this changes with base location time
+						minAz = Math.round(roundPlace*baseLocation.radecToAz(minRa, minDec))/roundPlace;
+						minEl = Math.round(roundPlace*baseLocation.radecToEl(minRa, minDec))/roundPlace;
+						maxAz = Math.round(roundPlace*baseLocation.radecToAz(maxRa, maxDec))/roundPlace;
+						maxEl = Math.round(roundPlace*baseLocation.radecToEl(maxRa, maxDec))/roundPlace;
+					}while(continousScanOn);
+				}
+
+				else {
+					do {
+						waitWhileMoving();
+						scope.scan(azSc, elSc);
+					}while(continousScanOn);
+				}
+
+				
+				
 			}});
 		
 		//TODO is this correct?
