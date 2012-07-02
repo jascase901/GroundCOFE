@@ -2,8 +2,8 @@ package edu.ucsb.deepspace;
 
 public class DataGalil implements DataInterface {
 	
-	private GalilStatus az = new GalilStatus(0, 0, 0, 0,  false, false), el = new GalilStatus(0, 0, 0, 0, false, false);
-	
+	private GalilAxisStatus az = new GalilAxisStatus(0, 0, 0, 0,  false, false), el = new GalilAxisStatus(0, 0, 0, 0, false, false);
+	private GalilThreadStatus threads = new GalilThreadStatus(0,0,0);
 	public DataGalil() {
 		
 	}
@@ -39,10 +39,18 @@ public class DataGalil implements DataInterface {
 		boolean motionState = (1 == Double.parseDouble(motion));
 		switch (axis) {
 			case AZ:
-				az = new GalilStatus(dPos*Axis.AZ.getPolarity(), dVel, dJg, dAc, motorState, motionState); break;
+				az = new GalilAxisStatus(dPos*Axis.AZ.getPolarity(), dVel, dJg, dAc, motorState, motionState); break;
 			case EL:
-				el = new GalilStatus(dPos*Axis.EL.getPolarity(), dVel, dJg, dAc, motorState, motionState); break;
+				el = new GalilAxisStatus(dPos*Axis.EL.getPolarity(), dVel, dJg, dAc, motorState, motionState); break;
 		}
+	}
+	
+	void make(String hqThread0, String hqThread1, String hqThread2) {
+		double th0 = Double.parseDouble(hqThread0);
+		double th1 = Double.parseDouble(hqThread1);
+		double th2 = Double.parseDouble(hqThread2);
+		
+		threads = new GalilThreadStatus(th0, th1, th2);
 	}
 
 	@Override
@@ -74,12 +82,29 @@ public class DataGalil implements DataInterface {
 		return el.pos;
 	}
 	
-	class GalilStatus {
+	public boolean isThreadEx(int thread){
+		switch(thread) {
+		case 0:
+			return (threads.thread0 != 0);
+		case 1:
+			return (threads.thread1 != 0);
+		case 2:
+			return (threads.thread2 != 0);
+		default:
+			System.out.println("thread is greater than 2, not in data object");
+			return (false);
+			
+		}
+			
+	}
+	
+	
+	class GalilAxisStatus {
 		double pos, vel, jg, ac;
 	
 		boolean motorState, motionState;
 		
-		private GalilStatus(double pos, double vel, double jg, double ac, boolean motorState, boolean motionState) {
+		private GalilAxisStatus(double pos, double vel, double jg, double ac, boolean motorState, boolean motionState) {
 			this.pos = pos;
 			this.vel = vel;
 			this.jg = jg;
@@ -89,6 +114,16 @@ public class DataGalil implements DataInterface {
 			
 		}
 		
+		
+	}
+	class GalilThreadStatus{
+		double thread0, thread1, thread2;
+		
+		private GalilThreadStatus(double thread0, double thread1, double thread2) {
+			this.thread0 = thread0;
+			this.thread1 = thread1;
+			this.thread2 = thread2;
+		}
 	}
 
 	@Override

@@ -341,7 +341,7 @@ public class Stage {
 					do {
 
 
-						waitWhileMoving();
+						waitWhileExecuting(1);
 						//scan uses Az/El coord not ra dec so make scan commands with az/el
 						scope.scan(new ScanCommand(minAz, maxAz, azSc.getTime(), (int)azSc.getReps()), new ScanCommand(minEl, maxEl, elSc.getTime(), (int)elSc.getReps()));		
 						//convert ra coords, to az el this changes with base location time
@@ -349,12 +349,13 @@ public class Stage {
 						minEl = Math.round(roundPlace*baseLocation.radecToEl(minRa, minDec))/roundPlace;
 						maxAz = Math.round(roundPlace*baseLocation.radecToAz(maxRa, maxDec))/roundPlace;
 						maxEl = Math.round(roundPlace*baseLocation.radecToEl(maxRa, maxDec))/roundPlace;
+						
 					}while(continousScanOn);
 				}
 
 				else {
 					do {
-						waitWhileMoving();
+						waitWhileExecuting(1);
 						scope.scan(azSc, elSc);
 					}while(continousScanOn);
 				}
@@ -523,10 +524,12 @@ public class Stage {
 	/**
 	 * While isMoving() is true, sleeps for 100ms.
 	 */
-	public void waitWhileMoving() {
-		while (isMoving()) {
-			pause(100);
+	public void waitWhileExecuting(int thread) {
+		while (position.isThreadEx(thread)) {
+			System.out.println("Thread" + thread +" is executing");
 		}
+		System.out.println("Thread" + thread +" is  done executing");
+		//pause(50);
 	}
 	/**
 	 * Sleeps for the waitTime.

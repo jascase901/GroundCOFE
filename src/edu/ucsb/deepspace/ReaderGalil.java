@@ -45,10 +45,15 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 				String azMoving = temp[11];
 				String elMoving = temp[12];
 				
+				String hqThread0 = temp[13];
+				String hqThread1 = temp[14];
+				String hqThread2 = temp[15];
+				
 				
 				data = new DataGalil();
 				data.make(azPos, azVel, azJg, azAc, azMotor, azMoving, Axis.AZ);
 				data.make(elPos, elVel, elJg, elAc, elMotor, elMoving, Axis.EL);
+				data.make(hqThread0, hqThread1, hqThread2);
 				
 				stage.updatePosition(data);
 			}

@@ -28,6 +28,12 @@ public interface DataInterface {
 	 */
 	boolean motorState(Axis axis);
 	
+	/**
+	 * returns true if thread 0 is executing
+	 * @return
+	 */
+	public boolean isThreadEx(int thread);
+	
 
 	
 }

@@ -253,7 +253,8 @@ public class ScriptLoader {
 	
 	private void readerInfo() {
 		readerInfo = new Script("#READERI", size);
-		String temp = "MG _TPA, _TVA, _JGA, _ACA, _TPB, _TVB, _JGB, _ACB, _MOA, _MOB, _BGA, _BGB";
+		//There is a maximum amount of data, that can be sent in one line, so if we want to add more we need another solution
+		String temp = "MG _TPA,_TVA,_JGA,_ACA,_TPB,_TVB,_JGB,_ACB,_MOA,_MOB,_BGA,_BGB,_HX0,_HX1,_HX2";
 		readerInfo.add(temp);
 		readerInfo.add("EN");
 		size += readerInfo.size();
