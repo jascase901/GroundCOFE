@@ -47,7 +47,7 @@ public class Stage {
 	private LatLongAlt baseLocation, balloonLocation;
 	private double azToBalloon = 0, elToBalloon = 0;
 	private CommGalil stageProtocol, scopeProtocol, readerProtocol;
-	private Boolean continousScanOn;
+	private Boolean continousScanOn = false;
 
 	ScriptLoader sl;
 
@@ -360,21 +360,22 @@ public class Stage {
 						waitWhileExecuting(1);
 						scope.scan(azSc, elSc);
 					}while(continousScanOn);
+					
+					
 				}
+				
+				window.enableScanButtons();
+
+				
+				
+				
+				
+				
 
 				
 				
 			}});
 		
-		//TODO is this correct?
-		if (elSc == null) {
-			window.setScanEnabled(Axis.AZ);
-		}
-		else if (azSc == null) {
-			window.setScanEnabled(Axis.EL);
-		}
-		//TODO fix!
-		//window.setScanEnabled(axisType.BOTH);
 	}
 	/**
 	 * Stops movement caused by scanning.
@@ -386,24 +387,7 @@ public class Stage {
 	
 	
 	
-//	public void raster(ScanCommand azSc, ScanCommand elSc) {
-//		moveAbsolute(azSc.getMin(), elSc.getMin());
-//		double deltaAz = azSc.getMax() - azSc.getMin();
-//		double deltaEl = elSc.getMax() - elSc.getMin();
-//		double reps = azSc.getReps();
-//		double lines = 3;
-//		
-//		
-//		moveAbsolute(minAz, minEl);
-//		int i = 1;
-//		int mask = 0;
-//		int parity = 1;
-//		while (i<reps) {
-//		  //moveRelative(deltaAz, 0);
-//		  //moveRelative(-deltaAz, -deltaEl/lines);
-//		}
-//	}
-	
+
 	public void move(final MoveCommand mc) {
 		exec.submit(new Runnable() {
 			public void run() {
@@ -527,11 +511,12 @@ public class Stage {
 	 * While isMoving() is true, sleeps for 100ms.
 	 */
 	public void waitWhileExecuting(int thread) {
-		System.out.println("thread" +thread + "is executing");
+		
 		while (position.isThreadEx(thread)) {
+			//statusArea("thread" +thread + "is executing\n");
 			;
 		}
-		System.out.println("Thread" + thread +" is  done executing");
+		//statusArea("Thread" + thread +" is  done executing\n");
 		//pause(50);
 	}
 	/**

@@ -349,7 +349,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		waitWhileMoving(Axis.EL);
 		az.scanning = false;
 		el.scanning = false;
-		System.out.println("Min az:"+ minAz +"maxAz: "+ maxAz+" minEl:"+minEl+"maxEl:"+maxEl);
+		System.out.println("Min az:" + minAz +" maxAz: "+ maxAz+" minEl:"+minEl+" maxEl:"+maxEl);
 				
 		
 		}
