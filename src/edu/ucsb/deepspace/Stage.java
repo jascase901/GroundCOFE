@@ -527,8 +527,9 @@ public class Stage {
 	 * While isMoving() is true, sleeps for 100ms.
 	 */
 	public void waitWhileExecuting(int thread) {
+		System.out.println("thread" +thread + "is executing");
 		while (position.isThreadEx(thread)) {
-			System.out.println("Thread" + thread +" is executing");
+			;
 		}
 		System.out.println("Thread" + thread +" is  done executing");
 		//pause(50);

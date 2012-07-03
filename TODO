@@ -1,15 +1,11 @@
 TODO:
 status area.  the user needs information about what's going on in the program
 data output.  during ra/dec tracking and scanning.  into some sort of text file
-ra/dec + raster scan
+
 fool proof.  try breaking the program
 separate GUI for FTDI and GALIL
 
 
-Scanning
-
-Continuous Horizontal Scan
-Raster Scan
 
 
 start up procedure:
