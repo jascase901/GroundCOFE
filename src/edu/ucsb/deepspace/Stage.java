@@ -342,8 +342,10 @@ public class Stage {
 
 
 						waitWhileExecuting(1);
+						
 						//scan uses Az/El coord not ra dec so make scan commands with az/el
 						scope.scan(new ScanCommand(minAz, maxAz, azSc.getTime(), (int)azSc.getReps()), new ScanCommand(minEl, maxEl, elSc.getTime(), (int)elSc.getReps()));		
+						waitWhileExecuting(1);
 						//convert ra coords, to az el this changes with base location time
 						minAz = Math.round(roundPlace*baseLocation.radecToAz(minRa, minDec))/roundPlace;
 						minEl = Math.round(roundPlace*baseLocation.radecToEl(minRa, minDec))/roundPlace;

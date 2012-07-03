@@ -344,7 +344,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		
 		az.scanning = true;
 		el.scanning = true;
-		protocol.sendRead("XQ #RASTER,1");
+		protocol.sendRead("HX 1;XQ #RASTER,1");
 		waitWhileMoving(Axis.AZ);
 		waitWhileMoving(Axis.EL);
 		az.scanning = false;
@@ -367,7 +367,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		pause();
 		
 		az.scanning = true;
-		protocol.sendRead("XQ #AZSCAN,1");
+		protocol.sendRead("HX 1;XQ #AZSCAN,1");
 		waitWhileMoving(Axis.AZ);
 		az.scanning = false;		
 
@@ -387,7 +387,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		pause();
 		
 		el.scanning = true;
-		protocol.sendRead("XQ #ELSCAN,1");
+		protocol.sendRead("HX 1;XQ #ELSCAN,1");
 		waitWhileMoving(Axis.EL);
 		System.out.println("scanning");
 		el.scanning = false;		
