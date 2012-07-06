@@ -342,7 +342,6 @@ public class Stage {
 
 
 						waitWhileExecuting(1);
-						
 						//scan uses Az/El coord not ra dec so make scan commands with az/el
 						scope.scan(new ScanCommand(minAz, maxAz, azSc.getTime(), (int)azSc.getReps()), new ScanCommand(minEl, maxEl, elSc.getTime(), (int)elSc.getReps()));		
 						waitWhileExecuting(1);
@@ -359,6 +358,7 @@ public class Stage {
 					do {
 						waitWhileExecuting(1);
 						scope.scan(azSc, elSc);
+						waitWhileExecuting(1);
 					}while(continousScanOn);
 					
 					
@@ -436,11 +436,16 @@ public class Stage {
 	
 	public void moveRelative(Double amount, Axis axis, MoveType type) {
 		MoveCommand mc = new MoveCommand(MoveMode.RELATIVE, type, null, null);
+		
 		switch (axis) {
 			case AZ:
-				mc = new MoveCommand(MoveMode.RELATIVE, type, amount, null); break;
+				mc = new MoveCommand(MoveMode.RELATIVE, type, amount, null);
+				setVelocity( this.maxVelAz, axis);
+				break;
 			case EL:
-				mc = new MoveCommand(MoveMode.RELATIVE, type, null, amount); break;
+				mc = new MoveCommand(MoveMode.RELATIVE, type, null, amount);
+				setVelocity(this.maxVelEl, axis);
+				break;
 		}
 		move(mc);
 	}

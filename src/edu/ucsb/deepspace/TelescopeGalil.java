@@ -317,9 +317,18 @@ public class TelescopeGalil implements TelescopeInterface {
 	public void rasterScan(ScanCommand azSc, ScanCommand elSc) {
 		//el.indexing = true;
 		int el_inc= 5;
-		double azSpeed =  10000;
-		double elSpeed =  10000;
+	
 		
+		//all lines are roughly the same distance so I only calculate the distance of the bottom ones
+		double deltaX = Math.abs((az.convDegToEnc(azSc.getMax())-az.convDegToEnc(azSc.getMin())));
+		//el_inc is basically the slope, so I can use slope formula to get y1
+		double deltaY  = Math.abs(el_inc*deltaX);
+		double lineNums = el.convDegToEnc(elSc.getMax())/el_inc;
+		double azSpeed =  (int)lineNums*deltaX/azSc.getTime();
+		double elSpeed =  (int)lineNums*deltaY/elSc.getTime();
+		
+		
+	
 		//min az
 		protocol.sendRead("V7 = "+az.convDegToEnc(azSc.getMin()));
 		System.out.println(el.convDegToEnc(elSc.getMax()));
@@ -339,8 +348,8 @@ public class TelescopeGalil implements TelescopeInterface {
 		protocol.sendRead("V4 = "+elSpeed);
 		pause();
 		//el speed
-		protocol.sendRead("V5 = "+el.convDegToEnc(elSc.getMax())/el_inc);
-		System.out.println(el.convDegToEnc(elSc.getMax())/el_inc);
+		protocol.sendRead("V5 = "+lineNums);
+	
 		pause();
 		//number of increments
 		protocol.sendRead("V6 = "+elSc.getReps());
