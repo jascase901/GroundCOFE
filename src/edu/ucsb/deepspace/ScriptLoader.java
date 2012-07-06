@@ -204,6 +204,8 @@ public class ScriptLoader {
 		//counter
 		azScan.add("n=0");
 		//v3 = speed
+		azScan.add("SP 10000");
+		azScan.add("PA V7,");
 		azScan.add("SP V3");
 		azScan.add("#LOOP3");
 		//v7=min az
@@ -227,9 +229,12 @@ public class ScriptLoader {
 	private void elScan() {
 		elScan = new Script("#ELSCAN", size);
 		//counter
+		elScan.add("SP ,1000");
+		elScan.add("PA ,V7");
+		
 		elScan.add("n=0");
 		//v3 = speed
-		elScan.add("SP V3");
+		elScan.add("SP ,V3");
 		elScan.add("#LOOP4");
 		//v7=min az
 		elScan.add("PA ,V7");

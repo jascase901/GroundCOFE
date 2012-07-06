@@ -6,14 +6,16 @@ public class TelescopeGalil implements TelescopeInterface {
 	private CommGalil protocol;
 	
 	private GalilAxis az, el;
+	private double AZ_ENC = 1000d*1024d;
+	private double EL_ENC = 4000d;
 	
 	private String relative = "PR", absolute = "PA";
 	
 	public TelescopeGalil(Stage stage, CommGalil protocol) {
 		this.stage = stage;
 		this.protocol = protocol;
-		az = new GalilAxis(Axis.AZ, 1000d*1024d);
-		el = new GalilAxis(Axis.EL, 4000d);
+		az = new GalilAxis(Axis.AZ, AZ_ENC);
+		el = new GalilAxis(Axis.EL, EL_ENC);
 		
 	}
 
@@ -189,11 +191,11 @@ public class TelescopeGalil implements TelescopeInterface {
 	@Override
 	public void scan(ScanCommand azSc, ScanCommand elSc) {
 			if (azSc!=null && elSc!=null) 
-				rasterScan(azSc.getMin(), azSc.getMax(), elSc.getMin(), elSc.getMax(), (int)elSc.getReps());
-			else if(azSc!=null && elSc==null)
-				azScan(azSc.getMin(), azSc.getMax(), (int)azSc.getReps());
+				rasterScan(azSc, elSc);
+			else if(azSc!=null && elSc==null) 
+				azScan(azSc);
 			else if(azSc==null && elSc!=null) 
-				elScan(elSc.getMin(), elSc.getMax(), (int)elSc.getReps());
+				elScan(elSc);
 		
 	}
 
@@ -312,34 +314,36 @@ public class TelescopeGalil implements TelescopeInterface {
 			e.printStackTrace();
 		}
 	}
-	public void rasterScan(double minAz, double maxAz, double minEl, double maxEl, int reps) {
+	public void rasterScan(ScanCommand azSc, ScanCommand elSc) {
 		//el.indexing = true;
-		int el_inc= 5; 
-		
+		int el_inc= 5;
+		double azSpeed =  10000;
+		double elSpeed =  10000;
 		
 		//min az
-		protocol.sendRead("V7 = "+az.convDegToEnc(minAz));
-		System.out.println(el.convDegToEnc(maxEl));
+		protocol.sendRead("V7 = "+az.convDegToEnc(azSc.getMin()));
+		System.out.println(el.convDegToEnc(elSc.getMax()));
 		//mine el
-		protocol.sendRead("V0 = "+el.convDegToEnc(minEl));
+		protocol.sendRead("V0 = "+el.convDegToEnc(elSc.getMin()));
 		pause();
 		//max az
-		protocol.sendRead("V1 = "+az.convDegToEnc(maxAz));
+		protocol.sendRead("V1 = "+az.convDegToEnc(azSc.getMax()));
 		// EL Inc
 		pause();
 		protocol.sendRead("V2 = "+el_inc);
 		pause();
-		//El speed
-		protocol.sendRead("V3 = 100000");
+		//AZ speed
+		protocol.sendRead("V3 = " +azSpeed);
 		pause();
 		//El speed
-		protocol.sendRead("V4 = 100000");
+		protocol.sendRead("V4 = "+elSpeed);
 		pause();
 		//el speed
-		protocol.sendRead("V5 = "+el.convDegToEnc(maxEl)/el_inc);
+		protocol.sendRead("V5 = "+el.convDegToEnc(elSc.getMax())/el_inc);
+		System.out.println(el.convDegToEnc(elSc.getMax())/el_inc);
 		pause();
 		//number of increments
-		protocol.sendRead("V6 = "+reps);
+		protocol.sendRead("V6 = "+elSc.getReps());
 		pause();
 		
 		az.scanning = true;
@@ -349,22 +353,26 @@ public class TelescopeGalil implements TelescopeInterface {
 		waitWhileMoving(Axis.EL);
 		az.scanning = false;
 		el.scanning = false;
-		System.out.println("Min az:" + minAz +" maxAz: "+ maxAz+" minEl:"+minEl+" maxEl:"+maxEl);
+		System.out.println("Min az:" + azSc.getMin() +" maxAz: "+ azSc.getMax()+" minEl:"+elSc.getMin()+" maxEl:"+elSc.getMax());
 				
 		
 		}
 	
-	public void azScan(double minAz, double maxAz, int reps) {
+	public void azScan(ScanCommand azSc) {
+		double azSpeed =  (az.convDegToEnc(azSc.getMax())-az.convDegToEnc(azSc.getMin()))/azSc.getTime();
+	
 		//min az
-		protocol.sendRead("V7 = "+az.convDegToEnc(minAz));
+		protocol.sendRead("V7 = "+az.convDegToEnc(azSc.getMin()));
 		pause();
 		//max az
-		protocol.sendRead("V1 = "+az.convDegToEnc(maxAz));
+		protocol.sendRead("V1 = "+az.convDegToEnc(azSc.getMax()));
 		pause();
 		//az speed
-		protocol.sendRead("V3 = 100000");
+		
+		
+		protocol.sendRead("V3 = " +azSpeed);
 		pause();
-		protocol.sendRead("V6 = "+reps);
+		protocol.sendRead("V6 = "+azSc.getReps());
 		pause();
 		
 		az.scanning = true;
@@ -374,17 +382,19 @@ public class TelescopeGalil implements TelescopeInterface {
 
 
 	}
-	public void elScan(double minAz, double maxAz, int reps) {
+	public void elScan(ScanCommand elSc) {
+		double elDelta =  el.convDegToEnc((Math.abs(elSc.getMin()-elSc.getMax())));
+
 		//min az
-		protocol.sendRead("V7 = "+el.convDegToEnc(minAz));
+		protocol.sendRead("V7 = "+el.convDegToEnc(elSc.getMin()));
 		pause();
 		//max az
-		protocol.sendRead("V1 = "+el.convDegToEnc(maxAz));
+		protocol.sendRead("V1 = "+el.convDegToEnc(elSc.getMax()));
 		pause();
 		//az speed
-		protocol.sendRead("V3 = 100");
+		protocol.sendRead("V3 = "+ elDelta/elSc.getTime());
 		pause();
-		protocol.sendRead("V6 = "+reps);
+		protocol.sendRead("V6 = "+elSc.getReps());
 		pause();
 		
 		el.scanning = true;
