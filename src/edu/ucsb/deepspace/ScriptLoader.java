@@ -167,13 +167,14 @@ public class ScriptLoader {
 	}
 	
 	public void raster() {
+		
 		raster = new Script("#RASTER", size);
 		raster.add("n=0");
 		raster.add("j=0");
 		raster.add("i=0");
-		
-		
-	
+
+
+
 
 		raster.add ("SP V3,V4");
 		raster.add("#LOOP2");
