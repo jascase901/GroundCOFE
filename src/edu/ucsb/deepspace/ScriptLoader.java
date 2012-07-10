@@ -169,32 +169,33 @@ public class ScriptLoader {
 	public void raster() {
 		
 		raster = new Script("#RASTER", size);
-		raster.add("n=0");
-		raster.add("j=0");
-		raster.add("i=0");
-
-
-
-
-		raster.add ("SP V3,V4");
-		raster.add("#LOOP2");
-		raster.add("#LOOP");
-		raster.add("j=n*-V2");
-		raster.add("WT 200");
-		raster.add("PA V7,j");
-		raster.add(" BG");
-		raster.add("AM");
-		raster.add("WT 200");
-		raster.add("PA V1,j");
+		
+		//raster.add("time = 10");
+		//raster.add("minAz = 0");
+		//raster.add("maxAz =  10000");
+		//raster.add("minEl = 0");
+		//raster.add("maxEl = 100");
+		//Amount of az and el scans for this one it is actually 20 for az because each az is done twice
+		raster.add("lineNum=10");
+		//distance moved
+		raster.add("dx = maxAz - minAz");
+		raster.add("dy = (maxEl - minEl)/lineNum");
+		raster.add("vx = (dx/(time*.2))*2*lineNum");
+		raster.add(	"vy = (dy/(time*.8))*lineNum");
+		raster.add("y=minEl");
+		raster.add("SP vx, vy");
+		raster.add("#REPEAT");
+		raster.add("y = dy + y");
+		raster.add("PA ,y");
 		raster.add("BG");
 		raster.add("AM");
-		raster.add("n=n+1");
-		raster.add("JP #LOOP, n<V5");
-		raster.add("j=0");
-		raster.add("n=0");
-		raster.add("i=i+1");
-		raster.add("MG i");
-		raster.add("JP #LOOP2, i<V6");
+		raster.add("PA minAz");
+		raster.add("BG");
+		raster.add("AM");
+		raster.add("PA maxAz");
+		raster.add("BG");
+		raster.add("AM");
+		raster.add("JP #REPEAT, y<maxEl");
 		raster.add("EN");
 		size += raster.size();
 

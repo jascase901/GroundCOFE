@@ -330,29 +330,20 @@ public class TelescopeGalil implements TelescopeInterface {
 		
 	
 		//min az
-		protocol.sendRead("V7 = "+az.convDegToEnc(azSc.getMin()));
+		protocol.sendRead("minAz = "+az.convDegToEnc(azSc.getMin()));
 		System.out.println(el.convDegToEnc(elSc.getMax()));
 		//mine el
-		protocol.sendRead("V0 = "+el.convDegToEnc(elSc.getMin()));
+		protocol.sendRead("minEl= "+el.convDegToEnc(elSc.getMin()));
 		pause();
 		//max az
-		protocol.sendRead("V1 = "+az.convDegToEnc(azSc.getMax()));
+		protocol.sendRead("maxAz = "+az.convDegToEnc(azSc.getMax()));
 		// EL Inc
 		pause();
-		protocol.sendRead("V2 = "+el_inc);
+		protocol.sendRead("lineNum = "+el_inc);
 		pause();
-		//AZ speed
-		protocol.sendRead("V3 = " +azSpeed);
-		pause();
-		//El speed
-		protocol.sendRead("V4 = "+elSpeed);
-		pause();
-		//el speed
-		protocol.sendRead("V5 = "+lineNums);
-	
-		pause();
+		protocol.sendRead("time = "+azSc.getTime());
 		//number of increments
-		protocol.sendRead("V6 = "+elSc.getReps());
+		//protocol.sendRead("V6 = "+elSc.getReps());
 		pause();
 		
 		az.scanning = true;
