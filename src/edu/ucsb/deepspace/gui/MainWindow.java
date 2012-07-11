@@ -956,7 +956,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     				//stage.startScanning(min, max, time, reps, axisType.AZ, continuousScanOn);
     				
     				ScanCommand azSc = new ScanCommand(min, max, time, reps);
-    				stage.startScanning(azSc, null);
+    				stage.startScanning(azSc, null,false);
     				
     			}
     		}
@@ -991,7 +991,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     				btnScanBoth.setEnabled(false);
         			btnScanAz.setEnabled(false);
         			ScanCommand elSc = new ScanCommand(min, max, time, reps);
-        			stage.startScanning(null, elSc);
+        			stage.startScanning(null, elSc, false);
         			
         			
     			}
@@ -1024,7 +1024,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     				
     				ScanCommand azSc = new ScanCommand(minAz, maxAz, timeAz, reps);
     				ScanCommand elSc = new ScanCommand(minEl, maxEl, timeEl, reps);
-    				stage.startScanning(azSc, elSc);
+    				stage.startScanning(azSc, elSc, false);
     				
     				btnScanBoth.setText("Stop Scan");
     				btnScanEl.setEnabled(false);
@@ -1062,7 +1062,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 				ScanCommand elSc = new ScanCommand(minEl, maxEl);
 				btnScnRaster.setEnabled(false);
     			rasterScan = !rasterScan;
-    			stage.startScanning(azSc, elSc);
+    			stage.startScanning(azSc, elSc, true);
     			
     		}
     	});

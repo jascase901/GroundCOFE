@@ -41,8 +41,8 @@ public interface TelescopeInterface {
 	
 	
 	
+	public void scan(ScanCommand azSc, ScanCommand elSc, boolean fraster);
 	public void scan(ScanCommand azSc, ScanCommand elSc);
-	
 	public void stopScanning();
 	
 	

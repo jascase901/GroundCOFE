@@ -189,15 +189,20 @@ public class TelescopeGalil implements TelescopeInterface {
 	}
 
 	@Override
-	public void scan(ScanCommand azSc, ScanCommand elSc) {
+	public void scan(ScanCommand azSc, ScanCommand elSc, boolean fraster) {
 			if (azSc!=null && elSc!=null) 
-				rasterScan(azSc, elSc);
+				rasterScan(azSc, elSc, fraster);
 			else if(azSc!=null && elSc==null) 
+				
 				azScan(azSc);
 			else if(azSc==null && elSc!=null) 
 				elScan(elSc);
 		
 	}
+	public void scan(ScanCommand azSc, ScanCommand elSc) {
+		scan(azSc, elSc, false);
+	
+}
 
 	@Override
 	public void stopScanning() {
@@ -314,29 +319,34 @@ public class TelescopeGalil implements TelescopeInterface {
 			e.printStackTrace();
 		}
 	}
-	public void rasterScan(ScanCommand azSc, ScanCommand elSc) {
+	public void rasterScan(ScanCommand azSc, ScanCommand elSc, boolean fraster) {
 		//el.indexing = true;
-		int el_inc= 5;
+		int el_inc= 10;
 	
 		
 		//all lines are roughly the same distance so I only calculate the distance of the bottom ones
-		double deltaX = Math.abs((az.convDegToEnc(azSc.getMax())-az.convDegToEnc(azSc.getMin())));
+		double deltaX = Math.abs((az.absDegToEnc(azSc.getMax())-az.absDegToEnc(azSc.getMin())));
 		//el_inc is basically the slope, so I can use slope formula to get y1
 		double deltaY  = Math.abs(el_inc*deltaX);
-		double lineNums = el.convDegToEnc(elSc.getMax())/el_inc;
+		double lineNums = el.absDegToEnc(elSc.getMax())/el_inc;
 		double azSpeed =  (int)lineNums*deltaX/azSc.getTime();
 		double elSpeed =  (int)lineNums*deltaY/elSc.getTime();
 		
 		
 	
 		//min az
-		protocol.sendRead("minAz = "+az.convDegToEnc(azSc.getMin()));
-		System.out.println(el.convDegToEnc(elSc.getMax()));
-		//mine el
-		protocol.sendRead("minEl= "+el.convDegToEnc(elSc.getMin()));
+		protocol.sendRead("minAz = "+az.absDegToEnc(azSc.getMin()));
+		System.out.println(az.absDegToEnc(azSc.getMin()));
+		System.out.println(az.absDegToEnc(azSc.getMax()));
+		System.out.println(el.absDegToEnc(elSc.getMin()));
+		System.out.println(el.absDegToEnc(elSc.getMax()));
+		pause();
+		System.out.println(el.absDegToEnc(elSc.getMax()));
+		pause();
+		protocol.sendRead("minEl= "+el.absDegToEnc(elSc.getMin()));
 		pause();
 		//max az
-		protocol.sendRead("maxAz = "+az.convDegToEnc(azSc.getMax()));
+		protocol.sendRead("maxAz = "+az.absDegToEnc(azSc.getMax()));
 		// EL Inc
 		pause();
 		protocol.sendRead("lineNum = "+el_inc);
@@ -348,7 +358,10 @@ public class TelescopeGalil implements TelescopeInterface {
 		
 		az.scanning = true;
 		el.scanning = true;
-		protocol.sendRead("HX 1;XQ #RASTER,1");
+		if (fraster)
+			protocol.sendRead("HX 1;XQ #FRASTER,1");
+		else
+			protocol.sendRead("HX 1;XQ #RASTER,1");
 		waitWhileMoving(Axis.AZ);
 		waitWhileMoving(Axis.EL);
 		az.scanning = false;
@@ -359,13 +372,16 @@ public class TelescopeGalil implements TelescopeInterface {
 		}
 	
 	public void azScan(ScanCommand azSc) {
-		double azSpeed =  (az.convDegToEnc(azSc.getMax())-az.convDegToEnc(azSc.getMin()))/azSc.getTime();
-	
+		
+		double azSpeed =  (az.absDegToEnc(azSc.getMax())-az.absDegToEnc(azSc.getMin()))/azSc.getTime();
+		protocol.sendRead("PA "+az.absDegToEnc(azSc.getMin())+", ;BG;AM;WT 200");
+		pause();
+		
 		//min az
-		protocol.sendRead("V7 = "+az.convDegToEnc(azSc.getMin()));
+		protocol.sendRead("V7 = "+az.absDegToEnc(azSc.getMin()));
 		pause();
 		//max az
-		protocol.sendRead("V1 = "+az.convDegToEnc(azSc.getMax()));
+		protocol.sendRead("V1 = "+az.absDegToEnc(azSc.getMax()));
 		pause();
 		//az speed
 		
@@ -383,13 +399,14 @@ public class TelescopeGalil implements TelescopeInterface {
 
 	}
 	public void elScan(ScanCommand elSc) {
-		double elDelta =  el.convDegToEnc((Math.abs(elSc.getMin()-elSc.getMax())));
-
+		double elDelta =  el.absDegToEnc((Math.abs(elSc.getMin()-elSc.getMax())));
+		protocol.sendRead("PA ,"+el.absDegToEnc(elSc.getMin())+" ;BG;AM;WT 200");
+		pause();
 		//min az
-		protocol.sendRead("V7 = "+el.convDegToEnc(elSc.getMin()));
+		protocol.sendRead("V7 = "+el.absDegToEnc(elSc.getMin()));
 		pause();
 		//max az
-		protocol.sendRead("V1 = "+el.convDegToEnc(elSc.getMax()));
+		protocol.sendRead("V1 = "+el.absDegToEnc(elSc.getMax()));
 		pause();
 		//az speed
 		protocol.sendRead("V3 = "+ elDelta/elSc.getTime());

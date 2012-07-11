@@ -12,8 +12,10 @@ public class ScriptLoader {
 	private Script homeA;
 	private Script homeB;
 	private Script raster;
+	private Script fraster;
 	private Script azScan;
 	private Script elScan;
+	
 	
 	private Script readerInfo;
 	private Set<String> loadedScriptNames;
@@ -28,6 +30,7 @@ public class ScriptLoader {
 		scripts.put("#HOMEB", homeB);
 		scripts.put("#READERI", readerInfo);
 		scripts.put("#RASTER", raster);
+		scripts.put("FRASTER", fraster);
 		scripts.put("#AZSCAN", azScan);
 		scripts.put("#ELSCAN", elScan);
 		
@@ -77,6 +80,7 @@ public class ScriptLoader {
 		indexEl();
 		readerInfo();
 		raster();
+		fraster();
 		azScan();
 		elScan();
 		
@@ -87,6 +91,8 @@ public class ScriptLoader {
 		protocol.sendRead(readerInfo.getScript());
 		pause();
 		protocol.sendRead(raster.getScript());
+		pause();
+		protocol.sendRead(fraster.getScript());
 		pause();
 		protocol.sendRead(azScan.getScript());
 		pause();
@@ -192,14 +198,61 @@ public class ScriptLoader {
 		raster.add("PA minAz");
 		raster.add("BG");
 		raster.add("AM");
+		raster.add("WT 200");
 		raster.add("PA maxAz");
 		raster.add("BG");
 		raster.add("AM");
+		raster.add("WT 200");
 		raster.add("JP #REPEAT, y<maxEl");
 		raster.add("EN");
 		size += raster.size();
 
 	
+	}
+	
+	public void fraster(){
+		fraster = new Script("#FRASTER", size);
+
+		fraster.add("time = 20");
+		fraster.add("minAz = 0");
+		fraster.add("maxAz = 17066");
+		fraster.add("minEl = 0");
+		fraster.add("maxEl = 66.6");
+
+		fraster.add("lineNum=10");
+		fraster.add("dx = maxAz - minAz");
+		fraster.add("dy = (maxEl - minEl)/lineNum");
+
+		fraster.add("vx = (dx/(time*.5))*lineNum");
+		fraster.add("vy = (dy/(time*.5))*lineNum ");
+
+		fraster.add("alt = 1");
+		fraster.add("y=minEl");
+
+
+		fraster.add("SP vx, vy");
+		fraster.add("#SNAKE");
+
+		fraster.add("alt = alt*-1");
+		fraster.add("y = dy + y");
+
+		fraster.add("x = minAz");
+		fraster.add("IF(alt<0)");
+		fraster.add("x = maxAz");
+		fraster.add("ENDIF");
+		fraster.add("PA x");
+		fraster.add("BG");
+		fraster.add("AM");
+		fraster.add("WT 500");
+		fraster.add("PA x,y");
+		fraster.add("BG");
+		fraster.add("AM");
+		fraster.add("WT 500");
+		fraster.add("JP #SNAKE, y<maxEl");
+		fraster.add("EN");
+		size += fraster.size();
+
+
 	}
 	private void azScan() {
 		azScan = new Script("#AZSCAN", size);
