@@ -346,10 +346,10 @@ public class Stage {
 						scope.scan(new ScanCommand(minAz, maxAz, azSc.getTime(), (int)azSc.getReps()), new ScanCommand(minEl, maxEl, elSc.getTime(), (int)elSc.getReps()), fraster);		
 						waitWhileExecuting(1);
 						//convert ra coords, to az el this changes with base location time
-						minAz = Math.round(roundPlace*baseLocation.radecToAz(minRa, minDec))/roundPlace;
-						minEl = Math.round(roundPlace*baseLocation.radecToEl(minRa, minDec))/roundPlace;
-						maxAz = Math.round(roundPlace*baseLocation.radecToAz(maxRa, maxDec))/roundPlace;
-						maxEl = Math.round(roundPlace*baseLocation.radecToEl(maxRa, maxDec))/roundPlace;
+						minAz = GalilCalc.round(roundPlace*baseLocation.radecToAz(minRa, minDec), 4);
+						minEl = GalilCalc.round(roundPlace*baseLocation.radecToEl(minRa, minDec),4);
+						maxAz = GalilCalc.round(roundPlace*baseLocation.radecToAz(maxRa, maxDec),4);
+						maxEl = GalilCalc.round(roundPlace*baseLocation.radecToEl(maxRa, maxDec),4);
 						
 					}while(continousScanOn);
 				}

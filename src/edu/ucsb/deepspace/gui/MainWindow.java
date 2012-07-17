@@ -1058,8 +1058,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 				double timeAz = Double.parseDouble(txtTimeAzScan.getText());
 				double minEl = Double.parseDouble(txtMinElScan.getText());
     			double maxEl = Double.parseDouble(txtMaxElScan.getText());
-    			ScanCommand azSc = new ScanCommand(minAz, maxAz);
-				ScanCommand elSc = new ScanCommand(minEl, maxEl);
+    			ScanCommand azSc = new ScanCommand(minAz, maxAz, timeAz, 0);
+				ScanCommand elSc = new ScanCommand(minEl, maxEl, timeAz, 0);
 				btnScnRaster.setEnabled(false);
     			rasterScan = !rasterScan;
     			stage.startScanning(azSc, elSc, true);

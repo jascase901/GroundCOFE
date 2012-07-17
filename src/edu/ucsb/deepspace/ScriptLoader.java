@@ -30,7 +30,7 @@ public class ScriptLoader {
 		scripts.put("#HOMEB", homeB);
 		scripts.put("#READERI", readerInfo);
 		scripts.put("#RASTER", raster);
-		scripts.put("FRASTER", fraster);
+		scripts.put("#FRASTER", fraster);
 		scripts.put("#AZSCAN", azScan);
 		scripts.put("#ELSCAN", elScan);
 		
@@ -175,35 +175,53 @@ public class ScriptLoader {
 	public void raster() {
 		
 		raster = new Script("#RASTER", size);
-		
-		//raster.add("time = 10");
-		//raster.add("minAz = 0");
-		//raster.add("maxAz =  10000");
-		//raster.add("minEl = 0");
-		//raster.add("maxEl = 100");
-		//Amount of az and el scans for this one it is actually 20 for az because each az is done twice
-		raster.add("lineNum=10");
-		//distance moved
-		raster.add("dx = maxAz - minAz");
-		raster.add("dy = (maxEl - minEl)/lineNum");
-		raster.add("vx = (dx/(time*.2))*2*lineNum");
-		raster.add(	"vy = (dy/(time*.8))*lineNum");
-		raster.add("y=minEl");
-		raster.add("SP vx, vy");
-		raster.add("#REPEAT");
-		raster.add("y = dy + y");
-		raster.add("PA ,y");
+		raster.add("dx = maxAz  - minAz");
+		raster.add("dy = (maxEl-minEl)/lineNum");
+
+
+		raster.add("AC 1000");
+
+		raster.add("dx = maxAz-minAz");
+		raster.add("vf = 2*dx/(time)*lineNum");
+
+		raster.add("SP vf");
+
+		raster.add("AC _AC");
+		raster.add("DC _AC");
+		raster.add("acTime = vf/_AC");
+		raster.add("acX = .5*_AC*acTime*acTime"); 
+
+		raster.add("n=0");
+		raster.add("#SNAKE");
+
+
+
+		raster.add("PR dx + acX");
+		raster.add("BG A");
+
+
+		raster.add("AD acX"); 
+		raster.add("OP 1");
+		raster.add("AM");
+
+
+
+		raster.add("PR -dx-acX");
+
+		raster.add("BG A");
+		raster.add("AD dx");
+		raster.add("OP 0");
+
+		raster.add("AM");
+
+
+		raster.add("PR 0,dy");
 		raster.add("BG");
 		raster.add("AM");
-		raster.add("PA minAz");
-		raster.add("BG");
-		raster.add("AM");
-		raster.add("WT 200");
-		raster.add("PA maxAz");
-		raster.add("BG");
-		raster.add("AM");
-		raster.add("WT 200");
-		raster.add("JP #REPEAT, y<maxEl");
+
+		raster.add("n=n+1");
+		raster.add("JP #SNAKE, n<lineNum");
+
 		raster.add("EN");
 		size += raster.size();
 
@@ -212,105 +230,165 @@ public class ScriptLoader {
 	
 	public void fraster(){
 		fraster = new Script("#FRASTER", size);
-
-		fraster.add("time = 20");
-		fraster.add("minAz = 0");
-		fraster.add("maxAz = 17066");
-		fraster.add("minEl = 0");
-		fraster.add("maxEl = 66.6");
-
 		fraster.add("lineNum=10");
-		fraster.add("dx = maxAz - minAz");
-		fraster.add("dy = (maxEl - minEl)/lineNum");
 
-		fraster.add("vx = (dx/(time*.5))*lineNum");
-		fraster.add("vy = (dy/(time*.5))*lineNum ");
+		fraster.add("dx = maxAz  - minAz");
+		fraster.add("dy = (maxEl-minEl)/lineNum");
+
+		fraster.add("AC 1000");
+
+		fraster.add("dx = maxAz-minAz");
+		fraster.add("vf = lineNum*(dx/(time))");
+
+		fraster.add("SP vf");
+
+		fraster.add("AC _AC");
+		fraster.add("DC _AC");
+		fraster.add("acTime = vf/_AC");
+		fraster.add("acX = .5*_AC*acTime*acTime ");
 
 		fraster.add("alt = 1");
-		fraster.add("y=minEl");
+		fraster.add("n=0");
+		fraster.add("#ES");
 
 
-		fraster.add("SP vx, vy");
-		fraster.add("#SNAKE");
-
-		fraster.add("alt = alt*-1");
-		fraster.add("y = dy + y");
-
-		fraster.add("x = minAz");
 		fraster.add("IF(alt<0)");
-		fraster.add("x = maxAz");
+		fraster.add("PR dx + acX");
+		fraster.add("BG A");
+
+
+		fraster.add("AD acX ");
+		fraster.add("OP 1");
 		fraster.add("ENDIF");
-		fraster.add("PA x");
+
+
+		fraster.add("IF(alt>0) ");
+		fraster.add("PR -dx-acX");
+
+		fraster.add("BG A");
+		fraster.add("AD dx");
+		fraster.add("OP 1");
+		fraster.add("ENDIF");
+		fraster.add("AM");
+
+		fraster.add("OP 0");
+
+
+		fraster.add("PR 0,dy");
 		fraster.add("BG");
 		fraster.add("AM");
-		fraster.add("WT 500");
-		fraster.add("PA x,y");
-		fraster.add("BG");
-		fraster.add("AM");
-		fraster.add("WT 500");
-		fraster.add("JP #SNAKE, y<maxEl");
+
+		fraster.add("alt=alt*-1");
+		fraster.add("n=n+1");
+		fraster.add("JP #ES, n<lineNum");
+
+
 		fraster.add("EN");
 		size += fraster.size();
 
 
+
+
+
 	}
 	private void azScan() {
-		azScan = new Script("#AZSCAN", size);
-		//counter
-		azScan.add("n=0");
-		//v3 = speed
-		azScan.add("SP 10000");
-		azScan.add("PA V7,");
-		azScan.add("SP V3");
-		azScan.add("#LOOP3");
-		//v7=min az
-		azScan.add("PA V7,");
-		azScan.add("BG");
+		azScan = new Script("#AZSCAN", size);	
+
+		azScan.add("scan = 0");
+
+
+
+		azScan.add("dx = maxAz-minAz");
+		azScan.add("vf = 2*dx/(time)");
+
+		azScan.add("SP vf");
+
+		azScan.add("AC _AC");
+		azScan.add("DC _AC");
+
+		azScan.add("acTime = vf/_AC");
+		azScan.add("acX = .5*_AC*acTime*acTime"); 
+
+
+		azScan.add("PR dx + acX,0");
+		azScan.add("BG ");
+
+
+		azScan.add("AD acX ");
+		azScan.add("SB OP 1");
+		azScan.add("scan = 1");
+
+
+
+
+		azScan.add("AM");  
+		azScan.add("PR -dx-acX,0");
+
+		azScan.add("BG ");
+		azScan.add("AD dx");
+		azScan.add("OP 1");
+
 		azScan.add("AM");
-		azScan.add("WT 200");
-		//v1 = max az
-		azScan.add("PA V1,");
-		azScan.add("BG");
-		azScan.add("AM");
-		azScan.add("WT 200");
-		azScan.add("n = n+1");
-		azScan.add("JP #LOOP3, n<V6 ");
+		azScan.add("OP 0");
+
+
 		azScan.add("EN");
 		size += azScan.size();
-		
-		
-		
+
+
+
 	}
 	private void elScan() {
 		elScan = new Script("#ELSCAN", size);
-		//counter
-		elScan.add("SP ,1000");
-		elScan.add("PA ,V7");
-		
-		elScan.add("n=0");
-		//v3 = speed
-		elScan.add("SP ,V3");
-		elScan.add("#LOOP4");
-		//v7=min az
-		elScan.add("PA ,V7");
-		elScan.add("BG");
+		elScan.add("scan = 0");
+
+
+
+		elScan.add("dx = maxEl-minEl");
+		elScan.add("vf = 2*dx/(time)");
+
+		elScan.add("SP ,vf");
+		elScan.add("DC _AC");
+		elScan.add("acTime = vf/_ACB");
+		elScan.add("acX = .5*_ACB*acTime*acTime ");
+
+
+		elScan.add("PR ,dx + acX");
+		elScan.add("BG B");
+
+
+
+		elScan.add("AD ,acX ");
+		elScan.add("OP 1");
+		elScan.add("scan = 1");
+
+
+
+
 		elScan.add("AM");
-		elScan.add("WT 200");
-		//v1 = max az
-		elScan.add("PA ,V1");
-		elScan.add("BG");
+		elScan.add("PR 0,-dx-acX");
+
+		elScan.add("BG B");
+		elScan.add("AD ,dx");
+		elScan.add("OP 1");
+
 		elScan.add("AM");
-		elScan.add("WT 200");
-		elScan.add("n = n+1");
-		elScan.add("JP #LOOP4, n<V6 ");
+		elScan.add("OP 0");
+
+
+
+
+
+
+
 		elScan.add("EN");
 		size += elScan.size();
-		
-		
-		
+
+
+
 	}
-	
-	
+
+
 	private void readerInfo() {
 		readerInfo = new Script("#READERI", size);
 		//There is a maximum amount of data, that can be sent in one line, so if we want to add more we need another solution
