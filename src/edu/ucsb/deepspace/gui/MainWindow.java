@@ -85,9 +85,9 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Text txtMinAz, txtMaxAz;
 	private Text txtMinEl, txtMaxEl;
 	private Text txtMinAzScan, txtMaxAzScan;
-	private Text txtTimeAzScan;
+	private Text txtTimeScan;
 	private Text txtMinElScan, txtMaxElScan;
-	private Text txtTimeElScan;
+	
 	private Text txtRepScan;
 	private static Map<String, Button> popupWindowButtons = new HashMap<String, Button>();
 	private Text txtPosInfo;
@@ -879,13 +879,11 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	lblMaxElScan.setBounds(108, 41, 40, 19);
     	lblMaxElScan.setText("max el");
     	
-    	Label lblAzTimeScan = new Label(grpScanning, SWT.NONE);
-    	lblAzTimeScan.setBounds(13, 66, 40, 19);
-    	lblAzTimeScan.setText("az time");
+    	Label lblTimeScan = new Label(grpScanning, SWT.NONE);
+    	lblTimeScan.setBounds(13, 66, 40, 19);
+    	lblTimeScan.setText("time");
     	
-    	Label lblElTimeScan = new Label(grpScanning, SWT.NONE);
-    	lblElTimeScan.setBounds(108, 66, 40, 19);
-    	lblElTimeScan.setText("el time");
+    	
     	
     	txtMinAzScan = new Text(grpScanning, SWT.BORDER);
     	txtMinAzScan.setBounds(59, 16, 43, 19);
@@ -899,10 +897,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	scanAzTexts.add(txtMaxAzScan);
     	
     	
-    	txtTimeAzScan = new Text(grpScanning, SWT.BORDER);
-    	txtTimeAzScan.setBounds(59, 66, 43, 19);
-    	txtTimeAzScan.setText("0");
-    	scanAzTexts.add(txtTimeAzScan);
+    	txtTimeScan = new Text(grpScanning, SWT.BORDER);
+    	txtTimeScan.setBounds(59, 66, 43, 19);
+    	txtTimeScan.setText("0");
+    	scanAzTexts.add(txtTimeScan);
     	
     	txtMinElScan = new Text(grpScanning, SWT.BORDER);
     	txtMinElScan.setBounds(154, 16, 43, 19);
@@ -914,10 +912,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	txtMaxElScan.setText("0");
     	scanElTexts.add(txtMaxElScan);
     	
-    	txtTimeElScan = new Text(grpScanning, SWT.BORDER);
-    	txtTimeElScan.setBounds(154, 66, 43, 19);
-    	txtTimeElScan.setText("0");
-    	scanElTexts.add(txtTimeElScan);
+    
     	
     	Label lblRepetitionsScan = new Label(grpScanning, SWT.NONE);
     	lblRepetitionsScan.setBounds(13, 96, 58, 19);
@@ -951,7 +946,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     				
     				double min = Double.parseDouble(txtMinAzScan.getText());
     				double max = Double.parseDouble(txtMaxAzScan.getText());
-    				double time = Double.parseDouble(txtTimeAzScan.getText());
+    				double time = Double.parseDouble(txtTimeScan.getText());
     				int reps = Integer.parseInt(txtRepScan.getText());
     				//stage.startScanning(min, max, time, reps, axisType.AZ, continuousScanOn);
     				
@@ -983,7 +978,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
         			
         			double min = Double.parseDouble(txtMinElScan.getText());
         			double max = Double.parseDouble(txtMaxElScan.getText());
-        			double time = Double.parseDouble(txtTimeElScan.getText());
+        			double time = Double.parseDouble(txtTimeScan.getText());
         			int reps = Integer.parseInt(txtRepScan.getText());
         			//stage.startScanning(min, max, time, reps, axisType.EL,continuousScanOn);
         			
@@ -1016,10 +1011,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     				
     				double minAz = Double.parseDouble(txtMinAzScan.getText());
     				double maxAz = Double.parseDouble(txtMaxAzScan.getText());
-    				double timeAz = Double.parseDouble(txtTimeAzScan.getText());
+    				double timeAz = Double.parseDouble(txtTimeScan.getText());
     				double minEl = Double.parseDouble(txtMinElScan.getText());
         			double maxEl = Double.parseDouble(txtMaxElScan.getText());
-        			double timeEl = Double.parseDouble(txtTimeElScan.getText());
+        			double timeEl = Double.parseDouble(txtTimeScan.getText());
     				int reps = Integer.parseInt(txtRepScan.getText());
     				
     				ScanCommand azSc = new ScanCommand(minAz, maxAz, timeAz, reps);
@@ -1055,7 +1050,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		public void mouseDown(MouseEvent e) {
     			double minAz = Double.parseDouble(txtMinAzScan.getText());
 				double maxAz = Double.parseDouble(txtMaxAzScan.getText());
-				double timeAz = Double.parseDouble(txtTimeAzScan.getText());
+				double timeAz = Double.parseDouble(txtTimeScan.getText());
 				double minEl = Double.parseDouble(txtMinElScan.getText());
     			double maxEl = Double.parseDouble(txtMaxElScan.getText());
     			ScanCommand azSc = new ScanCommand(minAz, maxAz, timeAz, 0);
