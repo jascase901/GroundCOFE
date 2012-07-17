@@ -315,7 +315,7 @@ public class ScriptLoader {
 
 
 		azScan.add("AD acX ");
-		azScan.add("SB OP 1");
+		azScan.add("OP 1");
 		azScan.add("scan = 1");
 
 
