@@ -36,6 +36,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import edu.ucsb.deepspace.Axis;
 import edu.ucsb.deepspace.Formatters;
+import edu.ucsb.deepspace.GalilCalc;
 import edu.ucsb.deepspace.MoveCommand.MoveType;
 import edu.ucsb.deepspace.ScanCommand;
 import edu.ucsb.deepspace.Stage;
@@ -52,8 +53,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private MoveType moveType = MoveType.DEGREE;
 	private long moveAmountVal = 0;
 	private boolean minsec = false;
-	private boolean continuousScanOn = false;
+	private boolean continuousModeOn = false;
+	private boolean RaDecModeOn = false;
 	private boolean rasterScan = false;
+	private String scanType = "";
 	private double minAz = 0, maxAz = 0, minEl = 0, maxEl = 0;
 	private int encTol;
 	private boolean radecOn = false;
@@ -76,8 +79,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Button btnGoToBalloon;
 	private Button btnScanAz;
 	private Button btnScanEl;
-	private Button btnScanBoth;
-	private Button btnContinuousScan;
+	private Button btnScan;
+	private Button btnScanSnake;
+	private Button btnContinuousMode;
+	private Button btnRaDecMode;
 	private Text txtEncTol;
 	private Text txtRa;
 	private Text txtDec;
@@ -85,9 +90,9 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Text txtMinAz, txtMaxAz;
 	private Text txtMinEl, txtMaxEl;
 	private Text txtMinAzScan, txtMaxAzScan;
-	private Text txtTimeAzScan;
+	private Text txtTimeScan;
 	private Text txtMinElScan, txtMaxElScan;
-	private Text txtTimeElScan;
+	
 	private Text txtRepScan;
 	private static Map<String, Button> popupWindowButtons = new HashMap<String, Button>();
 	private Text txtPosInfo;
@@ -879,13 +884,11 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	lblMaxElScan.setBounds(108, 41, 40, 19);
     	lblMaxElScan.setText("max el");
     	
-    	Label lblAzTimeScan = new Label(grpScanning, SWT.NONE);
-    	lblAzTimeScan.setBounds(13, 66, 40, 19);
-    	lblAzTimeScan.setText("az time");
+    	Label lblTimeScan = new Label(grpScanning, SWT.NONE);
+    	lblTimeScan.setBounds(13, 66, 40, 19);
+    	lblTimeScan.setText("time");
     	
-    	Label lblElTimeScan = new Label(grpScanning, SWT.NONE);
-    	lblElTimeScan.setBounds(108, 66, 40, 19);
-    	lblElTimeScan.setText("el time");
+    	
     	
     	txtMinAzScan = new Text(grpScanning, SWT.BORDER);
     	txtMinAzScan.setBounds(59, 16, 43, 19);
@@ -899,10 +902,10 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	scanAzTexts.add(txtMaxAzScan);
     	
     	
-    	txtTimeAzScan = new Text(grpScanning, SWT.BORDER);
-    	txtTimeAzScan.setBounds(59, 66, 43, 19);
-    	txtTimeAzScan.setText("0");
-    	scanAzTexts.add(txtTimeAzScan);
+    	txtTimeScan = new Text(grpScanning, SWT.BORDER);
+    	txtTimeScan.setBounds(59, 66, 43, 19);
+    	txtTimeScan.setText("0");
+    	scanAzTexts.add(txtTimeScan);
     	
     	txtMinElScan = new Text(grpScanning, SWT.BORDER);
     	txtMinElScan.setBounds(154, 16, 43, 19);
@@ -914,156 +917,126 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	txtMaxElScan.setText("0");
     	scanElTexts.add(txtMaxElScan);
     	
-    	txtTimeElScan = new Text(grpScanning, SWT.BORDER);
-    	txtTimeElScan.setBounds(154, 66, 43, 19);
-    	txtTimeElScan.setText("0");
-    	scanElTexts.add(txtTimeElScan);
+    
     	
     	Label lblRepetitionsScan = new Label(grpScanning, SWT.NONE);
-    	lblRepetitionsScan.setBounds(13, 96, 58, 19);
-    	lblRepetitionsScan.setText("repetitions");
+    	lblRepetitionsScan.setBounds(108, 66, 40, 19);
+    	lblRepetitionsScan.setText("reps");
     	
     	txtRepScan = new Text(grpScanning, SWT.BORDER);
-    	txtRepScan.setBounds(72, 96, 43, 19);
+    	txtRepScan.setBounds(154, 66, 43, 19);
     	txtRepScan.setText("0");
     	scanAzTexts.add(txtRepScan);
     	scanElTexts.add(txtRepScan);
     	
     	
-    	btnScanAz = new Button(grpScanning, SWT.NONE);
-    	btnScanAz.setBounds(3, 121, 68, 23);
-    	btnScanAz.setText("Scan Az");
+    	btnScanAz = new Button(grpScanning, SWT.RADIO);
+    	btnScanAz.setBounds(3, 100, 68, 23);
+    	btnScanAz.setText("Azimuth");
     	btnScanAz.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
-    			if (btnScanAz.getText().equals("Stop Scan")) {
-    				setScanEnabled(Axis.AZ);
-    				stage.stopScanning();
-    			}
-    			else {
-    				if (!validateScanInput(scanAzTexts)) {
-    					return;
-    				}
-    				
-    				btnScanAz.setText("Stop Scan");
-    				btnScanEl.setEnabled(false);
-    				btnScanBoth.setEnabled(false);
-    				
-    				double min = Double.parseDouble(txtMinAzScan.getText());
-    				double max = Double.parseDouble(txtMaxAzScan.getText());
-    				double time = Double.parseDouble(txtTimeAzScan.getText());
-    				int reps = Integer.parseInt(txtRepScan.getText());
-    				//stage.startScanning(min, max, time, reps, axisType.AZ, continuousScanOn);
-    				
-    				ScanCommand azSc = new ScanCommand(min, max, time, reps);
-    				stage.startScanning(azSc, null,false);
-    				
-    			}
+    			scanType = "Azimuth";
+    			Double.parseDouble(txtMinAzScan.getText());
+    			
     		}
     	});
     	
-    	btnScanEl = new Button(grpScanning, SWT.NONE);
-    	btnScanEl.setBounds(72, 121, 68, 23);
-    	btnScanEl.setText("Scan El");
+    	
+    	
+    	btnScanEl = new Button(grpScanning, SWT.RADIO);
+    	btnScanEl.setBounds(120, 100, 68, 23);
+    	btnScanEl.setText("Elevation");
     
     	btnScanEl.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
-    			if (btnScanEl.getText().equals("Stop Scan")) {
-    				enableScanButtons();
-    				btnScanEl.setText("Scan El");
+    			scanType = "Elevation";
+    			
+    		}
+    	});
+    	
+    	btnScanSnake = new Button(grpScanning, SWT.RADIO);
+    	btnScanSnake.setBounds(120, 120, 68, 23);
+    	btnScanSnake.setText("Snake");
+    	btnScanSnake.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			scanType="Snake";
+    		}
+    	});
+    	
+    	btnContinuousMode = new Button(grpScanning, SWT.CHECK);
+    	btnContinuousMode.setBounds(3, 150, 100, 24);
+    	btnContinuousMode.setText("Continuous");
+    	btnContinuousMode.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			
+    			continuousModeOn = !continuousModeOn;
+    			stage.setContinousScanOn(continuousModeOn);
+    			
+    		}
+    	});
+    	btnRaDecMode = new Button(grpScanning, SWT.CHECK);
+    	btnRaDecMode.setBounds(120, 150, 100, 24);
+    	btnRaDecMode.setText("RaDec");
+    	btnRaDecMode.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			RaDecModeOn = !RaDecModeOn;
+    			//stage.setContinousModeOn(RaDecModeOn);
+    			
+    		}
+    	});
+    	
+    	//TODO
+    	btnScan = new Button(grpScanning, SWT.NONE);
+    	btnScan.setBounds(3, 175, 68, 23);
+    	btnScan.setText("Scan");
+    	popupWindowButtons.put("raster", btnScan);
+    	btnScan.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			if (btnScan.getText().equals("stop")){
+    				
     				stage.stopScanning();
+    				btnScan.setText("Scan");
+    				return;
     			}
-    			else {
-    				if (!validateScanInput(scanElTexts)) {
-    					return;
-    				}
+    				
+    			btnScan.setText("stop");
+    			switch (scanType){
+    			case "Azimuth":
+    				azScan();
+    				break;
+    			case "Elevation":
+    				elScan();
+    				break;
+    			case "Snake":
+    				snakeScan();
+    				break;
+    			case "Square":
+    				squareScan();
+    				break;
+    			default:
+    				btnScan.setEnabled(false);
     				
     				
-        			
-        			double min = Double.parseDouble(txtMinElScan.getText());
-        			double max = Double.parseDouble(txtMaxElScan.getText());
-        			double time = Double.parseDouble(txtTimeElScan.getText());
-        			int reps = Integer.parseInt(txtRepScan.getText());
-        			//stage.startScanning(min, max, time, reps, axisType.EL,continuousScanOn);
-        			
-        			btnScanEl.setText("Stop Scan");
-    				btnScanBoth.setEnabled(false);
-        			btnScanAz.setEnabled(false);
-        			ScanCommand elSc = new ScanCommand(min, max, time, reps);
-        			stage.startScanning(null, elSc, false);
-        			
-        			
     			}
-    		}
-    	});
-    	
-    	btnScanBoth = new Button(grpScanning, SWT.NONE);
-    	btnScanBoth.setBounds(146, 121, 68, 23);
-    	btnScanBoth.setText("Scan Both");
-    	btnScanBoth.addMouseListener(new MouseAdapter() {
-    		@Override
-    		public void mouseDown(MouseEvent e) {
-    			if (btnScanBoth.getText().equals("Stop Scan")) {
-    				enableScanButtons();
-    				btnScanBoth.setText("Scan Both");
-    				stage.stopScanning();
-    			}
-    			else {
-    				if (!validateScanInput(scanAzTexts) && !validateScanInput(scanElTexts)) {
-    					return;
-    				}
-    				
-    				double minAz = Double.parseDouble(txtMinAzScan.getText());
-    				double maxAz = Double.parseDouble(txtMaxAzScan.getText());
-    				double timeAz = Double.parseDouble(txtTimeAzScan.getText());
-    				double minEl = Double.parseDouble(txtMinElScan.getText());
-        			double maxEl = Double.parseDouble(txtMaxElScan.getText());
-        			double timeEl = Double.parseDouble(txtTimeElScan.getText());
-    				int reps = Integer.parseInt(txtRepScan.getText());
-    				
-    				ScanCommand azSc = new ScanCommand(minAz, maxAz, timeAz, reps);
-    				ScanCommand elSc = new ScanCommand(minEl, maxEl, timeEl, reps);
-    				stage.startScanning(azSc, elSc, false);
-    				
-    				btnScanBoth.setText("Stop Scan");
-    				btnScanEl.setEnabled(false);
-        			btnScanAz.setEnabled(false);
-    			}
-    		}
-    	});
-    	
-    	btnContinuousScan = new Button(grpScanning, SWT.CHECK);
-    	btnContinuousScan.setBounds(13, 150, 100, 24);
-    	btnContinuousScan.setText("Continuous Scan");
-    	btnContinuousScan.addMouseListener(new MouseAdapter() {
-    		@Override
-    		public void mouseDown(MouseEvent e) {
-    			
-    			continuousScanOn = !continuousScanOn;
-    			stage.setContinousScanOn(continuousScanOn);
     			
     		}
     	});
+	
     	
-    	final Button btnScnRaster = new Button(grpScanning, SWT.None);
-    	btnScnRaster.setBounds(119, 154, 85, 16);
-    	btnScnRaster.setText("Raster Scan");
-    	popupWindowButtons.put("raster", btnScnRaster);
-    	btnScnRaster.addMouseListener(new MouseAdapter() {
+    	final Button btnScanSquare = new Button(grpScanning, SWT.RADIO);
+    	btnScanSquare.setBounds(3, 120, 68, 23);
+    	btnScanSquare.setText("Square");
+    	popupWindowButtons.put("raster", btnScanSquare);
+    	btnScanSquare.addMouseListener(new MouseAdapter() {
     		@Override
     		public void mouseDown(MouseEvent e) {
-    			double minAz = Double.parseDouble(txtMinAzScan.getText());
-				double maxAz = Double.parseDouble(txtMaxAzScan.getText());
-				double timeAz = Double.parseDouble(txtTimeAzScan.getText());
-				double minEl = Double.parseDouble(txtMinElScan.getText());
-    			double maxEl = Double.parseDouble(txtMaxElScan.getText());
-    			ScanCommand azSc = new ScanCommand(minAz, maxAz, timeAz, 0);
-				ScanCommand elSc = new ScanCommand(minEl, maxEl, timeAz, 0);
-				btnScnRaster.setEnabled(false);
-    			rasterScan = !rasterScan;
-    			stage.startScanning(azSc, elSc, true);
-    			
+    			squareScan();
     		}
     	});
 	}
@@ -1263,13 +1236,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				btnScanAz.setEnabled(true);
-				btnScanEl.setEnabled(true);
-				btnScanBoth.setEnabled(true);
-				btnScanAz.setText("Scan Az");
-				btnScanEl.setText("Scan El");
-				btnScanBoth.setText("Scan Both");
-				System.out.println("ENABLEING SCAN");
+				btnScan.setText("Scan");
 			}
 		});
 		
@@ -1383,6 +1350,14 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		});
 	}
 	
+	public void setTime(final double time){
+		Display.getDefault().asyncExec(new Runnable(){
+			@Override
+			public void run(){
+				txtTimeScan.setText(""+time);			}
+		});
+	}
+	
 	public void updateStatusArea(final String message) {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
@@ -1463,4 +1438,84 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 			}
 		});
 	}
+	
+
+	public void azScan(){
+			if (!validateScanInput(scanAzTexts)) {
+				return;
+			}
+				
+			double min = Double.parseDouble(txtMinAzScan.getText());
+			double max = Double.parseDouble(txtMaxAzScan.getText());
+			double time = Double.parseDouble(txtTimeScan.getText());
+			int reps = Integer.parseInt(txtRepScan.getText());
+			//stage.startScanning(min, max, time, reps, axisType.AZ, continuousScanOn);
+			
+			ScanCommand azSc = new ScanCommand(min, max, time, reps);
+			stage.startScanning(azSc, null,false);
+			
+		
+		
+	}
+	
+	public void elScan(){
+	
+			if (!validateScanInput(scanElTexts)) {
+				return;
+			}
+			
+			
+			
+			double min = Double.parseDouble(txtMinElScan.getText());
+			double max = Double.parseDouble(txtMaxElScan.getText());
+			double time = Double.parseDouble(txtTimeScan.getText());
+			int reps = Integer.parseInt(txtRepScan.getText());
+			//stage.startScanning(min, max, time, reps, axisType.EL,continuousScanOn);
+			
+		
+			ScanCommand elSc = new ScanCommand(min, max, time, reps);
+			stage.startScanning(null, elSc, false);
+			
+			
+		
+	
+	}
+	
+	public void snakeScan(){
+
+			if (!validateScanInput(scanAzTexts) && !validateScanInput(scanElTexts)) {
+				return;
+			}
+			
+			double minAz = Double.parseDouble(txtMinAzScan.getText());
+			double maxAz = Double.parseDouble(txtMaxAzScan.getText());
+			double timeAz = Double.parseDouble(txtTimeScan.getText());
+			double minEl = Double.parseDouble(txtMinElScan.getText());
+			double maxEl = Double.parseDouble(txtMaxElScan.getText());
+			double timeEl = Double.parseDouble(txtTimeScan.getText());
+			int reps = Integer.parseInt(txtRepScan.getText());
+			
+			ScanCommand azSc = new ScanCommand(minAz, maxAz, timeAz, reps);
+			ScanCommand elSc = new ScanCommand(minEl, maxEl, timeEl, reps);
+			stage.startScanning(azSc, elSc, false);
+			
+			
+		
+		
+	}
+	public void squareScan(){
+		double minAz = Double.parseDouble(txtMinAzScan.getText());
+		double maxAz = Double.parseDouble(txtMaxAzScan.getText());
+		double timeAz = Double.parseDouble(txtTimeScan.getText());
+		double minEl = Double.parseDouble(txtMinElScan.getText());
+		double maxEl = Double.parseDouble(txtMaxElScan.getText());
+		ScanCommand azSc = new ScanCommand(minAz, maxAz, timeAz, 0);
+		ScanCommand elSc = new ScanCommand(minEl, maxEl, timeAz, 0);
+		
+		rasterScan = !rasterScan;
+		stage.startScanning(azSc, elSc, true);
+		
+	
+	}
 }
+

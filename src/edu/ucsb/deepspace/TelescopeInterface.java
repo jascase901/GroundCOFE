@@ -93,5 +93,7 @@ public interface TelescopeInterface {
 	 * Begin the indexing procedure for this axis.
 	 */
 	public void index(Axis axis);
+
+	public double getScanTime(ScanCommand sc, double a, double b,  Axis axis);
 	
 }

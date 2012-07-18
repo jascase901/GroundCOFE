@@ -207,8 +207,9 @@ public class TelescopeGalil implements TelescopeInterface {
 	@Override
 	public void stopScanning() {
 		// All scans are on thread 1
+		pause();
 		protocol.sendRead("ST");
-		
+		pause();
 	}
 
 	@Override
@@ -425,6 +426,34 @@ public class TelescopeGalil implements TelescopeInterface {
 	}
 		//waitWhileMoving(axis);
 		//az.indexing = false;
+	
+	public double getScanTime(ScanCommand sc, double max_vel, double max_acc, Axis axis ){
+		double distance;
+		switch (axis){
+		case EL:
+			distance =el.convDegToEnc(sc.getMax()) -el.convDegToEnc(sc.getMin());
+			break;
+		case AZ:
+			 distance =az.convDegToEnc(sc.getMax()) -az.convDegToEnc(sc.getMin());
+			break;
+		default:
+			 distance =0;
+			
+		
+		}
+		
+		double time = distance/max_vel;
+		double maxDistance = max_acc*.5*time*time;
+		if (distance<=maxDistance)
+			return 0;
+		return time;
+			
+		
+	
+		
+	
+	}
+	
 
 	
 
@@ -467,7 +496,9 @@ public class TelescopeGalil implements TelescopeInterface {
 		}
 		
 		private void stop() {
+			
 			protocol.sendRead("ST" + abbrev);
+			
 		}
 		
 		private boolean isMoving() {
@@ -588,6 +619,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		private void setAccel(double acc) {
 			protocol.sendRead("AC" + abbrev + "=" + (int) acc);
 		}
+		
 		
 		
 		
