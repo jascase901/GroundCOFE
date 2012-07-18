@@ -337,6 +337,7 @@ public class Stage {
 					double maxDec =baseLocation.azelToDec(azSc.getMax(), elSc.getMax());
 					double minRa = baseLocation.azelToRa(azSc.getMin(), elSc.getMin());
 					double maxRa = baseLocation.azelToRa(azSc.getMax(), elSc.getMax());
+					double maxScanTime = 0;
 
 					do {
 
@@ -350,6 +351,11 @@ public class Stage {
 						minEl = GalilCalc.round(roundPlace*baseLocation.radecToEl(minRa, minDec),4);
 						maxAz = GalilCalc.round(roundPlace*baseLocation.radecToAz(maxRa, maxDec),4);
 						maxEl = GalilCalc.round(roundPlace*baseLocation.radecToEl(maxRa, maxDec),4);
+						//TODO make sure I update maxScan or it will cause a inf error
+						if (maxScanTime<azSc.getTime()){
+							window.updateStatusArea("time exceeds max");
+							window.setTime(maxScanTime);
+						}
 						
 					}while(continousScanOn);
 				}
@@ -385,7 +391,19 @@ public class Stage {
 		scope.stopScanning();
 	}
 	
-	
+	public double getScanTime(ScanCommand sc, Axis axis){
+		switch(axis){
+		case AZ:
+			return scope.getScanTime(sc,maxVelAz, maxAccAz, axis);
+		case EL:
+			return scope.getScanTime(sc, maxVelEl, maxAccEl, axis);
+
+		default:
+			return 0;
+			
+		}
+		
+	}
 	
 
 	public void move(final MoveCommand mc) {
@@ -887,6 +905,7 @@ public class Stage {
 		this.continousScanOn = continousScanOn;
 	}
 	
+
 
 
 }
