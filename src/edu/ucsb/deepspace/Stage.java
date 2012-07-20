@@ -392,11 +392,14 @@ public class Stage {
 	}
 	
 	public double getScanTime(ScanCommand sc, Axis axis){
+		double d;
 		switch(axis){
 		case AZ:
-			return scope.getScanTime(sc,maxVelAz, maxAccAz, axis);
+			d = Math.abs(scope.getDistance(maxAz, minAz, axis));
+			return scope.getScanTime(sc,maxVelAz, maxAccAz,d, axis);
 		case EL:
-			return scope.getScanTime(sc, maxVelEl, maxAccEl, axis);
+			d=Math.abs(scope.getDistance(maxEl, minEl, axis));
+			return scope.getScanTime(sc, maxVelEl, maxAccEl,d, axis);
 
 		default:
 			return 0;
@@ -575,11 +578,15 @@ public class Stage {
 	public void setMaxVelAccAz(double maxVelAz, double maxAccAz) {
 		this.maxVelAz = maxVelAz;
 		this.maxAccAz = maxAccAz;
+		scope.setAccel(maxAccAz, Axis.AZ);
+		scope.setVelocity(maxVelAz, Axis.AZ);
 	}
 	
 	public void setMaxVelAccEl(double maxVelEl, double maxAccEl) {
 		this.maxVelEl = maxVelEl;
 		this.maxAccEl = maxAccEl;
+		scope.setAccel(this.maxEl, Axis.EL);
+		scope.setVelocity(maxVelEl, Axis.EL);
 	}
 	
 	public void setMaxMoveRel(double maxMoveRelAz, double maxMoveRelEl) {
