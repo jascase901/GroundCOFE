@@ -427,14 +427,14 @@ public class TelescopeGalil implements TelescopeInterface {
 		//waitWhileMoving(axis);
 		//az.indexing = false;
 	
-	public double getScanTime(ScanCommand sc, double max_vel, double max_acc, Axis axis ){
+	public double getScanTime(ScanCommand sc, double max_vel, double max_acc, double max_distance, Axis axis ){
 		double distance;
 		switch (axis){
 		case EL:
-			distance =el.convDegToEnc(sc.getMax()) -el.convDegToEnc(sc.getMin());
+			distance =getDistance(sc.getMax(), sc.getMin(), Axis.EL);
 			break;
 		case AZ:
-			 distance =az.convDegToEnc(sc.getMax()) -az.convDegToEnc(sc.getMin());
+			 distance =getDistance(sc.getMax(), sc.getMin(), Axis.AZ);
 			break;
 		default:
 			 distance =0;
@@ -443,15 +443,25 @@ public class TelescopeGalil implements TelescopeInterface {
 		}
 		
 		double time = distance/max_vel;
-		double maxDistance = max_acc*.5*time*time;
-		if (distance<=maxDistance)
-			return 0;
+		double tot_distance = (distance + max_acc*time*time);
+		if (tot_distance>max_distance)
+			return 0.0;
 		return time;
 			
 		
 	
 		
 	
+	}
+	public double getDistance(double max, double min, Axis axis){
+		switch (axis){
+		case AZ:
+			return az.convDegToEnc(max)-az.convDegToEnc(min);
+		case EL:
+			return el.convDegToEnc(max)-el.convDegToEnc(min);
+		default:
+			return 0;
+		}
 	}
 	
 

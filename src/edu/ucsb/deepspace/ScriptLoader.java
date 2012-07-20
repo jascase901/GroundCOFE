@@ -179,17 +179,17 @@ public class ScriptLoader {
 		raster.add("dy = (maxEl-minEl)/lineNum");
 
 
-		raster.add("AC 1000");
+		
 
 		raster.add("dx = maxAz-minAz");
 		raster.add("vf = 2*dx/(time)*lineNum");
 
 		raster.add("SP vf");
 
-		raster.add("AC _AC");
-		raster.add("DC _AC");
-		raster.add("acTime = vf/_AC");
-		raster.add("acX = .5*_AC*acTime*acTime"); 
+		raster.add("AC _ACA");
+		raster.add("DC _ACA");
+		raster.add("acTime = vf/_ACA");
+		raster.add("acX = .5*_ACA*acTime*acTime"); 
 
 		raster.add("n=0");
 		raster.add("#SNAKE");
@@ -202,15 +202,20 @@ public class ScriptLoader {
 
 		raster.add("AD acX"); 
 		raster.add("OP 1");
+		raster.add("AD dx");
+		raster.add("OP 0");
 		raster.add("AM");
 
 
 
 		raster.add("PR -dx-acX");
 
+		raster.add("AD -acX");
+		raster.add("OP 1");
 		raster.add("BG A");
-		raster.add("AD dx");
-		raster.add("OP 0");
+		
+		raster.add("AD -dx");
+		raster.add("OP 1");
 
 		raster.add("AM");
 
@@ -235,17 +240,16 @@ public class ScriptLoader {
 		fraster.add("dx = maxAz  - minAz");
 		fraster.add("dy = (maxEl-minEl)/lineNum");
 
-		fraster.add("AC 1000");
 
 		fraster.add("dx = maxAz-minAz");
 		fraster.add("vf = lineNum*(dx/(time))");
 
 		fraster.add("SP vf");
 
-		fraster.add("AC _AC");
-		fraster.add("DC _AC");
-		fraster.add("acTime = vf/_AC");
-		fraster.add("acX = .5*_AC*acTime*acTime ");
+		fraster.add("AC _ACA");
+		fraster.add("DC _ACA");
+		fraster.add("acTime = vf/_ACA");
+		fraster.add("acX = .5*_ACA*acTime*acTime ");
 
 		fraster.add("alt = 1");
 		fraster.add("n=0");
@@ -259,19 +263,24 @@ public class ScriptLoader {
 
 		fraster.add("AD acX ");
 		fraster.add("OP 1");
+		fraster.add("AD dx");
+		fraster.add("OP 0");
 		fraster.add("ENDIF");
+		
 
 
 		fraster.add("IF(alt>0) ");
 		fraster.add("PR -dx-acX");
 
 		fraster.add("BG A");
-		fraster.add("AD dx");
+		fraster.add("AD -acX");
 		fraster.add("OP 1");
+		fraster.add("AD -dx");
+		fraster.add("OP 0");
 		fraster.add("ENDIF");
 		fraster.add("AM");
 
-		fraster.add("OP 0");
+
 
 
 		fraster.add("PR 0,dy");
@@ -303,11 +312,11 @@ public class ScriptLoader {
 
 		azScan.add("SP vf");
 
-		azScan.add("AC _AC");
-		azScan.add("DC _AC");
+		azScan.add("AC _ACA");
+		azScan.add("DC _ACA");
 
-		azScan.add("acTime = vf/_AC");
-		azScan.add("acX = .5*_AC*acTime*acTime"); 
+		azScan.add("acTime = vf/_ACA");
+		azScan.add("acX = .5*_ACA*acTime*acTime"); 
 
 
 		azScan.add("PR dx + acX,0");
@@ -316,6 +325,8 @@ public class ScriptLoader {
 
 		azScan.add("AD acX ");
 		azScan.add("OP 1");
+		azScan.add("AD dx");
+		azScan.add("OP 0");
 		azScan.add("scan = 1");
 
 
@@ -325,11 +336,13 @@ public class ScriptLoader {
 		azScan.add("PR -dx-acX,0");
 
 		azScan.add("BG ");
-		azScan.add("AD dx");
+		azScan.add("AD -acX");
 		azScan.add("OP 1");
-
-		azScan.add("AM");
+		azScan.add("AD -dx");
 		azScan.add("OP 0");
+		
+		azScan.add("AM");
+	
 
 
 		azScan.add("EN");
@@ -348,18 +361,21 @@ public class ScriptLoader {
 		elScan.add("vf = 2*dx/(time)");
 
 		elScan.add("SP ,vf");
-		elScan.add("DC _AC");
+		elScan.add("AC ,_ACB");
+		elScan.add("DC ,_ACB");
 		elScan.add("acTime = vf/_ACB");
 		elScan.add("acX = .5*_ACB*acTime*acTime ");
 
 
-		elScan.add("PR ,dx + acX");
+		elScan.add("PR 0,dx + acX");
 		elScan.add("BG B");
 
 
 
 		elScan.add("AD ,acX ");
 		elScan.add("OP 1");
+		elScan.add("AD , dx");
+		elScan.add("OP 0");
 		elScan.add("scan = 1");
 
 
@@ -369,8 +385,10 @@ public class ScriptLoader {
 		elScan.add("PR 0,-dx-acX");
 
 		elScan.add("BG B");
-		elScan.add("AD ,dx");
-		elScan.add("OP 1");
+		elScan.add("AD ,-acX");
+		elScan.add("OP 0");
+		elScan.add("AD ,-dx");
+		elScan.add("OP 0");
 
 		elScan.add("AM");
 		elScan.add("OP 0");

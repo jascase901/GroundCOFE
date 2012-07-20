@@ -94,6 +94,7 @@ public interface TelescopeInterface {
 	 */
 	public void index(Axis axis);
 
-	public double getScanTime(ScanCommand sc, double a, double b,  Axis axis);
+	public double getScanTime(ScanCommand sc, double a, double b,double c,  Axis axis);
+	public double getDistance(double max, double min, Axis axis);
 	
 }

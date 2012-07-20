@@ -3,7 +3,7 @@ package edu.ucsb.deepspace;
 public enum Axis {
 	
 	AZ("Azimuth", "A", 1),
-	EL("Elevation", "B", -1);
+	EL("Elevation", "B", 1);
 
     private final String fullName;
     private final String abbrev;

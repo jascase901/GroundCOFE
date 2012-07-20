@@ -81,6 +81,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Button btnScanEl;
 	private Button btnScan;
 	private Button btnScanSnake;
+	private Button btnScanSquare;
 	private Button btnContinuousMode;
 	private Button btnRaDecMode;
 	private Text txtEncTol;
@@ -937,7 +938,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		@Override
     		public void mouseDown(MouseEvent e) {
     			scanType = "Azimuth";
-    			Double.parseDouble(txtMinAzScan.getText());
+    			ScanCommand azSc = new ScanCommand(Double.parseDouble(txtMinAzScan.getText()), Double.parseDouble(txtMaxAzScan.getText()));
+    			setTime(2*stage.getScanTime(azSc, Axis.AZ));
     			
     		}
     	});
@@ -952,6 +954,9 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		@Override
     		public void mouseDown(MouseEvent e) {
     			scanType = "Elevation";
+    
+    			ScanCommand elSc = new ScanCommand(Double.parseDouble(txtMinElScan.getText()), Double.parseDouble(txtMaxElScan.getText()));
+    			setTime(stage.getScanTime(elSc, Axis.EL));
     			
     		}
     	});
@@ -963,7 +968,24 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		@Override
     		public void mouseDown(MouseEvent e) {
     			scanType="Snake";
+    			ScanCommand azSc = new ScanCommand(Double.parseDouble(txtMinAzScan.getText()), Double.parseDouble(txtMaxAzScan.getText()));
+    			setTime(stage.getScanTime(azSc, Axis.AZ));
     		}
+    	});
+    	
+    	btnScanSquare = new Button(grpScanning, SWT.RADIO);
+    	btnScanSquare.setBounds(3, 120, 68, 23);
+    	btnScanSquare.setText("Square");
+    	popupWindowButtons.put("raster", btnScanSquare);
+    	btnScanSquare.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			scanType="Square";
+    			ScanCommand azSc = new ScanCommand(Double.parseDouble(txtMinAzScan.getText()), Double.parseDouble(txtMaxAzScan.getText()));
+    			setTime(2*stage.getScanTime(azSc, Axis.AZ));
+    			
+    		}
+    			
     	});
     	
     	btnContinuousMode = new Button(grpScanning, SWT.CHECK);
@@ -1029,16 +1051,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
 	
     	
-    	final Button btnScanSquare = new Button(grpScanning, SWT.RADIO);
-    	btnScanSquare.setBounds(3, 120, 68, 23);
-    	btnScanSquare.setText("Square");
-    	popupWindowButtons.put("raster", btnScanSquare);
-    	btnScanSquare.addMouseListener(new MouseAdapter() {
-    		@Override
-    		public void mouseDown(MouseEvent e) {
-    			squareScan();
-    		}
-    	});
+    	
 	}
 
 	private void guiDebug() {
