@@ -12,6 +12,7 @@ public enum Axis {
         this.fullName = fullName;
         this.abbrev = abbrev;
         this.polarity = polarity;
+      
     }
     public String getFullName() {return fullName;}
     public String getAbbrev() {return abbrev;}
