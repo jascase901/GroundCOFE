@@ -26,7 +26,7 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 				protocol.initialize();
 				protocol.sendRead("XQ #READERI,3");
 				String info = protocol.read();
-				System.out.println(info);
+				//System.out.println(info);
 				String[] temp = info.split(" ");
 				if (temp.length>1){
 				String azPos = temp[1];
