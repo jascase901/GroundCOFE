@@ -48,6 +48,7 @@ public class Stage {
 	private double azToBalloon = 0, elToBalloon = 0;
 	private CommGalil stageProtocol, scopeProtocol, readerProtocol;
 	private Boolean continousScanOn = false;
+	private Boolean rasterOn = false;
 
 	ScriptLoader sl;
 
@@ -314,6 +315,65 @@ public class Stage {
 	 * @param azSc
 	 * @param elSc
 	 */
+	
+	//TODO FIGURE OUT A WAY TO MAKE THIS PRETTY
+	public boolean canScan(ScanCommand azSc, ScanCommand elSc, double time){
+		
+		
+			
+			
+		double axAz;
+		double axEl;
+		boolean moveable = true;
+		
+		if (azSc == null){
+			
+
+			double acVelEl = 2*scope.getDistance(elSc.getMin(), elSc.getMax(), Axis.EL)/time;
+			double acTimeEl =acVelEl/maxAccEl;
+
+			 
+			axAz = 0;
+			axEl = .5*maxAccEl*acTimeEl*acTimeEl;
+			axEl = scope.convEncToDeg(axEl, Axis.EL);
+			MoveCommand mcMinEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, null ,elSc.getMin()-axEl);
+			MoveCommand mcMaxEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, null ,elSc.getMax()+axEl);
+			moveable = moveable && canMove(mcMinEl);
+			moveable = moveable && canMove(mcMaxEl);
+		}
+		else{
+			double acVelAz = 2*scope.getDistance(azSc.getMin(), azSc.getMax(), Axis.AZ)/time;
+			double acTimeAz =acVelAz/maxAccAz;
+			
+			
+
+			axAz = .5*maxAccAz*acTimeAz*acTimeAz;
+			axEl = 0;
+			axAz = scope.convEncToDeg(axAz, Axis.AZ);
+			System.out.println(axAz);
+
+			MoveCommand mcMinAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, azSc.getMin()-axAz, null);
+			MoveCommand mcMaxAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, azSc.getMax()+axAz, null);
+			moveable = moveable && canMove(mcMinAz);
+			moveable = moveable && canMove(mcMaxAz);
+		}
+		
+		
+		
+		
+		
+		
+		
+
+		System.out.println(moveable);
+
+			return moveable;
+	}
+	
+	public boolean test(){
+		return true;
+	}
+	
 	public void startScanning(final ScanCommand azSc, final ScanCommand elSc, final boolean fraster) {
 		if (azSc == null && elSc == null) {
 			window.updateStatusArea("Fatal error.  The ScanCommands associated with Az and El are both null.\n");
@@ -325,12 +385,14 @@ public class Stage {
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
+				
 				//If user presses scan both
-				if (azSc != null && elSc!=null) {
+				if (azSc != null && elSc!=null && rasterOn) {
 					double minAz = azSc.getMin();
 					double maxAz = azSc.getMax();
 					double minEl = azSc.getMin();
 					double maxEl = azSc.getMax();
+					goToPos(new Coordinate(minEl, maxEl));
 					double roundPlace = 1000;
 					//convert cords to time dependent RADEC
 					double minDec = baseLocation.azelToDec(azSc.getMin(), elSc.getMin());
@@ -344,7 +406,10 @@ public class Stage {
 
 						waitWhileExecuting(1);
 						//scan uses Az/El coord not ra dec so make scan commands with az/el
-						scope.scan(new ScanCommand(minAz, maxAz, azSc.getTime(), (int)azSc.getReps()), new ScanCommand(minEl, maxEl, elSc.getTime(), (int)elSc.getReps()), fraster);		
+						ScanCommand aSc= new ScanCommand(minAz, maxAz, azSc.getTime(), (int)azSc.getReps());
+						ScanCommand eSc =new ScanCommand(minEl, maxEl, elSc.getTime(), (int)elSc.getReps());
+						if(canScan(azSc, eSc, elSc.getTime()))
+							scope.scan(aSc,eSc, fraster);		
 						waitWhileExecuting(1);
 						//convert ra coords, to az el this changes with base location time
 						minAz = GalilCalc.round(roundPlace*baseLocation.radecToAz(minRa, minDec), 4);
@@ -363,7 +428,8 @@ public class Stage {
 				else {
 					do {
 						waitWhileExecuting(1);
-						scope.scan(azSc, elSc);
+						if (canScan(azSc, elSc, azSc.getTime()))
+							scope.scan(azSc, elSc);
 						waitWhileExecuting(1);
 					}while(continousScanOn);
 					
@@ -391,15 +457,17 @@ public class Stage {
 		scope.stopScanning();
 	}
 	
+	
+	//TODO figure out another place for this
 	public double getScanTime(ScanCommand sc, Axis axis){
 		double d;
 		switch(axis){
 		case AZ:
 			d = Math.abs(scope.getDistance(maxAz, minAz, axis));
-			return scope.getScanTime(sc,maxVelAz, maxAccAz,d, axis);
+			return scope.getScanTime(sc,maxVelAz, maxAccAz,2*d, axis);
 		case EL:
 			d=Math.abs(scope.getDistance(maxEl, minEl, axis));
-			return scope.getScanTime(sc, maxVelEl, maxAccEl,d, axis);
+			return scope.getScanTime(sc, maxVelEl, maxAccEl,2*d, axis);
 
 		default:
 			return 0;
@@ -408,41 +476,50 @@ public class Stage {
 		
 	}
 	
+	boolean canMove( final MoveCommand mc){
+		if (mc.getAzAmount() != null) {
+			if (!motorCheck(Axis.AZ) && !motorCheck(Axis.EL)) {
+				window.controlMoveButtons(true);
+				statusArea("The motors must be on before moving.\n");
+				return false;
+			}
+		}
+		
+		if (mc.getMode() == MoveMode.RELATIVE && mc.getType() == MoveType.DEGREE) {
+			if (mc.getAmount(Axis.AZ) == null) {
+				if (Math.abs(mc.getAmount(Axis.EL)) > maxMoveRelEl) {
+					window.controlMoveButtons(true);
+					statusArea("Maximum allowed relative move limit exceeded.\n");
+					return false;
+				}
+			}
+			else if (mc.getAmount(Axis.EL) == null) {
+				if (Math.abs(mc.getAmount(Axis.AZ)) > maxMoveRelAz) {
+					window.controlMoveButtons(true);
+					statusArea("Maximum allowed relative move limit exceeded.\n");
+					return false;
+				}
+			}
+		}
+		
+	
+		
+		if (!scope.validMove(mc, minAz, maxAz, minEl, maxEl)) {
+			System.out.println("this is an invalid move");
+			statusArea("The desired position falls outside the allowed moving angles.\n");
+			window.controlMoveButtons(true);
+			return false;
+		}
+		
+		return true;
+		
+	}
 
 	public void move(final MoveCommand mc) {
 		exec.submit(new Runnable() {
 			public void run() {
-				if (mc.getAzAmount() != null) {
-					if (!motorCheck(Axis.AZ) && !motorCheck(Axis.EL)) {
-						window.controlMoveButtons(true);
-						statusArea("The motors must be on before moving.\n");
-						return;
-					}
-				}
-				
-				if (mc.getMode() == MoveMode.RELATIVE && mc.getType() == MoveType.DEGREE) {
-					if (mc.getAmount(Axis.AZ) == null) {
-						if (Math.abs(mc.getAmount(Axis.EL)) > maxMoveRelEl) {
-							window.controlMoveButtons(true);
-							statusArea("Maximum allowed relative move limit exceeded.\n");
-							return;
-						}
-					}
-					else if (mc.getAmount(Axis.EL) == null) {
-						if (Math.abs(mc.getAmount(Axis.AZ)) > maxMoveRelAz) {
-							window.controlMoveButtons(true);
-							statusArea("Maximum allowed relative move limit exceeded.\n");
-							return;
-						}
-					}
-				}
-				
-				if (!scope.validMove(mc, minAz, maxAz, minEl, maxEl)) {
-					System.out.println("this is an invalid move");
-					statusArea("The desired position falls outside the allowed moving angles.\n");
-					window.controlMoveButtons(true);
+				if (!canMove(mc))
 					return;
-				}
 				scope.move(mc);
 				
 				System.out.println("done stage.move\n");
