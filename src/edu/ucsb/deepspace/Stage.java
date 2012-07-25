@@ -318,27 +318,59 @@ public class Stage {
 	
 	//TODO FIGURE OUT A WAY TO MAKE THIS PRETTY
 	public boolean canScan(ScanCommand azSc, ScanCommand elSc, double time){
+		
+		
+			
+			
 		double axAz;
 		double axEl;
-		if (elSc == null){
-			 axAz = .5*maxAccAz*time*time;
-			 axEl = 0;
+		boolean moveable = true;
+		
+		if (azSc == null){
+			
+
+			double acVelEl = 2*scope.getDistance(elSc.getMin(), elSc.getMax(), Axis.EL)/time;
+			double acTimeEl =acVelEl/maxAccEl;
+
+			 
+			axAz = 0;
+			axEl = .5*maxAccEl*acTimeEl*acTimeEl;
+			axEl = scope.convEncToDeg(axEl, Axis.EL);
+			MoveCommand mcMinEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, null ,elSc.getMin()-axEl);
+			MoveCommand mcMaxEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, null ,elSc.getMax()+axEl);
+			moveable = moveable && canMove(mcMinEl);
+			moveable = moveable && canMove(mcMaxEl);
 		}
 		else{
-			axAz = 0;
-			axEl = .5*maxAccEl*time*time;
+			double acVelAz = 2*scope.getDistance(azSc.getMin(), azSc.getMax(), Axis.AZ)/time;
+			double acTimeAz =acVelAz/maxAccAz;
+			
+			
+
+			axAz = .5*maxAccAz*acTimeAz*acTimeAz;
+			axEl = 0;
+			axAz = scope.convEncToDeg(axAz, Axis.AZ);
+			System.out.println(axAz);
+
+			MoveCommand mcMinAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, azSc.getMin()-axAz, null);
+			MoveCommand mcMaxAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, azSc.getMax()+axAz, null);
+			moveable = moveable && canMove(mcMinAz);
+			moveable = moveable && canMove(mcMaxAz);
 		}
-		MoveCommand mcMinAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, azSc.getMin()-axAz, null);
-		MoveCommand mcMaxAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, azSc.getMax()+axAz, null);
-		MoveCommand mcMinEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, null ,elSc.getMin()-axEl);
-		MoveCommand mcMaxEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, null ,elSc.getMax()+axEl);
 		
-		boolean moveable = scope.validMove(mcMinAz, minAz, maxAz, minEl, maxEl);
-		moveable = moveable && scope.validMove(mcMaxAz, minAz, maxAz, minEl, maxEl);
-		moveable = moveable && scope.validMove(mcMinEl, minAz, maxAz, minEl, maxEl);
-		moveable = moveable && scope.validMove(mcMaxEl, minAz, maxAz, minEl, maxEl);
-		if (!moveable)
-			System.out.println("not moving");
+		
+		
+		
+		
+		
+		
+
+		System.out.println(moveable);
+
+			return moveable;
+	}
+	
+	public boolean test(){
 		return true;
 	}
 	
@@ -396,7 +428,7 @@ public class Stage {
 				else {
 					do {
 						waitWhileExecuting(1);
-						if (canScan(azSc,elSc, elSc.getTime()))
+						if (canScan(azSc, elSc, azSc.getTime()))
 							scope.scan(azSc, elSc);
 						waitWhileExecuting(1);
 					}while(continousScanOn);
@@ -432,10 +464,10 @@ public class Stage {
 		switch(axis){
 		case AZ:
 			d = Math.abs(scope.getDistance(maxAz, minAz, axis));
-			return scope.getScanTime(sc,maxVelAz, maxAccAz,d, axis);
+			return scope.getScanTime(sc,maxVelAz, maxAccAz,2*d, axis);
 		case EL:
 			d=Math.abs(scope.getDistance(maxEl, minEl, axis));
-			return scope.getScanTime(sc, maxVelEl, maxAccEl,d, axis);
+			return scope.getScanTime(sc, maxVelEl, maxAccEl,2*d, axis);
 
 		default:
 			return 0;
@@ -469,6 +501,8 @@ public class Stage {
 				}
 			}
 		}
+		
+	
 		
 		if (!scope.validMove(mc, minAz, maxAz, minEl, maxEl)) {
 			System.out.println("this is an invalid move");

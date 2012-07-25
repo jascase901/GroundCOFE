@@ -94,6 +94,8 @@ public class TelescopeGalil implements TelescopeInterface {
 		return goal;
 	}
 	
+	
+	//Not sure if it can handle null MC
 	private double goalUserDeg(MoveCommand mc, Axis axis) {
 		double goal = 0;
 		GalilAxis temp = picker(axis);
@@ -446,7 +448,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		double tot_distance = (distance + max_acc*time*time);
 		if (tot_distance>max_distance)
 			return 0.0;
-		return time;
+		return 2*time;
 			
 		
 	
@@ -459,6 +461,17 @@ public class TelescopeGalil implements TelescopeInterface {
 			return az.convDegToEnc(max)-az.convDegToEnc(min);
 		case EL:
 			return el.convDegToEnc(max)-el.convDegToEnc(min);
+		default:
+			return 0;
+		}
+	}
+	
+	public double convEncToDeg(double enc, Axis axis){
+		switch (axis){
+		case AZ:
+			return az.convEncToDeg(enc);
+		case EL:
+			return el.convEncToDeg(enc);
 		default:
 			return 0;
 		}
