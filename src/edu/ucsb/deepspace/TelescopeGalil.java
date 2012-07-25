@@ -448,7 +448,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		double tot_distance = (distance + max_acc*time*time);
 		if (tot_distance>max_distance)
 			return 0.0;
-		return 2*time;
+		return time;
 			
 		
 	

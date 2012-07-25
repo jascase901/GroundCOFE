@@ -465,6 +465,7 @@ public class Stage {
 		case AZ:
 			d = Math.abs(scope.getDistance(maxAz, minAz, axis));
 			return scope.getScanTime(sc,maxVelAz, maxAccAz,2*d, axis);
+			
 		case EL:
 			d=Math.abs(scope.getDistance(maxEl, minEl, axis));
 			return scope.getScanTime(sc, maxVelEl, maxAccEl,2*d, axis);
