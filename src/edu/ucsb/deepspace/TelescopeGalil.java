@@ -197,9 +197,9 @@ public class TelescopeGalil implements TelescopeInterface {
 			else if(azSc!=null && elSc==null) 
 				
 				azScan(azSc);
-			else if(azSc==null && elSc!=null) 
+			else if(azSc==null && elSc!=null){
 				elScan(elSc);
-		
+			}
 	}
 	public void scan(ScanCommand azSc, ScanCommand elSc) {
 		scan(azSc, elSc, false);
@@ -367,12 +367,18 @@ public class TelescopeGalil implements TelescopeInterface {
 		
 		az.scanning = true;
 		el.scanning = true;
-		if (fraster)
+		if (fraster){
 			protocol.sendRead("HX 1;XQ #FRASTER,1");
-		else
+			System.out.println("fraster");
+		}
+		else{
 			protocol.sendRead("HX 1;XQ #RASTER,1");
+			System.out.println("raster");
+		}
+		pause();
 		waitWhileMoving(Axis.AZ);
 		waitWhileMoving(Axis.EL);
+		pause();
 		az.scanning = false;
 		el.scanning = false;
 		System.out.println("Min az:" + azSc.getMin() +" maxAz: "+ azSc.getMax()+" minEl:"+elSc.getMin()+" maxEl:"+elSc.getMax());
@@ -404,10 +410,11 @@ public class TelescopeGalil implements TelescopeInterface {
 
 	}
 	public void elScan(ScanCommand elSc) {
+		
 		double elDelta =  el.convDegToEnc((Math.abs(elSc.getMin()-elSc.getMax())));
-	
-		protocol.sendRead("PA ,"+el.absDegToEnc(elSc.getMin())+" ;BG A;AM;WT 200");
-		pause();
+		
+		//protocol.sendRead("PA 0,"+el.absDegToEnc(elSc.getMin())+" ;BG A;AM;WT 200");
+	/*	pause();
 		protocol.sendRead("time="+ GalilCalc.round(elSc.getTime(), 4));
 		pause();
 		//min el
@@ -415,7 +422,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		pause();
 		//max el
 		protocol.sendRead("maxEl = "+GalilCalc.round(el.absDegToEnc(elSc.getMax()),4));
-		pause();
+		pause();*/
 		
 		
 		el.scanning = true;

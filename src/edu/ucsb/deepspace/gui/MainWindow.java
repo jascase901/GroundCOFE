@@ -1007,7 +1007,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		@Override
     		public void mouseDown(MouseEvent e) {
     			RaDecModeOn = !RaDecModeOn;
-    			//stage.setContinousModeOn(RaDecModeOn);
+    			
+    			stage.setRaOn(RaDecModeOn);
     			
     		}
     	});
@@ -1033,12 +1034,14 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     				azScan();
     				break;
     			case "Elevation":
+    				
     				elScan();
     				break;
     			case "Snake":
     				snakeScan();
     				break;
     			case "Square":
+    				
     				squareScan();
     				break;
     			default:

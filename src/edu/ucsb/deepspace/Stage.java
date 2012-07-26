@@ -48,7 +48,7 @@ public class Stage {
 	private double azToBalloon = 0, elToBalloon = 0;
 	private CommGalil stageProtocol, scopeProtocol, readerProtocol;
 	private Boolean continousScanOn = false;
-	private Boolean rasterOn = false;
+	private Boolean raOn = false;
 
 	ScriptLoader sl;
 
@@ -326,7 +326,7 @@ public class Stage {
 		double axEl;
 		boolean moveable = true;
 		
-		if (azSc == null){
+	if (azSc == null){
 			
 
 			double acVelEl = 2*scope.getDistance(elSc.getMin(), elSc.getMax(), Axis.EL)/time;
@@ -340,6 +340,7 @@ public class Stage {
 			MoveCommand mcMaxEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, null ,elSc.getMax()+axEl);
 			moveable = moveable && canMove(mcMinEl);
 			moveable = moveable && canMove(mcMaxEl);
+			
 		}
 		else{
 			double acVelAz = 2*scope.getDistance(azSc.getMin(), azSc.getMax(), Axis.AZ)/time;
@@ -387,7 +388,7 @@ public class Stage {
 			public void run() {
 				
 				//If user presses scan both
-				if (azSc != null && elSc!=null && rasterOn) {
+				if (azSc != null && elSc!=null && raOn) {
 					double minAz = azSc.getMin();
 					double maxAz = azSc.getMax();
 					double minEl = azSc.getMin();
@@ -416,11 +417,7 @@ public class Stage {
 						minEl = GalilCalc.round(roundPlace*baseLocation.radecToEl(minRa, minDec),4);
 						maxAz = GalilCalc.round(roundPlace*baseLocation.radecToAz(maxRa, maxDec),4);
 						maxEl = GalilCalc.round(roundPlace*baseLocation.radecToEl(maxRa, maxDec),4);
-						//TODO make sure I update maxScan or it will cause a inf error
-						if (maxScanTime<azSc.getTime()){
-							window.updateStatusArea("time exceeds max");
-							window.setTime(maxScanTime);
-						}
+						
 						
 					}while(continousScanOn);
 				}
@@ -429,7 +426,7 @@ public class Stage {
 					do {
 						waitWhileExecuting(1);
 						if (canScan(azSc, elSc, azSc.getTime()))
-							scope.scan(azSc, elSc);
+							scope.scan(azSc, elSc, fraster);
 						waitWhileExecuting(1);
 					}while(continousScanOn);
 					
@@ -989,6 +986,13 @@ public class Stage {
 	public void setContinousScanOn(Boolean continousScanOn) {
 		this.continousScanOn = continousScanOn;
 	}
+	public Boolean RaOn() {
+		return raOn;
+	}
+	public void setRaOn(Boolean raOn){
+		this.raOn = raOn;
+	}
+	
 	
 
 

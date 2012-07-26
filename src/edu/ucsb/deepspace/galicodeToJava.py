@@ -1,0 +1,10 @@
+fileopen = open("in.txt")
+txt = fileopen.readlines()
+if __name__=='__main__':
+	for line in txt:
+		if line.rstrip()=="":
+			pass
+		else:
+			print('raster.add("' +line.rstrip()+'");')
+
+

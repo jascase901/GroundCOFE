@@ -1,0 +1,34 @@
+minEl=0
+maxEl = 100
+scan = 0
+
+time = 10
+
+dx = maxEl-minEl
+vf = 2*dx/(time)
+
+
+SP ,vf
+DC _AC
+acTime = vf/_ACB
+acX = .5*_ACB*acTime*acTime 
+
+PR ,dx + acX
+BG B
+
+AD ,acX 
+OP 1
+scan = 1
+
+AM  
+PR ,-dx-acX
+
+BG B
+AD ,dx
+OP 1
+scan = 0
+AM
+
+
+
+EN
