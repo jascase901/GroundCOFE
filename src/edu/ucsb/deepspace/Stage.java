@@ -335,7 +335,9 @@ public class Stage {
 			 
 			axAz = 0;
 			axEl = .5*maxAccEl*acTimeEl*acTimeEl;
+			System.out.println(axEl);
 			axEl = scope.convEncToDeg(axEl, Axis.EL);
+			System.out.println(axEl);
 			MoveCommand mcMinEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, null ,elSc.getMin()-axEl);
 			MoveCommand mcMaxEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, null ,elSc.getMax()+axEl);
 			moveable = moveable && canMove(mcMinEl);
@@ -386,7 +388,11 @@ public class Stage {
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
-				
+				double time = 0;
+				if (elSc!=null)
+						time=elSc.getTime();
+				else
+						time = azSc.getTime();
 				//If user presses scan both
 				if (azSc != null && elSc!=null && raOn) {
 					double minAz = azSc.getMin();
@@ -407,8 +413,8 @@ public class Stage {
 
 						waitWhileExecuting(1);
 						//scan uses Az/El coord not ra dec so make scan commands with az/el
-						ScanCommand aSc= new ScanCommand(minAz, maxAz, azSc.getTime(), (int)azSc.getReps());
-						ScanCommand eSc =new ScanCommand(minEl, maxEl, elSc.getTime(), (int)elSc.getReps());
+						ScanCommand aSc= new ScanCommand(minAz, maxAz, time, (int)azSc.getReps());
+						ScanCommand eSc =new ScanCommand(minEl, maxEl, time, (int)elSc.getReps());
 						if(canScan(azSc, eSc, elSc.getTime()))
 							scope.scan(aSc,eSc, fraster);		
 						waitWhileExecuting(1);
@@ -425,7 +431,7 @@ public class Stage {
 				else {
 					do {
 						waitWhileExecuting(1);
-						if (canScan(azSc, elSc, azSc.getTime()))
+						if (canScan(azSc, elSc, time))
 							scope.scan(azSc, elSc, fraster);
 						waitWhileExecuting(1);
 					}while(continousScanOn);
@@ -465,7 +471,7 @@ public class Stage {
 			
 		case EL:
 			d=Math.abs(scope.getDistance(maxEl, minEl, axis));
-			return scope.getScanTime(sc, maxVelEl, maxAccEl,2*d, axis);
+			return scope.getScanTime(sc, maxVelEl, maxAccEl,d, axis);
 
 		default:
 			return 0;
