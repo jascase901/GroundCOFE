@@ -1420,7 +1420,16 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 			}
 		});
 	}
-	
+	public void updateReps(final double reps){
+		Display.getDefault().asyncExec(new Runnable(){
+			@Override
+			public void run(){
+				txtRepScan.setText(""+reps);
+
+			}
+		});
+		
+	}
 	public void updateScriptArea(final String type, final Set<String> scripts) {
 		org.eclipse.swt.widgets.List temp = null;
 		switch (type) {

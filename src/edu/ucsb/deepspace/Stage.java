@@ -392,18 +392,22 @@ public class Stage {
 				while (isMoving())
 						pause(200);
 				pause(200);*/
+				double reps = 0;
 				double time = 0;
-				if (elSc!=null)
+				if (elSc!=null){
 						time=elSc.getTime();
-				else
+						reps=elSc.getReps();
+				}
+				else{
 						time = azSc.getTime();
+						reps = azSc.getReps();
+				}
 				//If user presses scan both
 				if (azSc != null && elSc!=null && raOn) {
 					double minAz = azSc.getMin();
 					double maxAz = azSc.getMax();
 					double minEl = azSc.getMin();
 					double maxEl = azSc.getMax();
-					
 					double roundPlace = 1000;
 					//convert cords to time dependent RADEC
 					double minDec = baseLocation.azelToDec(azSc.getMin(), elSc.getMin());
@@ -412,8 +416,8 @@ public class Stage {
 					double maxRa = baseLocation.azelToRa(azSc.getMax(), elSc.getMax());
 					double maxScanTime = 0;
 
-					do {
-
+					while(continousScanOn || reps>0){
+						reps = reps -1;
 
 						waitWhileExecuting(1);
 						//scan uses Az/El coord not ra dec so make scan commands with az/el
@@ -429,16 +433,18 @@ public class Stage {
 						maxEl = GalilCalc.round(roundPlace*baseLocation.radecToEl(maxRa, maxDec),4);
 						
 						
-					}while(continousScanOn);
+					}
 				}
 
 				else {
-					do {
+					while(continousScanOn || reps>0){
+						reps = reps-1;
 						waitWhileExecuting(1);
 						if (canScan(azSc, elSc, time))
 							scope.scan(azSc, elSc, fraster);
 						waitWhileExecuting(1);
-					}while(continousScanOn);
+						window.updateReps(reps);
+					}
 					
 					
 				}
