@@ -197,7 +197,7 @@ public class TelescopeGalil implements TelescopeInterface {
 			else if(azSc!=null && elSc==null) 
 				
 				azScan(azSc);
-			else if(azSc==null && elSc!=null){
+			else{
 				elScan(elSc);
 			}
 	}
@@ -390,7 +390,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		
 		
 	
-		protocol.sendRead("PA "+GalilCalc.round(az.absDegToEnc(azSc.getMin()),4)+" ;BG A;AM;WT 200");
+		//protocol.sendRead("PA "+GalilCalc.round(az.absDegToEnc(azSc.getMin()),4)+" ;BG A;AM;WT 200");
 		pause();
 		protocol.sendRead("time="+ GalilCalc.round(azSc.getTime(), 4));
 		pause();
@@ -414,15 +414,16 @@ public class TelescopeGalil implements TelescopeInterface {
 		double elDelta =  el.convDegToEnc((Math.abs(elSc.getMin()-elSc.getMax())));
 		
 		//protocol.sendRead("PA 0,"+el.absDegToEnc(elSc.getMin())+" ;BG A;AM;WT 200");
-	/*	pause();
+		pause();
 		protocol.sendRead("time="+ GalilCalc.round(elSc.getTime(), 4));
 		pause();
 		//min el
 		protocol.sendRead("minEl = "+GalilCalc.round(el.absDegToEnc(elSc.getMin()),4));
 		pause();
+		System.out.println("dd"+el.convEncToDeg(GalilCalc.round(el.absDegToEnc(elSc.getMax()),4)));
 		//max el
 		protocol.sendRead("maxEl = "+GalilCalc.round(el.absDegToEnc(elSc.getMax()),4));
-		pause();*/
+		pause();
 		
 		
 		el.scanning = true;

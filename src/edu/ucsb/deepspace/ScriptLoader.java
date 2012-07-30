@@ -308,17 +308,14 @@ size += azScan.size();
 }
 private void elScan() {
 elScan = new Script("#ELSCAN", size);
-elScan.add("minEl=0");
-elScan.add("maxEl = 100");
-elScan.add("scan = 0");
-elScan.add("time = 10");
+
 elScan.add("dx = maxEl-minEl");
 elScan.add("vf = 2*dx/(time)");
 elScan.add("SP ,vf");
 elScan.add("DC _AC");
 elScan.add("acTime = vf/_ACB");
 elScan.add("acX = .5*_ACB*acTime*acTime");
-elScan.add("PR ,dx + acX");
+elScan.add("PR ,dx +acX");
 elScan.add("BG B");
 elScan.add("AD ,acX");
 elScan.add("OP 1");

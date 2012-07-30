@@ -388,6 +388,10 @@ public class Stage {
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
+			/*	goToPos(new Coordinate(minEl, minAz));
+				while (isMoving())
+						pause(200);
+				pause(200);*/
 				double time = 0;
 				if (elSc!=null)
 						time=elSc.getTime();
@@ -399,7 +403,7 @@ public class Stage {
 					double maxAz = azSc.getMax();
 					double minEl = azSc.getMin();
 					double maxEl = azSc.getMax();
-					goToPos(new Coordinate(minEl, maxEl));
+					
 					double roundPlace = 1000;
 					//convert cords to time dependent RADEC
 					double minDec = baseLocation.azelToDec(azSc.getMin(), elSc.getMin());
@@ -461,17 +465,36 @@ public class Stage {
 	}
 	
 	
-	//TODO figure out another place for this
+	//TODO Can Infinate loop
 	public double getScanTime(ScanCommand sc, Axis axis){
-		double d;
+		double d=0, dx =0;
+		double time = 0;
+		d = Math.abs(scope.getDistance(maxAz, minAz, axis));
+		
+		
 		switch(axis){
 		case AZ:
+			while (!canScan(sc, null, time)){
+				if (maxAz<=sc.getMax() || minAz>=sc.getMin())
+					return time;
+				time=time+.05;
+				System.out.println("dx="+ dx);
+				
+				
+			}
+			
 			d = Math.abs(scope.getDistance(maxAz, minAz, axis));
-			return scope.getScanTime(sc,maxVelAz, maxAccAz,2*d, axis);
+	
+			return time;
 			
 		case EL:
+			while (!canScan(null, sc, time)){
+				if (maxEl<=sc.getMax() || minEl>=sc.getMin())
+					return time;
+				time=time+.05;
+			}
 			d=Math.abs(scope.getDistance(maxEl, minEl, axis));
-			return scope.getScanTime(sc, maxVelEl, maxAccEl,d, axis);
+			return time;
 
 		default:
 			return 0;
