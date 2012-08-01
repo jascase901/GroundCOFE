@@ -208,7 +208,7 @@ public class TelescopeGalil implements TelescopeInterface {
 
 	@Override
 	public void stopScanning() {
-		// All scans are on thread 1
+		// All scans are on thread 0
 		pause();
 		protocol.sendRead("ST");
 		pause();
@@ -368,11 +368,11 @@ public class TelescopeGalil implements TelescopeInterface {
 		az.scanning = true;
 		el.scanning = true;
 		if (fraster){
-			protocol.sendRead("HX 1;XQ #FRASTER,1");
+			protocol.sendRead("HX 0;XQ #FRASTER,0");
 			System.out.println("fraster");
 		}
 		else{
-			protocol.sendRead("HX 1;XQ #RASTER,1");
+			protocol.sendRead("HX 0;XQ #RASTER,0");
 			System.out.println("raster");
 		}
 		pause();
@@ -403,7 +403,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		
 		
 		az.scanning = true;
-		protocol.sendRead("HX 1;XQ #AZSCAN,1");
+		protocol.sendRead("HX 0;XQ #AZSCAN,0");
 		waitWhileMoving(Axis.AZ);
 		az.scanning = false;		
 
@@ -422,17 +422,36 @@ public class TelescopeGalil implements TelescopeInterface {
 		pause();
 		System.out.println("dd"+el.convEncToDeg(GalilCalc.round(el.absDegToEnc(elSc.getMax()),4)));
 		//max el
-		protocol.sendRead("maxEl = "+GalilCalc.round(el.absDegToEnc(elSc.getMax()),4));
+		protocol.sendRead("maxEl="+GalilCalc.round(el.absDegToEnc(elSc.getMax()),4));
 		pause();
 		
 		
 		el.scanning = true;
-		protocol.sendRead("HX 1;XQ #ELSCAN,1");
+		protocol.sendRead("HX 0;XQ #ELSCAN,0");
 		waitWhileMoving(Axis.EL);
 		System.out.println("scanning");
 		el.scanning = false;		
 
 
+	}
+	
+	public void safty(double minAz, double maxAz,double minEl, double maxEl){
+		
+		protocol.sendRead("ElMinLim="+GalilCalc.round(el.absDegToEnc(minEl), 4));
+		pause();
+		protocol.sendRead("ElMaxLim="+GalilCalc.round(el.absDegToEnc(maxEl),4));
+		pause();
+		protocol.sendRead("AzMinLim="+GalilCalc.round(az.absDegToEnc(minAz),4));
+		pause();
+		protocol.sendRead("AzMaxLim="+GalilCalc.round(az.absDegToEnc(maxAz),4));
+		pause();
+		protocol.sendRead("XQ #SAFTY");
+		pause();
+		System.out.println(protocol.sendRead("MG _BLa, _BLb, _FLa, _FLb"));
+		pause();
+		
+		
+		
 	}
 		//waitWhileMoving(axis);
 		//az.indexing = false;

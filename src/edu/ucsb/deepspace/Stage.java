@@ -83,6 +83,7 @@ public class Stage {
 			reader = new ReaderGalil(this, readerProtocol);
 			sl = new ScriptLoader();
 			loadGalil();
+			loadSafty(minAz, maxAz, minEl, maxEl);
 			break;
 		case FTDI:
 			//Really tired of FTDI stuff.
@@ -122,7 +123,10 @@ public class Stage {
 		double balloonAltitude = Double.parseDouble(settings.getProperty("balloonAltitude", "0"));
 		balloonLocation =  new LatLongAlt(balloonLatitude, balloonLongitude, balloonAltitude);
 	}
-	
+	public void loadSafty(double minAz, double maxAz, double minEl, double maxEl){
+		scope.safty(minAz, maxAz, minEl, maxEl);
+		
+	}
 	/**
 	 * Saves new settings to settings.ini.
 	 * @throws FileNotFoundException
@@ -170,6 +174,7 @@ public class Stage {
 		window.setMinMaxAzEl(minAz, maxAz, minEl, maxEl);
 		window.setVelAccAzEl(maxVelAz, maxAccAz, maxVelEl, maxAccEl);
 		window.setMaxMoveRel(maxMoveRelAz, maxMoveRelEl);
+		
 	}
 	
 	/**
@@ -483,8 +488,9 @@ public class Stage {
 			while (!canScan(sc, null, time)){
 				if (maxAz<=sc.getMax() || minAz>=sc.getMin())
 					return time;
-				time=time+.05;
+				time=time+.5;
 				System.out.println("dx="+ dx);
+				pause(12);
 				
 				
 			}
@@ -497,7 +503,7 @@ public class Stage {
 			while (!canScan(null, sc, time)){
 				if (maxEl<=sc.getMax() || minEl>=sc.getMin())
 					return time;
-				time=time+.05;
+				time=time+1;
 			}
 			d=Math.abs(scope.getDistance(maxEl, minEl, axis));
 			return time;
@@ -674,6 +680,7 @@ public class Stage {
 	public void setMinMaxAz(double minAz, double maxAz) {
 		this.minAz = minAz;
 		this.maxAz = maxAz;
+		scope.safty(minAz, maxAz, minEl, maxEl);
 	}
 	/**
 	 * Sets Galil's min and max el value.
@@ -683,6 +690,7 @@ public class Stage {
 	public void setMinMaxEl(double minEl, double maxEl) {
 		this.minEl = minEl;
 		this.maxEl = maxEl;
+		scope.safty(minAz, maxAz, minEl, maxEl);
 	}
 	
 	public void setMaxVelAccAz(double maxVelAz, double maxAccAz) {

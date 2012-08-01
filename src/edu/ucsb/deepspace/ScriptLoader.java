@@ -15,6 +15,7 @@ private Script raster;
 private Script fraster;
 private Script azScan;
 private Script elScan;
+private Script safty;
 
 
 private Script readerInfo;
@@ -33,6 +34,7 @@ scripts.put("#RASTER", raster);
 scripts.put("#FRASTER", fraster);
 scripts.put("#AZSCAN", azScan);
 scripts.put("#ELSCAN", elScan);
+scripts.put("#SAFTY", safty);
 
 }
 
@@ -83,6 +85,7 @@ raster();
 fraster();
 azScan();
 elScan();
+safty();
 
 protocol.sendRead(homeA.getScript());
 pause();
@@ -97,6 +100,8 @@ pause();
 protocol.sendRead(azScan.getScript());
 pause();
 protocol.sendRead(elScan.getScript());
+pause();
+protocol.sendRead(safty.getScript());
 pause();
 }
 
@@ -343,6 +348,16 @@ String temp = "MG _TPA,_TVA,_JGA,_ACA,_TPB,_TVB,_JGB,_ACB,_MOA,_MOB,_BGA,_BGB,_H
 readerInfo.add(temp);
 readerInfo.add("EN");
 size += readerInfo.size();
+}
+
+private void safty(){
+	safty = new Script("#SAFTY", size);
+	safty.add("BL AzMinLim, ElMinLim");
+	safty.add("FL AzMaxLim, ElMaxLim");
+	safty.add("EN");
+	
+	size+=safty.size();
+
 }
 
 private void pause() {

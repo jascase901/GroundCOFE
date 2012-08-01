@@ -130,6 +130,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Text txtCommandArea;
 	private Text txtAzRpm;
 	private Text txtElRpm;
+	private double lines = 10;
 
 	public MainWindow(Composite parent, int style, Stage stage, Stage.StageTypes StageTypes) {
 		super(parent, style);
@@ -939,7 +940,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		public void mouseDown(MouseEvent e) {
     			scanType = "Azimuth";
     			ScanCommand azSc = new ScanCommand(Double.parseDouble(txtMinAzScan.getText()), Double.parseDouble(txtMaxAzScan.getText()));
-    			setTime(2*stage.getScanTime(azSc, Axis.AZ));
+    			setTime(stage.getScanTime(azSc, Axis.AZ));
     			
     		}
     	});
@@ -969,7 +970,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		public void mouseDown(MouseEvent e) {
     			scanType="Snake";
     			ScanCommand azSc = new ScanCommand(Double.parseDouble(txtMinAzScan.getText()), Double.parseDouble(txtMaxAzScan.getText()));
-    			setTime(stage.getScanTime(azSc, Axis.AZ));
+    			setTime(lines*stage.getScanTime(azSc, Axis.AZ));
     		}
     	});
     	
@@ -981,8 +982,9 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		@Override
     		public void mouseDown(MouseEvent e) {
     			scanType="Square";
+    			
     			ScanCommand azSc = new ScanCommand(Double.parseDouble(txtMinAzScan.getText()), Double.parseDouble(txtMaxAzScan.getText()));
-    			setTime(2*stage.getScanTime(azSc, Axis.AZ));
+    			setTime(2*lines*stage.getScanTime(azSc, Axis.AZ));
     			
     		}
     			
@@ -1290,10 +1292,14 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
+				;
 				txtMinAz.setText(String.valueOf(minAz));
 				txtMaxAz.setText(String.valueOf(maxAz));
 				txtMinEl.setText(String.valueOf(minEl));
 				txtMaxEl.setText(String.valueOf(maxEl));
+				stage.loadSafty(minAz, maxAz, minEl, maxEl);
+				
+	
 			}
 		});
 	}
