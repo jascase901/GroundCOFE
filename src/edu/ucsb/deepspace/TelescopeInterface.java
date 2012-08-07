@@ -55,7 +55,7 @@ public interface TelescopeInterface {
 	/**
 	 * Returns true if motor is on, false if not.
 	 */
-	//public boolean motorState(Axis axis);
+
 	
 	/**
 	 * Updates the motor state.
@@ -99,5 +99,6 @@ public interface TelescopeInterface {
 	public double convEncToDeg(double enc, Axis axis);
 
 	public void safty(double minAz, double maxAz, double minEl, double maxEl);
+
 	
 }

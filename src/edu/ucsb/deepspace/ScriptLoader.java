@@ -180,6 +180,9 @@ size += homeB.size();
 public void raster() {
 
 raster = new Script("#RASTER", size);
+raster.add("PA minAz,minEl");
+raster.add("BG");
+raster.add("AM");
 raster.add("lineNum=10");
 raster.add("dx = maxAz  - minAz");
 raster.add("dy = (maxEl-minEl)/lineNum");
@@ -216,6 +219,9 @@ size += raster.size();
 
 public void fraster(){
 fraster = new Script("#FRASTER", size);
+fraster.add("PA minAz,minEl");
+fraster.add("BG");
+fraster.add("AM");
 fraster.add("lineNum=10");
 fraster.add("dx = maxAz  - minAz");
 fraster.add("dy = (maxEl-minEl)/lineNum");
@@ -261,7 +267,10 @@ size += fraster.size();
 
 }
 private void azScan() {
-azScan = new Script("#AZSCAN", size);	
+azScan = new Script("#AZSCAN", size);
+azScan.add("PA minAz");
+azScan.add("BG");
+azScan.add("AM");
 
 azScan.add("scan = 0");
 
@@ -313,6 +322,10 @@ size += azScan.size();
 }
 private void elScan() {
 elScan = new Script("#ELSCAN", size);
+
+elScan.add("PA ,minEl");
+elScan.add("BG");
+elScan.add("AM");
 
 elScan.add("dx = maxEl-minEl");
 elScan.add("vf = 2*dx/(time)");

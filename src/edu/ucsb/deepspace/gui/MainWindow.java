@@ -183,6 +183,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	
+    	
+    
     	btnCalibrate = new Button(area, SWT.PUSH | SWT.CENTER);
     	btnCalibrate.setText("Calibrate");
     	btnCalibrate.setBounds(387, 437, 96, 31);
@@ -1043,7 +1045,6 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     				snakeScan();
     				break;
     			case "Square":
-    				
     				squareScan();
     				break;
     			default:
@@ -1540,13 +1541,17 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		double timeAz = Double.parseDouble(txtTimeScan.getText());
 		double minEl = Double.parseDouble(txtMinElScan.getText());
 		double maxEl = Double.parseDouble(txtMaxElScan.getText());
-		ScanCommand azSc = new ScanCommand(minAz, maxAz, timeAz, 0);
-		ScanCommand elSc = new ScanCommand(minEl, maxEl, timeAz, 0);
+		
+		int reps = Integer.parseInt(txtRepScan.getText());
+
+		ScanCommand azSc = new ScanCommand(minAz, maxAz, timeAz, reps);
+		ScanCommand elSc = new ScanCommand(minEl, maxEl, timeAz, reps);
 		
 		rasterScan = !rasterScan;
 		stage.startScanning(azSc, elSc, true);
 		
 	
 	}
+	
 }
 

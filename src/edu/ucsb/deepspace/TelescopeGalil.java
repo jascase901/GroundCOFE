@@ -230,11 +230,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		}
 	}
 
-//	@Override
-//	public boolean motorState(Axis axis) {
-//		GalilAxis temp = picker(axis);
-//		return temp.motorState;
-//	}
+
 	
 	@Override
 	public void queryMotorState() {

@@ -18,18 +18,6 @@ public class DataGalil implements DataInterface {
 	}
 	
 	void make (String pos, String vel, String jg, String ac, String motor, String motion, Axis axis) {
-//		if (pos.equals("")) {
-//			pos = "0";
-//		}
-//		if (vel.equals("")) {
-//			vel = "0";
-//		}
-//		if (jg.equals("")) {
-//			jg = "0";
-//		}
-//		if (ac.equals("")) {
-//			ac = "0";
-//		}
 		double dPos = Double.parseDouble(pos);
 		double dVel = Double.parseDouble(vel);
 		double dJg = Double.parseDouble(jg);

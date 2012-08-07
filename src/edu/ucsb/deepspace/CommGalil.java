@@ -120,19 +120,9 @@ public class CommGalil implements CommInterface {
      * @return message from Galil
      */
     public String sendRead(String message) {
-    	//System.out.println("\n" + port + "   " + message + "\n");
-    	//read();
-    	
-    	//send.add(message);
     	send(message);
-    	
-    	//readCount++;
-    	//Thread tr = Thread.currentThread();
-    	//threads.add(port + tr.getName());
-    	
     	String temp = read();
-    	//System.out.println(temp);
-    	//response.add(temp);
+    	
     	return temp;
     }
     
@@ -153,21 +143,7 @@ public class CommGalil implements CommInterface {
      * Closes the connection with Galil.
      */
     public void close() {
-//    	System.out.println("readCount: " + readCount);
-//    	System.out.println("sendCount: " + sendCount);
-//    	List<String> temp = new ArrayList<String>();
-//    	for (int i = 0; i < send.size(); i++) {
-//    		String a = "qq";
-//    		try {
-//    			a = i + " " + threads.get(i) + "   " + send.get(i) + " " + response.get(i);
-//    		} catch (IndexOutOfBoundsException e) {
-//    			//don't care
-//    		}
-//    		temp.add(a);
-//    	}
-//    	for (String s : temp) {
-//    		System.out.println(s);
-//    	}
+
     	try {
 			socket.close();
 		} catch (IOException e) {
@@ -178,7 +154,7 @@ public class CommGalil implements CommInterface {
     public void initialize() {
     	sendRead("CF I;CW 2"); //causes responses to be sent over the port that sent this command
     	read();
-    	//sendRead("CW 2"); //disables flipping of MSB
+    	
     }
     
     /**

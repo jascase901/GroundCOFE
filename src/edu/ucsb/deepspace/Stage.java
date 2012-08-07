@@ -36,7 +36,7 @@ public class Stage {
 	private TelescopeInterface scope;
 
 	private Timer raDecTracker, lstUpdater;
-	private final ExecutorService exec = Executors.newFixedThreadPool(2);
+	private final ExecutorService exec = Executors.newFixedThreadPool(1);
 	private MainWindow window;
 	private boolean commStatus = false;
 	private ReaderInterface reader;
@@ -323,9 +323,6 @@ public class Stage {
 	
 	//TODO FIGURE OUT A WAY TO MAKE THIS PRETTY
 	public boolean canScan(ScanCommand azSc, ScanCommand elSc, double time){
-		
-		
-			
 			
 		double axAz;
 		double axEl;
@@ -340,13 +337,17 @@ public class Stage {
 			 
 			axAz = 0;
 			axEl = .5*maxAccEl*acTimeEl*acTimeEl;
-			System.out.println(axEl);
+		
 			axEl = scope.convEncToDeg(axEl, Axis.EL);
-			System.out.println(axEl);
+		
 			MoveCommand mcMinEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, null ,elSc.getMin()-axEl);
 			MoveCommand mcMaxEl = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, null ,elSc.getMax()+axEl);
-			moveable = moveable && canMove(mcMinEl);
-			moveable = moveable && canMove(mcMaxEl);
+			moveable =  canMove(mcMaxEl, false) && canMove(mcMinEl,false);
+			if (GalilCalc.round(axEl, 2) == 0){
+				statusArea("scan in dead range");
+				return true;
+			}
+		
 			
 		}
 		else{
@@ -358,12 +359,18 @@ public class Stage {
 			axAz = .5*maxAccAz*acTimeAz*acTimeAz;
 			axEl = 0;
 			axAz = scope.convEncToDeg(axAz, Axis.AZ);
-			System.out.println(axAz);
 
 			MoveCommand mcMinAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, azSc.getMin()-axAz, null);
 			MoveCommand mcMaxAz = new MoveCommand(MoveMode.ABSOLUTE, MoveType.DEGREE, azSc.getMax()+axAz, null);
-			moveable = moveable && canMove(mcMinAz);
-			moveable = moveable && canMove(mcMaxAz);
+			moveable = canMove(mcMaxAz,false) && canMove(mcMinAz,false);
+			
+			if (GalilCalc.round(axAz, 2) == 0){
+				statusArea("scan in dead range");
+				return true;
+
+			}
+				
+			
 		}
 		
 		
@@ -373,7 +380,6 @@ public class Stage {
 		
 		
 
-		System.out.println(moveable);
 
 			return moveable;
 	}
@@ -393,10 +399,7 @@ public class Stage {
 		exec.submit(new Runnable() {
 			@Override
 			public void run() {
-			/*	goToPos(new Coordinate(minEl, minAz));
-				while (isMoving())
-						pause(200);
-				pause(200);*/
+	
 				double reps = 0;
 				double time = 0;
 				if (elSc!=null){
@@ -489,7 +492,6 @@ public class Stage {
 				if (maxAz<=sc.getMax() || minAz>=sc.getMin())
 					return time;
 				time=time+.5;
-				System.out.println("dx="+ dx);
 				pause(12);
 				
 				
@@ -515,7 +517,7 @@ public class Stage {
 		
 	}
 	
-	boolean canMove( final MoveCommand mc){
+	boolean canMove( final MoveCommand mc, final boolean displayStatus){
 		if (mc.getAzAmount() != null) {
 			if (!motorCheck(Axis.AZ) && !motorCheck(Axis.EL)) {
 				window.controlMoveButtons(true);
@@ -528,14 +530,16 @@ public class Stage {
 			if (mc.getAmount(Axis.AZ) == null) {
 				if (Math.abs(mc.getAmount(Axis.EL)) > maxMoveRelEl) {
 					window.controlMoveButtons(true);
-					statusArea("Maximum allowed relative move limit exceeded.\n");
+					if (displayStatus)
+						statusArea("Maximum allowed relative move limit exceeded.\n");
 					return false;
 				}
 			}
 			else if (mc.getAmount(Axis.EL) == null) {
 				if (Math.abs(mc.getAmount(Axis.AZ)) > maxMoveRelAz) {
 					window.controlMoveButtons(true);
-					statusArea("Maximum allowed relative move limit exceeded.\n");
+					if (displayStatus)
+						statusArea("Maximum allowed relative move limit exceeded.\n");
 					return false;
 				}
 			}
@@ -545,12 +549,17 @@ public class Stage {
 		
 		if (!scope.validMove(mc, minAz, maxAz, minEl, maxEl)) {
 			System.out.println("this is an invalid move");
-			statusArea("The desired position falls outside the allowed moving angles.\n");
+			if(displayStatus)
+				statusArea("The desired position falls outside the allowed moving angles.\n");
 			window.controlMoveButtons(true);
 			return false;
 		}
 		
 		return true;
+		
+	}
+	boolean canMove(final MoveCommand mc){
+		return  canMove(mc, true);
 		
 	}
 
