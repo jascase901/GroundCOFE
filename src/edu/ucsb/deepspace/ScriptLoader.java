@@ -268,8 +268,8 @@ size += fraster.size();
 }
 private void azScan() {
 azScan = new Script("#AZSCAN", size);
-azScan.add("PA minAz");
-azScan.add("BG");
+azScan.add("PA minAz,");
+azScan.add("BGA");
 azScan.add("AM");
 
 azScan.add("scan = 0");
@@ -324,7 +324,7 @@ private void elScan() {
 elScan = new Script("#ELSCAN", size);
 
 elScan.add("PA ,minEl");
-elScan.add("BG");
+elScan.add("BGB");
 elScan.add("AM");
 
 elScan.add("dx = maxEl-minEl");

@@ -1431,7 +1431,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		Display.getDefault().asyncExec(new Runnable(){
 			@Override
 			public void run(){
-				txtRepScan.setText(""+reps);
+				txtRepScan.setText(""+(int)reps);
 
 			}
 		});
