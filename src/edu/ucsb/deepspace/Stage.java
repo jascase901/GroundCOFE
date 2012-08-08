@@ -52,6 +52,8 @@ public class Stage {
 
 	ScriptLoader sl;
 
+	
+
 
 	/**
 	 * Creates a new stage object and loads all the preset settings into it.
