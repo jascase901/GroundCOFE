@@ -1298,7 +1298,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 				txtMaxAz.setText(String.valueOf(maxAz));
 				txtMinEl.setText(String.valueOf(minEl));
 				txtMaxEl.setText(String.valueOf(maxEl));
-				stage.loadSafty(minAz, maxAz, minEl, maxEl);
+				stage.loadSafety(minAz, maxAz, minEl, maxEl);
 				
 	
 			}

@@ -431,7 +431,7 @@ public class TelescopeGalil implements TelescopeInterface {
 
 	}
 	
-	public void safty(double minAz, double maxAz,double minEl, double maxEl){
+	public void safety(double minAz, double maxAz,double minEl, double maxEl){
 		
 		protocol.sendRead("ElMinLim="+GalilCalc.round(el.absDegToEnc(minEl), 4));
 		pause();
@@ -441,7 +441,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		pause();
 		protocol.sendRead("AzMaxLim="+GalilCalc.round(az.absDegToEnc(maxAz),4));
 		pause();
-		protocol.sendRead("XQ #SAFTY");
+		protocol.sendRead("XQ #SAFETY");
 		pause();
 		System.out.println(protocol.sendRead("MG _BLa, _BLb, _FLa, _FLb"));
 		pause();

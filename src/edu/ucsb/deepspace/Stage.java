@@ -85,7 +85,7 @@ public class Stage {
 			reader = new ReaderGalil(this, readerProtocol);
 			sl = new ScriptLoader();
 			loadGalil();
-			loadSafty(minAz, maxAz, minEl, maxEl);
+			loadSafety(minAz, maxAz, minEl, maxEl);
 			break;
 		case FTDI:
 			//Really tired of FTDI stuff.
@@ -125,8 +125,8 @@ public class Stage {
 		double balloonAltitude = Double.parseDouble(settings.getProperty("balloonAltitude", "0"));
 		balloonLocation =  new LatLongAlt(balloonLatitude, balloonLongitude, balloonAltitude);
 	}
-	public void loadSafty(double minAz, double maxAz, double minEl, double maxEl){
-		scope.safty(minAz, maxAz, minEl, maxEl);
+	public void loadSafety(double minAz, double maxAz, double minEl, double maxEl){
+		scope.safety(minAz, maxAz, minEl, maxEl);
 		
 	}
 	/**
@@ -494,7 +494,7 @@ public class Stage {
 				if (maxAz<=sc.getMax() || minAz>=sc.getMin())
 					return time;
 				time=time+.5;
-				pause(12);
+				//pause(12);
 				
 				
 			}
@@ -691,7 +691,7 @@ public class Stage {
 	public void setMinMaxAz(double minAz, double maxAz) {
 		this.minAz = minAz;
 		this.maxAz = maxAz;
-		scope.safty(minAz, maxAz, minEl, maxEl);
+		scope.safety(minAz, maxAz, minEl, maxEl);
 	}
 	/**
 	 * Sets Galil's min and max el value.
@@ -701,7 +701,7 @@ public class Stage {
 	public void setMinMaxEl(double minEl, double maxEl) {
 		this.minEl = minEl;
 		this.maxEl = maxEl;
-		scope.safty(minAz, maxAz, minEl, maxEl);
+		scope.safety(minAz, maxAz, minEl, maxEl);
 	}
 	
 	public void setMaxVelAccAz(double maxVelAz, double maxAccAz) {

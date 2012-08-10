@@ -98,7 +98,7 @@ public interface TelescopeInterface {
 	public double getDistance(double max, double min, Axis axis);
 	public double convEncToDeg(double enc, Axis axis);
 
-	public void safty(double minAz, double maxAz, double minEl, double maxEl);
+	public void safety(double minAz, double maxAz, double minEl, double maxEl);
 
 	
 }
