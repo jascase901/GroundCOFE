@@ -15,7 +15,7 @@ private Script raster;
 private Script fraster;
 private Script azScan;
 private Script elScan;
-private Script safty;
+private Script safety;
 
 
 private Script readerInfo;
@@ -34,7 +34,7 @@ scripts.put("#RASTER", raster);
 scripts.put("#FRASTER", fraster);
 scripts.put("#AZSCAN", azScan);
 scripts.put("#ELSCAN", elScan);
-scripts.put("#SAFTY", safty);
+scripts.put("#SAFETY", safety);
 
 }
 
@@ -85,7 +85,7 @@ raster();
 fraster();
 azScan();
 elScan();
-safty();
+SAFETY();
 
 protocol.sendRead(homeA.getScript());
 pause();
@@ -101,7 +101,7 @@ protocol.sendRead(azScan.getScript());
 pause();
 protocol.sendRead(elScan.getScript());
 pause();
-protocol.sendRead(safty.getScript());
+protocol.sendRead(safety.getScript());
 pause();
 }
 
@@ -363,13 +363,13 @@ readerInfo.add("EN");
 size += readerInfo.size();
 }
 
-private void safty(){
-	safty = new Script("#SAFTY", size);
-	safty.add("BL AzMinLim, ElMinLim");
-	safty.add("FL AzMaxLim, ElMaxLim");
-	safty.add("EN");
+private void SAFETY(){
+	safety = new Script("#SAFETY", size);
+	safety.add("BL ,ElMinLim");
+	safety.add("FL ,ElMaxLim");
+	safety.add("EN");
 	
-	size+=safty.size();
+	size+=safety.size();
 
 }
 

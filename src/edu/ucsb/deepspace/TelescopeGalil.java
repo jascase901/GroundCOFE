@@ -44,10 +44,10 @@ public class TelescopeGalil implements TelescopeInterface {
 
 	@Override
 	public boolean validMove(MoveCommand mc, double minAz, double maxAz, double minEl, double maxEl) {
-		double goalAz = goalUserDeg(mc, Axis.AZ);
+		double goalAz = (goalUserDeg(mc, Axis.AZ)) % 360;
 		System.out.println("goalAz: " + goalAz);
 		
-		double goalEl = goalUserDeg(mc, Axis.EL);
+		double goalEl = (goalUserDeg(mc, Axis.EL)) % 360;
 		System.out.println("goalEl: " + goalEl);
 		
 		boolean validAz = (minAz <= goalAz && goalAz <= maxAz);
