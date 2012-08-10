@@ -432,6 +432,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		public void mouseDown(MouseEvent e) {
     			stage.loadScripts();
     			btnLoadScripts.setVisible(false);
+    			stage.refreshScriptWindow();
     		}
     	});
     	
@@ -442,6 +443,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		@Override
     		public void mouseDown(MouseEvent e) {
     			stage.refreshScripts();
+    			stage.refreshScriptWindow();
+    			
     			//btnLoadScripts.setVisible(false);
     		}
     	});

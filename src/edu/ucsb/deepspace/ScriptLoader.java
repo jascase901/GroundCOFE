@@ -59,17 +59,13 @@ return loadedScriptNames;
 }
 
 public boolean readerReady() {
+	System.out.println(loadedScriptNames.toString());
+	//System.out.println(protocol.sendRead("LL"));
 return loadedScriptNames.contains("#READERI");
+	
 }
 
-// public void check() {
-// String labels = protocol.sendRead("LL");
-// String[] split = labels.split("\r\n");
-// for (String s : split) {
-// String name = s.split("=")[0];
-// loadedScriptNames.add(name);
-// }
-// }
+
 
 public void load() {
 Set<String> scriptsToLoad = scripts.keySet();
@@ -85,7 +81,7 @@ raster();
 fraster();
 azScan();
 elScan();
-SAFETY();
+safety();
 
 protocol.sendRead(homeA.getScript());
 pause();
@@ -363,7 +359,7 @@ readerInfo.add("EN");
 size += readerInfo.size();
 }
 
-private void SAFETY(){
+private void safety(){
 	safety = new Script("#SAFETY", size);
 	safety.add("BL ,ElMinLim");
 	safety.add("FL ,ElMaxLim");

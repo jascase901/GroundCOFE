@@ -59,13 +59,16 @@ public class Stage {
 	 * Creates a new stage object and loads all the preset settings into it.
 	 */
 	public Stage() {
+		
 		try {
+			
 			loadSettings();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
 	/**
@@ -81,9 +84,10 @@ public class Stage {
 			stageProtocol = new CommGalil(2222);
 			scopeProtocol = new CommGalil(23);
 			readerProtocol = new CommGalil(4444);
+			loadScripts();
 			scope = new TelescopeGalil(this, scopeProtocol);
 			reader = new ReaderGalil(this, readerProtocol);
-			sl = new ScriptLoader();
+			
 			loadGalil();
 			loadSafety(minAz, maxAz, minEl, maxEl);
 			break;
@@ -223,14 +227,23 @@ public class Stage {
 	}
 	
 	public void loadScripts() {
+		sl = new ScriptLoader();
 		sl.load();
-		window.updateScriptArea("loaded", sl.findLoaded());
+		sl.findLoaded();
 		sl.close();
 	}
 	
 	public void refreshScripts() {
+		sl = new ScriptLoader();
+		sl.findLoaded();
+		sl.close();
+	}
+	
+	public void refreshScriptWindow() {
+		sl = new ScriptLoader();
 		window.updateScriptArea("expected", sl.findExpected());
 		window.updateScriptArea("loaded", sl.findLoaded());
+		sl.close();
 	}
 	
 	/**
