@@ -189,7 +189,11 @@ public class TelescopeGalil implements TelescopeInterface {
 		double currentEncPos = stage.encPos(axis);
 		return temp.encToAbsDeg(currentEncPos);
 	}
-
+	@Override
+	public void Spin(){
+		protocol.sendRead("HX 0;XQ #SPIN,0");
+		waitWhileMoving(Axis.AZ);
+	}
 	@Override
 	public void scan(ScanCommand azSc, ScanCommand elSc, boolean fraster) {
 			if (azSc!=null && elSc!=null) 

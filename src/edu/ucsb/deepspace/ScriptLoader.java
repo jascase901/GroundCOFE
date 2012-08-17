@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.swt.widgets.Button;
+
 public class ScriptLoader {
 
 private CommGalil protocol;
@@ -16,6 +18,7 @@ private Script fraster;
 private Script azScan;
 private Script elScan;
 private Script safety;
+private Script spin;
 
 
 private Script readerInfo;
@@ -35,7 +38,7 @@ scripts.put("#FRASTER", fraster);
 scripts.put("#AZSCAN", azScan);
 scripts.put("#ELSCAN", elScan);
 scripts.put("#SAFETY", safety);
-
+scripts.put("#SPIN", spin);
 }
 
 public Set<String> findExpected() {
@@ -82,6 +85,7 @@ fraster();
 azScan();
 elScan();
 safety();
+spin();
 
 protocol.sendRead(homeA.getScript());
 pause();
@@ -98,6 +102,8 @@ pause();
 protocol.sendRead(elScan.getScript());
 pause();
 protocol.sendRead(safety.getScript());
+pause();
+protocol.sendRead(spin.getScript());
 pause();
 }
 
@@ -367,6 +373,18 @@ private void safety(){
 	
 	size+=safety.size();
 
+}
+private void spin(){
+	spin = new Script("#SPIN", size);
+	spin.add("cont=0");
+	spin.add("SHA");
+	spin.add("JGA=1000");
+	spin.add("BGA");
+	spin.add("#SPINNY");
+	spin.add("JP #SPINNY, cont<1");
+	spin.add("STA");
+	spin.add("EN");
+	size+=spin.size();
 }
 
 private void pause() {

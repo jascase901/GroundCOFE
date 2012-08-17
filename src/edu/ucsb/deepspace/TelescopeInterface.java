@@ -16,7 +16,7 @@ public interface TelescopeInterface {
 	
 	public void stop(Axis axis);
 	
-	
+	public void Spin();
 	
 	public void setOffsets(double azOffset, double elOffset);
 	

@@ -82,6 +82,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Button btnScan;
 	private Button btnScanSnake;
 	private Button btnScanSquare;
+	private Button btnScanSpin;
 	private Button btnContinuousMode;
 	private Button btnRaDecMode;
 	private Text txtEncTol;
@@ -938,7 +939,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	
     	btnScanAz = new Button(grpScanning, SWT.RADIO);
-    	btnScanAz.setBounds(3, 100, 68, 23);
+    	btnScanAz.setBounds(13, 91, 68, 23);
     	btnScanAz.setText("Azimuth");
     	btnScanAz.addMouseListener(new MouseAdapter() {
     		@Override
@@ -953,7 +954,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	
     	btnScanEl = new Button(grpScanning, SWT.RADIO);
-    	btnScanEl.setBounds(120, 100, 68, 23);
+    	btnScanEl.setBounds(130, 91, 68, 23);
     	btnScanEl.setText("Elevation");
     
     	btnScanEl.addMouseListener(new MouseAdapter() {
@@ -968,7 +969,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnScanSnake = new Button(grpScanning, SWT.RADIO);
-    	btnScanSnake.setBounds(120, 120, 68, 23);
+    	btnScanSnake.setBounds(130, 111, 68, 23);
     	btnScanSnake.setText("Snake");
     	btnScanSnake.addMouseListener(new MouseAdapter() {
     		@Override
@@ -980,7 +981,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	btnScanSquare = new Button(grpScanning, SWT.RADIO);
-    	btnScanSquare.setBounds(3, 120, 68, 23);
+    	btnScanSquare.setBounds(13, 111, 55, 23);
     	btnScanSquare.setText("Square");
     	popupWindowButtons.put("raster", btnScanSquare);
     	btnScanSquare.addMouseListener(new MouseAdapter() {
@@ -994,9 +995,24 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     			
     	});
+    	btnScanSpin = new Button(grpScanning, SWT.RADIO);
+    	btnScanSpin.setBounds(13, 130, 68, 23);
+    	btnScanSpin.setText("Spin");
+    	popupWindowButtons.put("spin", btnScanSpin);
+    	btnScanSpin.addMouseListener(new MouseAdapter() {
+    		@Override
+    		public void mouseDown(MouseEvent e) {
+    			scanType="Spin";
+    			
+    			ScanCommand azSc = new ScanCommand(Double.parseDouble(txtMinAzScan.getText()), Double.parseDouble(txtMaxAzScan.getText()));
+    			setTime(2*lines*stage.getScanTime(azSc, Axis.AZ));
+    			
+    		}
+    			
+    	});
     	
     	btnContinuousMode = new Button(grpScanning, SWT.CHECK);
-    	btnContinuousMode.setBounds(3, 150, 100, 24);
+    	btnContinuousMode.setBounds(13, 150, 100, 24);
     	btnContinuousMode.setText("Continuous");
     	btnContinuousMode.addMouseListener(new MouseAdapter() {
     		@Override
@@ -1008,7 +1024,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     		}
     	});
     	btnRaDecMode = new Button(grpScanning, SWT.CHECK);
-    	btnRaDecMode.setBounds(120, 150, 100, 24);
+    	btnRaDecMode.setBounds(130, 150, 100, 24);
     	btnRaDecMode.setText("RaDec");
     	btnRaDecMode.addMouseListener(new MouseAdapter() {
     		@Override
@@ -1022,6 +1038,11 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	
     	//TODO
     	btnScan = new Button(grpScanning, SWT.NONE);
+    	btnScan.addSelectionListener(new SelectionAdapter() {
+    		@Override
+    		public void widgetSelected(SelectionEvent e) {
+    		}
+    	});
     	btnScan.setBounds(3, 175, 68, 23);
     	btnScan.setText("Scan");
     	popupWindowButtons.put("raster", btnScan);
@@ -1049,6 +1070,9 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     				break;
     			case "Square":
     				squareScan();
+    				break;
+    			case "Spin":
+    				spinScan();
     				break;
     			default:
     				btnScan.setEnabled(false);
@@ -1556,5 +1580,8 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	
 	}
 	
+	public void spinScan(){
+		stage.Spin();
+	}
 }
 

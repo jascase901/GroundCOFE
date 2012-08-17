@@ -402,6 +402,14 @@ public class Stage {
 	public boolean test(){
 		return true;
 	}
+	public void Spin(){
+		exec.submit(new Runnable(){
+			@Override
+			public void run(){
+				scope.Spin();
+			}
+		});
+	}
 	
 	public void startScanning(final ScanCommand azSc, final ScanCommand elSc, final boolean fraster) {
 		if (azSc == null && elSc == null) {
