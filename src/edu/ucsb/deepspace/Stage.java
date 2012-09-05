@@ -15,15 +15,19 @@ import edu.ucsb.deepspace.MoveCommand.MoveMode;
 import edu.ucsb.deepspace.MoveCommand.MoveType;
 import edu.ucsb.deepspace.gui.MainWindow;
 
-public class Stage {
+public class Stage implements  StageInterface {
 	
-	private static final Stage INSTANCE = new Stage();
-	public static Stage getInstance() {return INSTANCE;}
+	private static final StageInterface INSTANCE = new Stage();
+	public static StageInterface getInstance() {return INSTANCE;}
 	
 	public static enum StageTypes {
 		GALIL, FTDI;
 	}
 	private StageTypes stageType = StageTypes.GALIL;
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#getType()
+	 */
+	@Override
 	public StageTypes getType() {
 		return this.stageType;
 	}
@@ -34,10 +38,10 @@ public class Stage {
 	private int encTol = 10;
 	
 	private TelescopeInterface scope;
-
+	private String txtPosInfo;
 	private Timer raDecTracker, lstUpdater;
 	private final ExecutorService exec = Executors.newFixedThreadPool(1);
-	private MainWindow window;
+	private Ui window;
 	private boolean commStatus = false;
 	private ReaderInterface reader;
 	private boolean readerState = false;
@@ -71,13 +75,11 @@ public class Stage {
 		
 	}
 	
-	/**
-	 * Creates all the CommGalil, ActGalil, etc. objects and starts the connection. 
-	 * @param window
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#initialize(edu.ucsb.deepspace.Ui)
 	 */
-	public void initialize(MainWindow window) throws FileNotFoundException, IOException {
+	@Override
+	public void initialize(Ui window) throws FileNotFoundException, IOException {
 		this.window = window;
 		switch (stageType) {
 		case GALIL:
@@ -129,6 +131,10 @@ public class Stage {
 		double balloonAltitude = Double.parseDouble(settings.getProperty("balloonAltitude", "0"));
 		balloonLocation =  new LatLongAlt(balloonLatitude, balloonLongitude, balloonAltitude);
 	}
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#loadSafety(double, double, double, double)
+	 */
+	@Override
 	public void loadSafety(double minAz, double maxAz, double minEl, double maxEl){
 		scope.safety(minAz, maxAz, minEl, maxEl);
 		
@@ -214,18 +220,27 @@ public class Stage {
 		actSettings.load(new FileInputStream("FTDI.ini"));
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#confirmCommConnection()
+	 */
+	@Override
 	public void confirmCommConnection() {
 		commStatus = true;
 	}
 	
-	/**
-	 * Toggles the reader on or off.
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#toggleReader()
 	 */
+	@Override
 	public void toggleReader() {
 		readerState = !readerState;
 		reader.readerOnOff(readerState);
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#loadScripts()
+	 */
+	@Override
 	public void loadScripts() {
 		sl = new ScriptLoader();
 		sl.load();
@@ -233,12 +248,20 @@ public class Stage {
 		sl.close();
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#refreshScripts()
+	 */
+	@Override
 	public void refreshScripts() {
 		sl = new ScriptLoader();
 		sl.findLoaded();
 		sl.close();
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#refreshScriptWindow()
+	 */
+	@Override
 	public void refreshScriptWindow() {
 		sl = new ScriptLoader();
 		window.updateScriptArea("expected", sl.findExpected());
@@ -246,11 +269,10 @@ public class Stage {
 		sl.close();
 	}
 	
-	/**
-	 * Points to a ra dec position every amount of time specified until told to stop.
-	 * @param ra
-	 * @param dec
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#startRaDecTracking(double, double)
 	 */
+	@Override
 	public void startRaDecTracking(final double ra, final double dec) {
 		if (!motorCheck(Axis.AZ)) {
 			window.raDecTrackingButtonUpdater(true, false);
@@ -277,9 +299,10 @@ public class Stage {
 			}
 		}, 0, period);
 	}
-	/**
-	 * Stops ra dec tracking.
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#stopRaDecTracking()
 	 */
+	@Override
 	public void stopRaDecTracking() {
 		if (raDecTracker == null) return;
 		raDecTracker.cancel();
@@ -321,22 +344,19 @@ public class Stage {
 		}, 0, 1000);
 	}
 	
-	/**
-	 * updates scan command min and max using ra/dec conversions
-	 * @param sc
-	 * @param axis
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#updateScanCommand(edu.ucsb.deepspace.ScanCommand, edu.ucsb.deepspace.Axis)
 	 */
+	@Override
 	public void updateScanCommand(ScanCommand sc, Axis axis) {
 		
 	}
-	/**
-	 * Moves over a specified min and max az and el a specified or continuous number of times. 
-	 * 
-	 * @param azSc
-	 * @param elSc
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#canScan(edu.ucsb.deepspace.ScanCommand, edu.ucsb.deepspace.ScanCommand, double)
 	 */
 	
 	//TODO FIGURE OUT A WAY TO MAKE THIS PRETTY
+	@Override
 	public boolean canScan(ScanCommand azSc, ScanCommand elSc, double time){
 			
 		double axAz;
@@ -399,9 +419,17 @@ public class Stage {
 			return moveable;
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#test()
+	 */
+	@Override
 	public boolean test(){
 		return true;
 	}
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#Spin()
+	 */
+	@Override
 	public void Spin(){
 		exec.submit(new Runnable(){
 			@Override
@@ -411,6 +439,10 @@ public class Stage {
 		});
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#startScanning(edu.ucsb.deepspace.ScanCommand, edu.ucsb.deepspace.ScanCommand, boolean)
+	 */
+	@Override
 	public void startScanning(final ScanCommand azSc, final ScanCommand elSc, final boolean fraster) {
 		if (azSc == null && elSc == null) {
 			window.updateStatusArea("Fatal error.  The ScanCommands associated with Az and El are both null.\n");
@@ -493,16 +525,20 @@ public class Stage {
 			}});
 		
 	}
-	/**
-	 * Stops movement caused by scanning.
-	 * 
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#stopScanning()
 	 */
+	@Override
 	public void stopScanning() {
 		scope.stopScanning();
 	}
 	
 	
 	//TODO Can Infinate loop
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#getScanTime(edu.ucsb.deepspace.ScanCommand, edu.ucsb.deepspace.Axis)
+	 */
+	@Override
 	public double getScanTime(ScanCommand sc, Axis axis){
 		double d=0, dx =0;
 		double time = 0;
@@ -586,6 +622,10 @@ public class Stage {
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#move(edu.ucsb.deepspace.MoveCommand)
+	 */
+	@Override
 	public void move(final MoveCommand mc) {
 		exec.submit(new Runnable() {
 			public void run() {
@@ -599,10 +639,18 @@ public class Stage {
 		});
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#setVelocity(double, edu.ucsb.deepspace.Axis)
+	 */
+	@Override
 	public void setVelocity(double vel, Axis axis) {
 		scope.setVelocity(vel, axis);
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#moveRelative(java.lang.Double, edu.ucsb.deepspace.Axis, edu.ucsb.deepspace.MoveCommand.MoveType)
+	 */
+	@Override
 	public void moveRelative(Double amount, Axis axis, MoveType type) {
 		MoveCommand mc = new MoveCommand(MoveMode.RELATIVE, type, null, null);
 		
@@ -632,10 +680,10 @@ public class Stage {
 	
 	
 
-	/**
-	 * Moves an axis to its default position.
-	 * @param type of axis
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#index(edu.ucsb.deepspace.Axis)
 	 */
+	@Override
 	public void index(final Axis axis) {
 		if (scope.isIndexing(axis)) {
 			buttonEnabler("indexAz");
@@ -665,10 +713,10 @@ public class Stage {
 	
 
 
-	/**
-	 * Returns true if something is moving, false if not.
-	 * @return boolean
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#isMoving()
 	 */
+	@Override
 	public boolean isMoving() {
 		switch (stageType) {
 			case FTDI:
@@ -681,9 +729,10 @@ public class Stage {
 		}
 	}
 
-	/**
-	 * While isMoving() is true, sleeps for 100ms.
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#waitWhileExecuting(int)
 	 */
+	@Override
 	public void waitWhileExecuting(int thread) {
 		
 		while (position.isThreadEx(thread)) {
@@ -704,27 +753,29 @@ public class Stage {
 			e.printStackTrace();
 		}
 	}
-	/**
-	 * Sets Galil's min and max az value.
-	 * @param minAz
-	 * @param maxAz
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#setMinMaxAz(double, double)
 	 */
+	@Override
 	public void setMinMaxAz(double minAz, double maxAz) {
 		this.minAz = minAz;
 		this.maxAz = maxAz;
 		scope.safety(minAz, maxAz, minEl, maxEl);
 	}
-	/**
-	 * Sets Galil's min and max el value.
-	 * @param minEl
-	 * @param maxEl
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#setMinMaxEl(double, double)
 	 */
+	@Override
 	public void setMinMaxEl(double minEl, double maxEl) {
 		this.minEl = minEl;
 		this.maxEl = maxEl;
 		scope.safety(minAz, maxAz, minEl, maxEl);
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#setMaxVelAccAz(double, double)
+	 */
+	@Override
 	public void setMaxVelAccAz(double maxVelAz, double maxAccAz) {
 		this.maxVelAz = maxVelAz;
 		this.maxAccAz = maxAccAz;
@@ -732,6 +783,10 @@ public class Stage {
 		scope.setVelocity(maxVelAz, Axis.AZ);
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#setMaxVelAccEl(double, double)
+	 */
+	@Override
 	public void setMaxVelAccEl(double maxVelEl, double maxAccEl) {
 		this.maxVelEl = maxVelEl;
 		this.maxAccEl = maxAccEl;
@@ -739,68 +794,83 @@ public class Stage {
 		scope.setVelocity(maxVelEl, Axis.EL);
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#setMaxMoveRel(double, double)
+	 */
+	@Override
 	public void setMaxMoveRel(double maxMoveRelAz, double maxMoveRelEl) {
 		this.maxMoveRelAz = maxMoveRelAz;
 		this.maxMoveRelEl = maxMoveRelEl;
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#setRpm(double, double)
+	 */
+	@Override
 	public void setRpm(double azRpm, double elRpm) {
 		scope.setSpeedByRpm(azRpm, Axis.AZ);
 		scope.setSpeedByRpm(elRpm, Axis.EL);
 	}
 
-	public int getEncTol() {return encTol;}
-	/**
-	 * Sets some value of Galil, I'm not sure which.
-	 * @param encTol
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#getEncTol()
 	 */
+	@Override
+	public int getEncTol() {return encTol;}
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#setEncTol(int)
+	 */
+	@Override
 	public void setEncTol(int encTol) {
 		this.encTol = encTol;
 	}
-	/** 
-	 * Gets and updates the velocity and position of the az axis.
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#status()
 	 */
+	@Override
 	public void status() {
 		stageProtocol.initialize();
 		System.out.println(stageProtocol.sendRead("XQ #READERI"));
 		System.out.println(stageProtocol.read());
 	}
-	/**
-	 * Sends a message to Galil and prints its reply.
-	 * @param command to send
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#sendCommand(java.lang.String)
 	 */
+	@Override
 	public void sendCommand(String command) {
 		System.out.println(stageProtocol.sendRead(command));
 	}
-	/**
-	 * Gets and prints the amount of bytes waiting to be read from Galil.
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#queueSize()
 	 */
+	@Override
 	public void queueSize() {
 		System.out.println("stage protocol queue size: " + stageProtocol.queueSize());
 		System.out.println("scope protocol queue size: " + scopeProtocol.queueSize());
 		System.out.println(readerProtocol.port + " reader protocol queue size: " + readerProtocol.queueSize());
 	}
-	/**
-	 * Reads off what Galil is waiting to send.
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#readQueue()
 	 */
+	@Override
 	public void readQueue() {
 		stageProtocol.test();
 		System.out.println("--------");
 		scopeProtocol.test();
 	}
 	
-	/**
-	 * Stops the desired axis.
-	 * @param axis az or el
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#stop(edu.ucsb.deepspace.Axis)
 	 */
+	@Override
 	public void stop(Axis axis) {
 		scope.stop(axis);
 	}
 	
-	/**
-	 * Toggles the motor on or off.
-	 * @param axis az or el
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#motorToggle(edu.ucsb.deepspace.Axis)
 	 */
+	@Override
 	public void motorToggle(final Axis axis) {
 		exec.submit(new Runnable() {
 			public void run() {
@@ -826,34 +896,33 @@ public class Stage {
 		}
 	}
 
-	/**
-	 * Moves Galil to a specified coordinate.
-	 * @param c coordinate
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#goToPos(edu.ucsb.deepspace.Coordinate)
 	 */
+	@Override
 	public void goToPos(Coordinate c) {
 		moveAbsolute(c.getAz(), c.getEl());
 	}
-	/**
-	 * Sets the coordinate for ra dec tracking.
-	 * @param ra
-	 * @param dec
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#setRaDecTracking(double, double)
 	 */
+	@Override
 	public void setRaDecTracking(double ra, double dec) {
 		window.setRaDec(ra, dec);
 	}
-	/**
-	 * Sets the base location.
-	 * @param pos in latitude, longitude, and position
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#setBaseLocation(edu.ucsb.deepspace.LatLongAlt)
 	 */
+	@Override
 	public void setBaseLocation(LatLongAlt pos) {
 		baseLocation = pos;
 		calcAzElToBalloon();
 		window.updateBaseBalloonLoc();
 	}
-	/**
-	 * Sets the balloon location.
-	 * @param pos in latitude, longitude, and position
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#setBalloonLocation(edu.ucsb.deepspace.LatLongAlt)
 	 */
+	@Override
 	public void setBalloonLocation(LatLongAlt pos) {
 		balloonLocation = pos;
 		calcAzElToBalloon();
@@ -886,56 +955,57 @@ public class Stage {
 		azToBalloon = Math.toDegrees(Math.atan2(xRel, yRel));
 		if (azToBalloon < 0) azToBalloon = azToBalloon + 360;
 	}
-	/**
-	 * Returns the balloon location.
-	 * @return
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#getBalloonLocation()
 	 */
+	@Override
 	public LatLongAlt getBalloonLocation() {
 		return balloonLocation;
 	}
-	/**
-	 * Return the base location.
-	 * @return
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#getBaseLocation()
 	 */
+	@Override
 	public LatLongAlt getBaseLocation() {
 		return baseLocation;
 	}
-	/**
-	 * The string that displays the base location in the program.
-	 * @return
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#baseLocDisplay()
 	 */
+	@Override
 	public String baseLocDisplay() {
 		return "Base Location\n" + baseLocation.guiString();
 	}
-	/**
-	 * The string that displays the balloon location in the program.
-	 * @return
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#balloonLocDisplay()
 	 */
+	@Override
 	public String balloonLocDisplay() {
 		String out = "BalloonLocation\n" + balloonLocation.guiString();
 		out += "\nAz to balloon:  " + Formatters.TWO_POINTS_FORCE.format(azToBalloon) + "\n";
 		out += "El to balloon:  " + Formatters.TWO_POINTS_FORCE.format(elToBalloon);
 		return out;
 	}
-	/**
-	 * Moves Galil to the balloon position.
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#goToBalloon()
 	 */
+	@Override
 	public void goToBalloon() {
 		moveAbsolute(azToBalloon, elToBalloon);
 	}
-	/**
-	 * Sets a new coordinate as the relative (0,0).
-	 * @param c coordinate
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#calibrate(edu.ucsb.deepspace.Coordinate)
 	 */
+	@Override
 	public void calibrate(Coordinate c) {
 		scope.calibrate(c);
 		System.out.println("az: " + c.getAz());
 		System.out.println("el: " + c.getEl());
 	}
-	/**
-	 * Convenience method for enabling a method.
-	 * @param name
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#buttonEnabler(java.lang.String)
 	 */
+	@Override
 	public void buttonEnabler(String name) {
 		window.buttonEnabler(name);
 	}
@@ -961,6 +1031,7 @@ public class Stage {
 			double elAbsPos = scope.getAbsolutePos(Axis.EL);
 			info += String.format(Formatters.ACTINFO_FORMAT, "Abs Pos", azAbsPos, elAbsPos);
 		}
+		txtPosInfo = info;
 		window.updateTxtPosInfo(info);
 	}
 	
@@ -978,9 +1049,10 @@ public class Stage {
 		window.setGoalPos(Formatters.TWO_POINTS.format(deg), axis);
 	}
 	
-	/**
-	 * Closes the program and saves all settings.
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#shutdown()
 	 */
+	@Override
 	public void shutdown() {
 		exec.shutdown();
 		reader.stop2();
@@ -1001,6 +1073,10 @@ public class Stage {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#statusArea(java.lang.String)
+	 */
+	@Override
 	public void statusArea(String message) {
 		window.updateStatusArea(message);
 	}
@@ -1054,19 +1130,41 @@ public class Stage {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#getContinousScanOn()
+	 */
+	@Override
 	public Boolean getContinousScanOn() {
 		return continousScanOn;
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#setContinousScanOn(java.lang.Boolean)
+	 */
+	@Override
 	public void setContinousScanOn(Boolean continousScanOn) {
 		this.continousScanOn = continousScanOn;
 	}
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#RaOn()
+	 */
+	@Override
 	public Boolean RaOn() {
 		return raOn;
 	}
+	/* (non-Javadoc)
+	 * @see edu.ucsb.deepspace.StageInterface#setRaOn(java.lang.Boolean)
+	 */
+	@Override
 	public void setRaOn(Boolean raOn){
 		this.raOn = raOn;
 	}
+	public String getTxtPosInfo(){
+		
+		return txtPosInfo;
+	}
+	
+	
 	
 	
 

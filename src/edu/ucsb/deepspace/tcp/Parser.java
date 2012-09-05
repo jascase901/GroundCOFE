@@ -37,16 +37,13 @@ public class Parser {
 			if (c!=' ')
 				str+=c;
 		}
-		return str;	
+		return str.toLowerCase();	
 	}
 
 	
 	public String getParsed(){
-		String parsed = getScript();
-		for (String str: cmdMap.keySet()){
-			parsed = parsed.replaceAll(str, cmdMap.get(str));
-		}
-		return parsed;
+		
+		return parse(script);
 		
 	}
 	
