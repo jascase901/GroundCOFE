@@ -17,21 +17,30 @@ public class Interpereter {
 	private StageInterface stage;
 	private static final Map<String, Integer> argMap;
 	private String debugInfo;
+	private boolean isWaiting = false;
 	static {
 		Map<String, Integer> aMap = new HashMap<String, Integer>();
 		aMap.put("time", 0);
 		aMap.put("quit", 0);
 		aMap.put("spin", 0);
 		aMap.put("stop", 0);
+		aMap.put("r", 0);
 		aMap.put("tellposition", 0);
 		aMap.put("delay", 1);
 		aMap.put("send", 1);
+		aMap.put("setminaz",1);
+		aMap.put("setmaxaz", 1);
+		aMap.put("setminel", 1);
+		aMap.put("setmaxel", 1);
+		aMap.put("setazvel", 1);
+		aMap.put("setelvel", 1);
 		aMap.put("abs", 2);
 		aMap.put("rel", 2);
 		aMap.put("azscan", 4);
 		aMap.put("elscan", 4);
 		aMap.put("snake", 6);
 		aMap.put("square", 6);
+	
 
 		argMap = Collections.unmodifiableMap(aMap);
 	}
@@ -70,6 +79,7 @@ public class Interpereter {
 			break;
 		case 6:
 			str = InterperetSix(methodArray[0]);
+			break;
 		default:
 			str=" at interpereter FAIL";
 
@@ -91,6 +101,9 @@ public class Interpereter {
 			return "spinning";
 		case "stop":
 			stage.stopScanning();
+			return "Stoped";
+		case "r":
+			return "repeat";
 
 		default:
 			return "Function:" + method + " Args:";
@@ -107,6 +120,37 @@ public class Interpereter {
 		case "send":
 			stage.sendCommand(arg.toUpperCase());
 			break;
+		case "setminaz":
+			stage.setMinMaxAz(Double.parseDouble(arg), stage.getMaxAz());
+			return "min azSet to"+ arg;
+		case "setmaxaz":
+			stage.setMinMaxAz(stage.getMinAz(), Double.parseDouble(arg));
+			return "max azSet to"+ arg;
+		case "setminel":
+			stage.setMinMaxEl(Double.parseDouble(arg), stage.getMaxEl());
+			return "max minEl to"+ arg;
+		case "setmaxel":
+			stage.setMinMaxEl(stage.getMinEl(), Double.parseDouble(arg));
+			return "max minEl to"+ arg;
+		case "setazvel":
+			stage.setVelocity(Double.parseDouble(arg), Axis.AZ);
+			return "setting az speed to "+arg;
+		case "setelvel":
+			stage.setVelocity(Double.parseDouble(arg), Axis.EL);
+			return "setting el speed to "+arg;
+		case "delay":
+			setWaiting(true);
+			try {
+				Thread.sleep(Integer.parseInt(arg));
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			setWaiting(false);
+			return "done waiting for "+arg+ "miliseconds";
 		default:
 			return "Error in InterperetOne";
 		}
@@ -202,6 +246,14 @@ public class Interpereter {
 	}
 	public String getDebug(){
 		return debugInfo;
+	}
+
+	public boolean isWaiting() {
+		return isWaiting;
+	}
+
+	public void setWaiting(boolean isWaiting) {
+		this.isWaiting = isWaiting;
 	}
 
 

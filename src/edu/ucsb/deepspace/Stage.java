@@ -1163,6 +1163,18 @@ public class Stage implements  StageInterface {
 		
 		return txtPosInfo;
 	}
+	public double getMinAz(){
+		return this.minAz;
+	}
+	public double getMaxAz(){
+		return this.maxAz;
+	}
+	public double getMinEl(){
+		return this.getMinEl();
+	}
+	public double getMaxEl(){
+		return this.getMaxEl();
+	}
 	
 	
 	
