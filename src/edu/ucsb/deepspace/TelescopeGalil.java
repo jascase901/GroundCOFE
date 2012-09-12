@@ -333,8 +333,9 @@ public class TelescopeGalil implements TelescopeInterface {
 		double deltaY  = Math.abs(el_inc*deltaX);
 		double lineNums = el.absDegToEnc(elSc.getMax())/el_inc;
 		double azSpeed =  (int)lineNums*deltaX/azSc.getTime();
+		
 		double elSpeed =  (int)lineNums*deltaY/elSc.getTime();
-		System.out.println(azSpeed);
+		System.out.println("speed="+ azSpeed);
 		
 		
 	
@@ -367,13 +368,18 @@ public class TelescopeGalil implements TelescopeInterface {
 		
 		az.scanning = true;
 		el.scanning = true;
-		if (fraster){
-			protocol.sendRead("HX 0;XQ #FRASTER,0");
-			System.out.println("fraster");
+		if (stage.validateSpeed(azSpeed, Axis.AZ)){
+			if (fraster){
+				protocol.sendRead("HX 0;XQ #FRASTER,0");
+				System.out.println("fraster");
+			}
+			else{
+				protocol.sendRead("HX 0;XQ #RASTER,0");
+				System.out.println("raster");
+			}
 		}
 		else{
-			protocol.sendRead("HX 0;XQ #RASTER,0");
-			System.out.println("raster");
+			stage.statusArea("Speed out of range");
 		}
 		pause();
 		waitWhileMoving(Axis.AZ);
