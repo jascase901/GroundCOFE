@@ -1,21 +1,21 @@
 	package edu.ucsb.deepspace.gui;
 
 	import org.eclipse.swt.SWT;
-	import org.eclipse.swt.events.DisposeEvent;
-	import org.eclipse.swt.events.DisposeListener;
-	import org.eclipse.swt.events.ModifyEvent;
-	import org.eclipse.swt.events.ModifyListener;
-	import org.eclipse.swt.events.MouseAdapter;
-	import org.eclipse.swt.events.MouseEvent;
-	import org.eclipse.swt.widgets.Button;
-	import org.eclipse.swt.widgets.Display;
-	import org.eclipse.swt.widgets.Label;
-	import org.eclipse.swt.widgets.Shell;
-	import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 	import edu.ucsb.deepspace.Coordinate;
-	import edu.ucsb.deepspace.LatLongAlt;
-	import edu.ucsb.deepspace.Stage;
+import edu.ucsb.deepspace.LatLongAlt;
+import edu.ucsb.deepspace.StageInterface;
 
 	public class RaDecCalibrateWindow {
 		
@@ -30,9 +30,9 @@
 		private double az = 0, el = 0, raVal = 0, decVal = 0;
 	
 		private String type = "";
-		private final Stage stage;
+		private final StageInterface stage;
 
-		public  RaDecCalibrateWindow(boolean minsec, String type, Stage stage) {
+		public  RaDecCalibrateWindow(boolean minsec, String type, StageInterface stage) {
 			shell = new Shell(Display.getDefault(), SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.MAX);
 			shell.setSize(213, 294);
 			this.minsec = minsec;

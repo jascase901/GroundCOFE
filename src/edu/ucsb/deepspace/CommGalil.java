@@ -1,6 +1,7 @@
 package edu.ucsb.deepspace;
 
 import java.io.BufferedReader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,7 +38,10 @@ public class CommGalil implements CommInterface {
 		this.port = port;
 		try {
 			socket = new Socket();
+
 			socket.connect(new InetSocketAddress("192.168.1.241", port), 1000);
+		socket.connect(new InetSocketAddress("192.168.1.200", port), 1000);
+		
 			socket.setSoTimeout(500);
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));

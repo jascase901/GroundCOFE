@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ucsb.deepspace.Coordinate;
-import edu.ucsb.deepspace.Stage;
+import edu.ucsb.deepspace.StageInterface;
 
 public class AzElWindow {
 	
@@ -27,9 +27,9 @@ public class AzElWindow {
 
 	private boolean minsec;
 	private final String type;
-	private final Stage stage;
+	private final StageInterface stage;
 
-	public AzElWindow(boolean minsec, String type, Stage stage) {
+	public AzElWindow(boolean minsec, String type, StageInterface stage) {
 		shell = new Shell(Display.getDefault(), SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.MAX);
 		shell.setSize(213, 294);
 		this.minsec = minsec;

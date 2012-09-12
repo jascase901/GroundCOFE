@@ -40,14 +40,16 @@ import edu.ucsb.deepspace.GalilCalc;
 import edu.ucsb.deepspace.MoveCommand.MoveType;
 import edu.ucsb.deepspace.ScanCommand;
 import edu.ucsb.deepspace.Stage;
+import edu.ucsb.deepspace.StageInterface;
+import edu.ucsb.deepspace.Ui;
 
-public class MainWindow extends org.eclipse.swt.widgets.Composite {
+public class MainWindow extends org.eclipse.swt.widgets.Composite implements Ui{
 	public boolean debug = true;
 	private Axis debugAxis = Axis.AZ;
 	
 	private Shell shell;
 	private final Properties windowSettings = new Properties();
-	private Stage stage;
+	private StageInterface stage;
 	
 	private String motorOff = "Motor Off", motorOn = "Motor On";
 	private MoveType moveType = MoveType.DEGREE;
@@ -133,7 +135,7 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 	private Text txtElRpm;
 	private double lines = 10;
 
-	public MainWindow(Composite parent, int style, Stage stage, Stage.StageTypes StageTypes) {
+	public MainWindow(Composite parent, int style, StageInterface stage, Stage.StageTypes StageTypes) {
 		super(parent, style);
 		this.stage = stage;
 		this.stageType = StageTypes;
@@ -498,6 +500,11 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
     	});
     	
     	azPlus = new Button(grpJoystick, SWT.PUSH | SWT.CENTER);
+    	azPlus.addSelectionListener(new SelectionAdapter() {
+    		@Override
+    		public void widgetSelected(SelectionEvent e) {
+    		}
+    	});
     	azPlus.setBounds(79, 106, 67, 31);
     	azPlus.setText("azPlus");
     	azPlus.addMouseListener(new MouseAdapter() {
@@ -1288,13 +1295,14 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		
 	}
 	
-	public void updateTxtPosInfo(final String info) {
+	public String updateTxtPosInfo(final String info) {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				txtPosInfo.setText(info);
 			}
 		});
+		return "";
 	}
 	
 	public void updateTxtAzElRaDec(final String info) {
@@ -1408,13 +1416,14 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 		});
 	}
 	
-	public void updateStatusArea(final String message) {
+	public String updateStatusArea(final String message) {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				txtStatusArea.append(message);
 			}
 		});
+		return "";
 	}
 	
 	public boolean isDouble(String input) {
@@ -1510,12 +1519,27 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite {
 			int reps = Integer.parseInt(txtRepScan.getText());
 			//stage.startScanning(min, max, time, reps, axisType.AZ, continuousScanOn);
 			
-			ScanCommand azSc = new ScanCommand(min, max, time, reps);
-			stage.startScanning(azSc, null,false);
+			azScan(min, max, time, reps);
+			
 			
 		
 		
 	}
+	
+	public void azScan(double minAz, double maxAz, double time, int reps){
+		if (!validateScanInput(scanAzTexts)) {
+			return;
+		}
+			
+		
+		//stage.startScanning(min, max, time, reps, axisType.AZ, continuousScanOn);
+		
+		ScanCommand azSc = new ScanCommand(minAz, maxAz, time, reps);
+		stage.startScanning(azSc, null,false);
+		
+	
+	
+}
 	
 	public void elScan(){
 	
