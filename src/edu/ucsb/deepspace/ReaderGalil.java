@@ -74,4 +74,5 @@ public class ReaderGalil extends Thread implements ReaderInterface {
 			e.printStackTrace();
 		}
 	}
+	
 }

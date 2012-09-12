@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ucsb.deepspace.LatLongAlt;
-import edu.ucsb.deepspace.Stage;
+import edu.ucsb.deepspace.StageInterface;
 
 public class LatLongAltWindow {
 	private Shell shell;
@@ -28,9 +28,9 @@ public class LatLongAltWindow {
 	private boolean minsec;
 	private LatLongAlt previous;
 	private final String type;
-	private final Stage stage;
+	private final StageInterface stage;
 
-	public LatLongAltWindow(boolean minsec, String type, Stage stage) {
+	public LatLongAltWindow(boolean minsec, String type, StageInterface stage) {
 		shell = new Shell(Display.getDefault(), SWT.CLOSE | SWT.TITLE | SWT.MIN);
 		shell.setSize(228, 259);
 		this.minsec = minsec;
