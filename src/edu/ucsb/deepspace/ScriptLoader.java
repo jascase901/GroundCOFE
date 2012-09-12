@@ -188,11 +188,11 @@ raster.add("AM");
 raster.add("lineNum=10");
 raster.add("dx = maxAz  - minAz");
 raster.add("dy = (maxEl-minEl)/lineNum");
-raster.add("AC 1000");
+//raster.add("AC 1000");
 raster.add("dx = maxAz-minAz");
 raster.add("vf = 2*dx/(time)*lineNum");
 raster.add("SP vf");
-raster.add("AC _AC");
+//raster.add("AC _AC");
 raster.add("DC _AC");
 raster.add("acTime = vf/_AC");
 raster.add("acX = .5*_AC*acTime*acTime");
@@ -227,11 +227,11 @@ fraster.add("AM");
 fraster.add("lineNum=10");
 fraster.add("dx = maxAz  - minAz");
 fraster.add("dy = (maxEl-minEl)/lineNum");
-fraster.add("AC 1000");
+//fraster.add("AC 1000");
 fraster.add("dx = maxAz-minAz");
 fraster.add("vf = dx/(time)*lineNum");
 fraster.add("SP vf");
-fraster.add("AC _AC");
+//fraster.add("AC _AC");
 fraster.add("DC _AC");
 fraster.add("acTime = vf/_AC");
 fraster.add("acX = .5*_AC*acTime*acTime");
@@ -283,7 +283,7 @@ azScan.add("vf = 2*dx/(time)");
 
 azScan.add("SP vf");
 
-azScan.add("AC _ACA");
+//azScan.add("AC _ACA");
 azScan.add("DC _ACA");
 
 azScan.add("acTime = vf/_ACA");
@@ -369,6 +369,9 @@ private void safety(){
 	safety = new Script("#SAFETY", size);
 	safety.add("BL ,ElMinLim");
 	safety.add("FL ,ElMaxLim");
+	safety.add("KP 3");
+	safety.add("KI 0");
+	safety.add("KD 90");
 	safety.add("EN");
 	
 	size+=safety.size();

@@ -7,7 +7,7 @@ public class TelescopeGalil implements TelescopeInterface {
 	
 	private GalilAxis az, el;
 	private double AZ_ENC = 1000d*1024d;
-	private double EL_ENC = 4000d;
+	private double EL_ENC = 40000d;
 	
 	private String relative = "PR", absolute = "PA";
 	
