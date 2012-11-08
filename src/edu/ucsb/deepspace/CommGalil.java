@@ -51,6 +51,8 @@ public class CommGalil implements CommInterface {
 		} catch (SocketTimeoutException e) {
 			System.out.println("Could not connect to Galil.");
 			connection = false;
+			System.exit(1);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -62,9 +64,11 @@ public class CommGalil implements CommInterface {
 	 * @param message to send
 	 */
     public void send(String message) {
+    	
     	//sendCount++;
     	previousCommand = message;
-    	out.println(message);
+    	
+    		out.println(message);
     	//System.out.print(message);
     }
     /**
