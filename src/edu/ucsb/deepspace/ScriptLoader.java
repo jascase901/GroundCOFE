@@ -369,9 +369,12 @@ private void safety(){
 	safety = new Script("#SAFETY", size);
 	safety.add("BL ,ElMinLim");
 	safety.add("FL ,ElMaxLim");
-	safety.add("KP 3");
-	safety.add("KI 0");
-	safety.add("KD 90");
+	safety.add("KP 8");
+	safety.add("KI .01");
+	safety.add("KD 0");
+	safety.add("SP 10000,1000");
+	safety.add("AC 1024,1024");
+	safety.add("DC 1024, 1024");
 	safety.add("EN");
 	
 	size+=safety.size();
@@ -381,7 +384,7 @@ private void spin(){
 	spin = new Script("#SPIN", size);
 	spin.add("cont=0");
 	spin.add("SHA");
-	spin.add("JGA=1000");
+	spin.add("JGA = 5000");
 	spin.add("BGA");
 	spin.add("#SPINNY");
 	spin.add("JP #SPINNY, cont<1");

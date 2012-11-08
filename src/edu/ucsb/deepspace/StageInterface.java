@@ -257,6 +257,7 @@ public interface StageInterface {
 	public abstract double getMaxEl();
 
 	public abstract double getMinEl();
+	public abstract int getMaxVel(Axis axis);
 
 	
 

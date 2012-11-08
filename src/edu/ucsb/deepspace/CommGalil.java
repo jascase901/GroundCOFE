@@ -40,7 +40,6 @@ public class CommGalil implements CommInterface {
 			socket = new Socket();
 
 			socket.connect(new InetSocketAddress("192.168.1.241", port), 1000);
-		socket.connect(new InetSocketAddress("192.168.1.200", port), 1000);
 		
 			socket.setSoTimeout(500);
 			out = new PrintWriter(socket.getOutputStream(), true);

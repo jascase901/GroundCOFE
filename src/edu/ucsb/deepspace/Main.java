@@ -21,8 +21,8 @@ public class Main {
 		
 		Stage.StageTypes StageTypes = stage.getType();
 		Shell shell = new Shell(Display.getDefault(), SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.MAX | SWT.RESIZE);
-		ui =  new CommandLine(stage, StageTypes);
-		//ui = new MainWindow(shell, SWT.NULL, stage, StageTypes);
+		//ui =  new CommandLine(stage, StageTypes);
+		ui = new MainWindow(shell, SWT.NULL, stage, StageTypes);
 		try {
 			stage.initialize(ui);
 		

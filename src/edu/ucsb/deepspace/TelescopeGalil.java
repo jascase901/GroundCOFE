@@ -325,27 +325,29 @@ public class TelescopeGalil implements TelescopeInterface {
 	public void rasterScan(ScanCommand azSc, ScanCommand elSc, boolean fraster) {
 		//el.indexing = true;
 		int el_inc= 10;
+		int currentMaxSpeed=stage.getMaxVel(Axis.AZ);
 	
 		
 		//all lines are roughly the same distance so I only calculate the distance of the bottom ones
-		double deltaX = Math.abs((az.absDegToEnc(azSc.getMax())-az.absDegToEnc(azSc.getMin())));
+		double deltaX = Math.abs(GalilCalc.round(az.absDegToEnc(azSc.getMax()),4)-GalilCalc.round(az.absDegToEnc(azSc.getMin()),4));
 		//el_inc is basically the slope, so I can use slope formula to get y1
 		double deltaY  = Math.abs(el_inc*deltaX);
-		double lineNums = el.absDegToEnc(elSc.getMax())/el_inc;
+	/*	double lineNums = el.absDegToEnc(elSc.getMax())/el_inc;*/
+		double lineNums = 10;
 		double azSpeed =  (int)lineNums*deltaX/azSc.getTime();
+		
 		
 		double elSpeed =  (int)lineNums*deltaY/elSc.getTime();
 		System.out.println("speed="+ azSpeed);
+		System.out.println("dx ="+deltaX);
+		System.out.println("lines="+lineNums);
+		System.out.println("time="+azSc.getTime());
 		
 		
 	
 		//min az
 		
 		protocol.sendRead("minAz = "+GalilCalc.round(az.absDegToEnc(azSc.getMin()), 4));
-		System.out.println(az.absDegToEnc(azSc.getMin()));
-		System.out.println(az.absDegToEnc(azSc.getMax()));
-		System.out.println(el.absDegToEnc(elSc.getMin()));
-		System.out.println(el.absDegToEnc(elSc.getMax()));
 		pause();
 		System.out.println(el.absDegToEnc(elSc.getMax()));
 		pause();
@@ -387,6 +389,7 @@ public class TelescopeGalil implements TelescopeInterface {
 		pause();
 		az.scanning = false;
 		el.scanning = false;
+		
 		System.out.println("Min az:" + azSc.getMin() +" maxAz: "+ azSc.getMax()+" minEl:"+elSc.getMin()+" maxEl:"+elSc.getMax());
 				
 		

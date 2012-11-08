@@ -371,4 +371,10 @@ public class MockStage implements StageInterface{
 		return 0;
 	}
 
+	@Override
+	public int getMaxVel(Axis axis) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

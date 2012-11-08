@@ -1037,7 +1037,6 @@ public class MainWindow extends org.eclipse.swt.widgets.Composite implements Ui{
     		@Override
     		public void mouseDown(MouseEvent e) {
     			RaDecModeOn = !RaDecModeOn;
-    			
     			stage.setRaOn(RaDecModeOn);
     			
     		}
